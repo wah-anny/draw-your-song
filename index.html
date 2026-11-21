@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.7</title>
+<title>画出原创歌曲 v1.8</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -190,6 +190,17 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
   background:var(--rowB);border:1px solid var(--line);border-radius:8px}
 .mscroll .pad{height:1px}
 @media (pointer:coarse){.mscroll{display:block}}
+
+/* ===== v1.8 手机/iPad 竖屏 → 横版海报封面（转横屏自动消失） ===== */
+#rot{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;text-align:center;
+  background:linear-gradient(160deg,#4b45c6,#6a63e0 55%,#918aef);color:#fff;padding:34px}
+#rot .mk{font-size:14px;letter-spacing:3px;opacity:.75}
+#rot .big{font-size:36px;font-weight:800;letter-spacing:2px;margin-top:10px}
+#rot .tag{font-size:17px;font-weight:600;opacity:.95;margin-top:4px}
+#rot .hint{font-size:14px;opacity:.82;line-height:1.9;margin-top:10px}
+#rot .arrow{font-size:46px;line-height:1;margin-top:6px}
+@media (pointer:coarse) and (orientation:portrait){#rot{display:flex}}
 @media (max-width:720px){
   :root{--cw:24px;--rh:28px}
   header{padding:10px 12px 6px}
@@ -220,7 +231,7 @@ var _hmt = _hmt || [];
 <body>
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.5 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板</span>
+  <span class="sub">v1.8 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板横屏</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -299,12 +310,21 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.7 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.8 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
   <a href="https://gitee.com/draw-your-song/draw-your-song" target="_blank" rel="noopener">源码</a>
 </footer>
+
+<!-- v1.8 手机/iPad 竖屏海报：横屏后自动消失 -->
+<div id="rot">
+  <div class="mk">DRAW YOUR SONG</div>
+  <div class="big">作曲超简单，版权归你</div>
+  <div class="tag">🎹 完整画布在横屏等你</div>
+  <div class="hint">竖屏看不全画布<br>把手机横过来，就是和电脑一样的完整界面</div>
+  <div class="arrow">↻</div>
+</div>
 
 <div id="menu">
   <button data-acc="1">♯　升半音</button>
