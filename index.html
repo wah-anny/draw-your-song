@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.3</title>
+<title>画出原创歌曲 v1.7</title>
+<meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
+<meta property="og:description" content="不替你生成，帮你把脑中的旋律画下来。画格子写旋律、贴歌词，浏览器实时合成试音，导出带词乐谱和 MIDI。免费开源，草稿只存在你自己的浏览器里。">
+<meta property="og:url" content="https://draw-your-song.app.workbuddy.host/?sharecode=X7VJNMU5NF">
+<meta property="og:image" content="https://draw-your-song.app.workbuddy.host/og-cover.png?sharecode=X7VJNMU5NF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234b45c6'/%3E%3Cpath d='M12 24V9l10-2v13' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='10' cy='24' r='3' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f7f6f2; --panel:#fff; --ink:#22201c; --muted:#7a7468;
@@ -73,7 +80,7 @@ button.armed:hover{color:#fff}
   font-size:10px;color:var(--muted)}
 .labels .lab.tonic{color:var(--accent);font-weight:700}
 .scroller{overflow-x:auto;overflow-y:hidden;flex:1;position:relative;padding-bottom:4px}
-.grid{display:block;user-select:none;touch-action:pan-x}
+.grid{display:block;user-select:none;touch-action:none}
 .row{display:flex;height:var(--rh)}
 .row.alt .cell{background:var(--rowB)}
 .row .cell.tonic{background:var(--tonic)}
@@ -174,6 +181,25 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
 .site-foot a{color:#7a6f5e;text-decoration:none;border-bottom:1px dotted #c9bfae;padding-bottom:1px}
 .site-foot a:hover{color:#2f2a22;border-bottom-color:#2f2a22}
 .site-foot .dot{color:#d4cabb}
+.site-foot #lnkFeedback{display:inline-block;background:#eef0ff;border:1px solid #c9cdf5;
+  color:var(--accent);padding:4px 12px;border-radius:16px;font-weight:700;font-size:13px}
+.site-foot #lnkFeedback:hover{background:#e0e3ff;color:#3a34b0}
+
+/* ===== v1.5 手机 / 触屏适配 ===== */
+.mscroll{display:none;overflow-x:auto;overflow-y:hidden;height:28px;margin-top:6px;
+  background:var(--rowB);border:1px solid var(--line);border-radius:8px}
+.mscroll .pad{height:1px}
+@media (pointer:coarse){.mscroll{display:block}}
+@media (max-width:720px){
+  :root{--cw:24px;--rh:28px}
+  header{padding:10px 12px 6px}
+  .bar{padding:0 12px 10px}
+  .wrap{flex-direction:column;padding:0 12px 10px}
+  .left{flex:auto;width:auto}
+  .stage{padding:8px}
+  .dock{margin:0 12px 30px}
+  .site-foot{font-size:13.5px;padding:12px 10px}
+}
 .empty{color:var(--muted);text-align:center;padding:20px 0}
 </style>
 <!-- 百度统计：只统计打开次数与按钮点击，不收集任何创作内容 -->
@@ -194,7 +220,7 @@ var _hmt = _hmt || [];
 <body>
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.3 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.5 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -246,6 +272,7 @@ var _hmt = _hmt || [];
         <div id="playhead"></div>
       </div>
     </div>
+    <div class="mscroll" id="mscroll"><div class="pad"></div></div>
     <div class="transport">
       <button id="btnDraft" class="primary">💾 保存草稿</button>
       <label class="chk"><input id="metro" type="checkbox">节拍器</label>
@@ -272,7 +299,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.3 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.7 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -312,6 +339,18 @@ let pitches = [], cellMap = new Map(), undoStack = [], drag = null, breakMode = 
 
 const $ = id => document.getElementById(id);
 const gridEl = $('grid'), labelsEl = $('labels'), rulerEl = $('ruler'), scrollerEl = $('scroller');
+
+/* v1.5 触屏：画布横向滑动条（与谱面滚动双向同步） */
+(function(){
+  const ms = $('mscroll'), pad = ms.querySelector('.pad');
+  let lock = false;
+  ms.addEventListener('scroll', () => { if (lock){ lock = false; return; } scrollerEl.scrollLeft = ms.scrollLeft; });
+  scrollerEl.addEventListener('scroll', () => { if (ms.scrollLeft !== scrollerEl.scrollLeft){ lock = true; ms.scrollLeft = scrollerEl.scrollLeft; } });
+  const sync = () => { pad.style.width = gridEl.scrollWidth + 'px'; if (ms.scrollLeft !== scrollerEl.scrollLeft){ lock = true; ms.scrollLeft = scrollerEl.scrollLeft; } };
+  if (window.ResizeObserver) new ResizeObserver(sync).observe(gridEl);
+  window.addEventListener('resize', sync);
+  sync();
+})();
 
 function colsPerMeasure(){ return S.sig[0] * 16 / S.sig[1]; }
 function totalCols(){ return colsPerMeasure() * S.measures; }
