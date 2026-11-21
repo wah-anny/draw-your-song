@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.13</title>
+<title>画出原创歌曲 v1.14</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -206,8 +206,6 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
 body.rot-show header,body.rot-show #svHint,body.rot-show .bar,
 body.rot-show .wrap,body.rot-show .dock,body.rot-show .site-foot{display:none}
 body.rot-show #app{display:none}
-/* v1.13 手机「电脑版」：桌面宽度排版整体缩放，一屏可见 */
-body.desk #app{transform-origin:top left}
 @media (max-width:720px){
   :root{--cw:24px;--rh:28px}
   header{padding:10px 12px 6px}
@@ -260,6 +258,7 @@ var _hmt = _hmt || [];
       <text x="30" y="70" font-size="15" fill="#7a7468">1</text>
       <text x="30" y="107" font-size="15" fill="#7a7468">2</text>
     </svg>
+    <div class="hint">手机专用界面制作中 · 完整体验建议先用电脑打开本页</div>
     <button class="primary go" id="rotGo">开始作曲 →</button>
   </div>
 </div>
@@ -267,7 +266,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.13 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板</span>
+  <span class="sub">v1.14 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -346,7 +345,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.13 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.14 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1884,49 +1883,25 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.13 手机：点「开始作曲」= 直接进「电脑版」
-   ① 视口切到 980 宽 → 桌面排版（和电脑一样）
-   ② 再把 #app 整体缩放到「一屏可见」（按手机物理宽算比例）
-   不再尝试强制横屏/全屏：安卓 webview 转屏后视口不更新，是 v1.12 错乱的根因 */
+/* v1.14 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+   v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
-const vpMeta = document.querySelector('meta[name="viewport"]');
-const appEl = $('app');
-function setVp(land){ vpMeta.setAttribute('content', land ? 'width=980' : 'width=device-width, initial-scale=1'); }
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
-function physW(){
-  const a = screen.width || 390, b = screen.height || 780;
-  const land = window.matchMedia('(orientation:landscape)').matches || a > b;
-  return land ? Math.max(a, b) : Math.min(a, b);
-}
-function fitZoom(){
-  if (!document.body.classList.contains('desk') || !appEl) return;
-  const z = Math.max(0.3, Math.min(1, (physW() - 8) / 980));
-  appEl.style.zoom = z;
-}
-function enterDesk(){
-  document.body.classList.add('desk');
-  setVp(true);
-  fitZoom();
-  window.scrollTo(0, 0);
-}
 function rotUpdate(){
   const show = isPortrait() && window.matchMedia('(pointer:coarse)').matches && !sessionStorage.getItem('hycyg_rotok');
   rotEl.style.display = show ? 'block' : 'none';
   document.body.classList.toggle('rot-show', show);
-  fitZoom();                      // 转屏 / 改窗后按新宽度重算缩放
 }
 $('rotGo').onclick = () => {
   sessionStorage.setItem('hycyg_rotok','1');
   rotEl.style.display = 'none';
   document.body.classList.remove('rot-show');
-  enterDesk();
+  window.scrollTo(0, 0);
   track('rot','开始作曲');
 };
-/* 同一次会话里二次打开：直接进电脑版 */
-if (sessionStorage.getItem('hycyg_rotok') && window.matchMedia('(pointer:coarse)').matches) enterDesk();
 rotUpdate();
 window.addEventListener('resize', rotUpdate);
-window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); setTimeout(rotUpdate, 1500); });
+window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
 setTimeout(rotUpdate, 600);
 </script>
 </body>
