@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.8</title>
+<title>画出原创歌曲 v1.9</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -191,16 +191,16 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
 .mscroll .pad{height:1px}
 @media (pointer:coarse){.mscroll{display:block}}
 
-/* ===== v1.8 手机/iPad 竖屏 → 横版海报封面（转横屏自动消失） ===== */
-#rot{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;
-  align-items:center;justify-content:center;gap:10px;text-align:center;
-  background:linear-gradient(160deg,#4b45c6,#6a63e0 55%,#918aef);color:#fff;padding:34px}
-#rot .mk{font-size:14px;letter-spacing:3px;opacity:.75}
-#rot .big{font-size:36px;font-weight:800;letter-spacing:2px;margin-top:10px}
-#rot .tag{font-size:17px;font-weight:600;opacity:.95;margin-top:4px}
-#rot .hint{font-size:14px;opacity:.82;line-height:1.9;margin-top:10px}
-#rot .arrow{font-size:46px;line-height:1;margin-top:6px}
-@media (pointer:coarse) and (orientation:portrait){#rot{display:flex}}
+/* ===== v1.9 手机/iPad 竖屏 → 横版海报封面（显隐由 JS 判定，兼容微信内置浏览器） ===== */
+#rot{position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;text-align:center;
+  background:linear-gradient(160deg,#4b45c6,#6a63e0 55%,#918aef);color:#fff;padding:24px}
+#rot .mk{font-size:clamp(13px,3.2vw,16px);letter-spacing:3px;opacity:.75}
+#rot .big{font-size:clamp(30px,8.5vw,44px);font-weight:800;letter-spacing:2px;line-height:1.35}
+#rot .tag{font-size:clamp(16px,4.2vw,20px);font-weight:600;opacity:.95}
+#rot .hint{font-size:clamp(13px,3.4vw,16px);opacity:.82;line-height:1.9}
+#rot svg{width:min(58vw,340px);height:auto;display:block}
+#rot .arrow{font-size:clamp(34px,9vw,48px);line-height:1}
 @media (max-width:720px){
   :root{--cw:24px;--rh:28px}
   header{padding:10px 12px 6px}
@@ -231,7 +231,7 @@ var _hmt = _hmt || [];
 <body>
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.8 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板横屏</span>
+  <span class="sub">v1.9 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板横屏</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -310,18 +310,35 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.8 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.9 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
   <a href="https://gitee.com/draw-your-song/draw-your-song" target="_blank" rel="noopener">源码</a>
 </footer>
 
-<!-- v1.8 手机/iPad 竖屏海报：横屏后自动消失 -->
+<!-- v1.9 手机/iPad 竖屏海报：JS 控制显隐，转横屏自动消失 -->
 <div id="rot">
   <div class="mk">DRAW YOUR SONG</div>
   <div class="big">作曲超简单，版权归你</div>
-  <div class="tag">🎹 完整画布在横屏等你</div>
+  <div class="tag">♪ 完整画布在横屏等你</div>
+  <svg viewBox="0 0 320 150" aria-hidden="true">
+    <rect x="1" y="1" width="318" height="148" rx="10" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+    <g stroke="rgba(255,255,255,.35)" stroke-width="1">
+      <line x1="40" y1="1" x2="40" y2="149"/><line x1="80" y1="1" x2="80" y2="149"/>
+      <line x1="120" y1="1" x2="120" y2="149"/><line x1="160" y1="1" x2="160" y2="149"/>
+      <line x1="200" y1="1" x2="200" y2="149"/><line x1="240" y1="1" x2="240" y2="149"/>
+      <line x1="280" y1="1" x2="280" y2="149"/>
+      <line x1="1" y1="38" x2="319" y2="38"/><line x1="1" y1="75" x2="319" y2="75"/><line x1="1" y1="112" x2="319" y2="112"/>
+    </g>
+    <rect x="6" y="82" width="58" height="22" rx="5" fill="#fff"/>
+    <rect x="86" y="44" width="38" height="22" rx="5" fill="#fff"/>
+    <rect x="126" y="82" width="78" height="22" rx="5" fill="#ffc44d"/>
+    <rect x="206" y="44" width="38" height="22" rx="5" fill="#fff"/>
+    <rect x="246" y="120" width="58" height="22" rx="5" fill="#ffc44d"/>
+    <text x="30" y="70" font-size="15" fill="rgba(255,255,255,.85)">1</text>
+    <text x="30" y="107" font-size="15" fill="rgba(255,255,255,.85)">2</text>
+  </svg>
   <div class="hint">竖屏看不全画布<br>把手机横过来，就是和电脑一样的完整界面</div>
   <div class="arrow">↻</div>
 </div>
@@ -1850,6 +1867,18 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 })();
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
+
+/* v1.9 竖屏海报显隐：JS 判定（微信内置浏览器等对 orientation 媒体查询不可靠） */
+const rotEl = $('rot');
+function rotUpdate(){
+  const portrait = window.innerHeight > window.innerWidth * 1.05;
+  const coarse = window.matchMedia('(pointer:coarse)').matches;
+  rotEl.style.display = (portrait && coarse) ? 'flex' : 'none';
+}
+rotUpdate();
+window.addEventListener('resize', rotUpdate);
+window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
+setTimeout(rotUpdate, 600);
 </script>
 </body>
 </html>
