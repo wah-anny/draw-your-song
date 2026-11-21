@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.12</title>
+<title>画出原创歌曲 v1.13</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -205,6 +205,9 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
 /* v1.11 海报显示时隐藏页面其余内容，只留干净一张卡 */
 body.rot-show header,body.rot-show #svHint,body.rot-show .bar,
 body.rot-show .wrap,body.rot-show .dock,body.rot-show .site-foot{display:none}
+body.rot-show #app{display:none}
+/* v1.13 手机「电脑版」：桌面宽度排版整体缩放，一屏可见 */
+body.desk #app{transform-origin:top left}
 @media (max-width:720px){
   :root{--cw:24px;--rh:28px}
   header{padding:10px 12px 6px}
@@ -261,9 +264,10 @@ var _hmt = _hmt || [];
   </div>
 </div>
 
+<div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.12 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板横屏</span>
+  <span class="sub">v1.13 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 支持手机平板</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -342,12 +346,13 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.12 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.13 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
   <a href="https://gitee.com/draw-your-song/draw-your-song" target="_blank" rel="noopener">源码</a>
 </footer>
+</div>
 
 <div id="menu">
   <button data-acc="1">♯　升半音</button>
@@ -1879,52 +1884,49 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.11 竖屏海报：页首浅色卡。①显示时藏起页面其余内容（干净） ②点「开始作曲」若仍竖屏，
-   把视口切到桌面宽度 980——界面立即变成横版排列（自动缩放），转过来手机后自动恢复 device-width */
+/* v1.13 手机：点「开始作曲」= 直接进「电脑版」
+   ① 视口切到 980 宽 → 桌面排版（和电脑一样）
+   ② 再把 #app 整体缩放到「一屏可见」（按手机物理宽算比例）
+   不再尝试强制横屏/全屏：安卓 webview 转屏后视口不更新，是 v1.12 错乱的根因 */
 const rotEl = $('rot');
 const vpMeta = document.querySelector('meta[name="viewport"]');
-const VP_NORMAL = 'width=device-width, initial-scale=1';
-function setVp(mode){ vpMeta.setAttribute('content', mode === 'land' ? 'width=980' : VP_NORMAL); }
+const appEl = $('app');
+function setVp(land){ vpMeta.setAttribute('content', land ? 'width=980' : 'width=device-width, initial-scale=1'); }
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
+function physW(){
+  const a = screen.width || 390, b = screen.height || 780;
+  const land = window.matchMedia('(orientation:landscape)').matches || a > b;
+  return land ? Math.max(a, b) : Math.min(a, b);
+}
+function fitZoom(){
+  if (!document.body.classList.contains('desk') || !appEl) return;
+  const z = Math.max(0.3, Math.min(1, (physW() - 8) / 980));
+  appEl.style.zoom = z;
+}
+function enterDesk(){
+  document.body.classList.add('desk');
+  setVp(true);
+  fitZoom();
+  window.scrollTo(0, 0);
+}
 function rotUpdate(){
   const show = isPortrait() && window.matchMedia('(pointer:coarse)').matches && !sessionStorage.getItem('hycyg_rotok');
   rotEl.style.display = show ? 'block' : 'none';
   document.body.classList.toggle('rot-show', show);
-  if (!isPortrait() && document.body.classList.contains('rot-land')) {
-    document.body.classList.remove('rot-land');
-    setVp('normal');            // 已转横屏 → 恢复原生态视口
-  }
+  fitZoom();                      // 转屏 / 改窗后按新宽度重算缩放
 }
-$('rotGo').onclick = async () => {
+$('rotGo').onclick = () => {
   sessionStorage.setItem('hycyg_rotok','1');
   rotEl.style.display = 'none';
   document.body.classList.remove('rot-show');
+  enterDesk();
   track('rot','开始作曲');
-  /* 安卓浏览器（含微信内置）：全屏 + 方向锁定 = 真强制横屏；iOS 不支持 → 走 980 宽兜底 */
-  try{
-    const el = document.documentElement;
-    if (el.requestFullscreen) await el.requestFullscreen();
-    if (screen.orientation && screen.orientation.lock){
-      await screen.orientation.lock('landscape');
-      setVp('normal');                    // 已真横屏 → 原生视口铺满
-      return;
-    }
-  }catch(e){ /* 锁不上就兜底 */ }
-  if (isPortrait()){                      // 兜底：仍竖着拿 → 按桌面宽度渲染 = 横版排列
-    document.body.classList.add('rot-land');
-    setVp('land');
-    window.scrollTo(0,0);
-  }
 };
-/* 退出全屏时释放方向锁，把旋转权还给用户 */
-document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement){
-    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
-  }
-});
+/* 同一次会话里二次打开：直接进电脑版 */
+if (sessionStorage.getItem('hycyg_rotok') && window.matchMedia('(pointer:coarse)').matches) enterDesk();
 rotUpdate();
 window.addEventListener('resize', rotUpdate);
-window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
+window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); setTimeout(rotUpdate, 1500); });
 setTimeout(rotUpdate, 600);
 </script>
 </body>
