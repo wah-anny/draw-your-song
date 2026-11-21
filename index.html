@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>画出原创歌曲 v1.3</title>
+<style>
+:root{
+  --bg:#f7f6f2; --panel:#fff; --ink:#22201c; --muted:#7a7468;
+  --line:#e2ddd2; --line2:#cfc8ba; --accent:#4b45c6; --note:#5b53d6;
+  --rowA:#fbfaf6; --rowB:#f2efe6; --tonic:#e2dcf6; --sel:#d97706;
+  --cw:14px; --rh:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;font-size:13px}
+header{display:flex;align-items:baseline;gap:12px;padding:14px 18px 10px}
+h1{font-size:16px;font-weight:600;margin:0;letter-spacing:.5px}
+header .sub{color:var(--muted);font-size:12px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 18px 12px}
+.field{display:flex;align-items:center;gap:6px;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:5px 9px}
+.field label{color:var(--muted);font-size:12px}
+select,input[type=number],input[type=text]{font-family:inherit;font-size:13px;color:var(--ink);
+  border:1px solid var(--line2);border-radius:6px;background:#fff;padding:3px 6px;outline:none}
+select:focus,input:focus{border-color:var(--accent)}
+button{font-family:inherit;font-size:13px;border:1px solid var(--line2);background:#fff;
+  color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button.primary:hover{opacity:.9;color:#fff}
+button.big{font-size:15px;padding:9px 26px;border-radius:10px}
+button.on{background:#efedfb;border-color:var(--accent);color:var(--accent)}
+button.mini{padding:3px 9px;font-size:12px}
+button.armed{background:#a33;border-color:#a33;color:#fff}
+button.armed:hover{color:#fff}
+.wrap{display:flex;gap:14px;padding:0 18px 14px;align-items:flex-start}
+.left{flex:0 0 250px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
+.card h2{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 8px;letter-spacing:.5px}
+#lyrics{width:100%;min-height:430px;resize:vertical;border:1px solid var(--line2);
+  border-radius:8px;padding:8px;font-family:inherit;font-size:13px;line-height:1.7;
+  color:var(--ink);outline:none;background:#fffdf8}
+#lyrics:focus{border-color:var(--accent)}
+.hint{color:var(--muted);font-size:11px;line-height:1.7;margin-top:6px}
+.hint b{color:var(--ink)}
+.stat{font-size:11px;color:var(--muted);line-height:1.7;margin-top:6px;min-height:16px}
+.stat b{color:var(--ink);font-weight:600}
+.stat .warn{color:#a33}
+
+/* 音色三选（可多选，最多三个同时响） */
+.timb{display:flex;align-items:center;gap:5px;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:4px 7px 4px 9px}
+.timb label{color:var(--muted);font-size:12px}
+.tbtn{padding:4px 10px;font-size:12px;border-radius:6px;background:#fff}
+.tbtn.on{background:#efedfb;border-color:var(--accent);color:var(--accent);font-weight:600}
+
+/* 使用方法弹窗 */
+.guide h4{font-size:12px;margin:16px 0 6px;color:var(--accent);letter-spacing:.5px}
+.guide h4:first-child{margin-top:0}
+.guide ul{margin:0;padding-left:18px;line-height:1.9;color:#3d3830}
+.guide li{margin:3px 0}
+.guide b{color:var(--ink)}
+.guide .kv{color:var(--muted)}
+.stage{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:10px 10px 8px}
+.ruler{display:flex;margin-left:38px;height:22px}
+.ruler .m{flex:0 0 auto;border-left:2px solid var(--line2);color:var(--muted);
+  font-size:10px;padding-left:4px;line-height:20px;white-space:nowrap;overflow:hidden}
+.gridwrap{display:flex;margin-top:2px}
+.labels{flex:0 0 38px}
+.labels .lab{height:var(--rh);line-height:var(--rh);text-align:right;padding-right:6px;
+  font-size:10px;color:var(--muted)}
+.labels .lab.tonic{color:var(--accent);font-weight:700}
+.scroller{overflow-x:auto;overflow-y:hidden;flex:1;position:relative;padding-bottom:4px}
+.grid{display:block;user-select:none;touch-action:pan-x}
+.row{display:flex;height:var(--rh)}
+.row.alt .cell{background:var(--rowB)}
+.row .cell.tonic{background:var(--tonic)}
+.cell{width:var(--cw);height:var(--rh);flex:0 0 var(--cw);
+  border-right:1px solid #eeeade;border-bottom:1px solid #f0ece2;
+  position:relative;cursor:crosshair}
+.cell.beat{border-left:1px solid #d9d3c6}
+.cell.barln{border-left:2px solid #b9b1a0}
+.row .cell.on, .row.alt .cell.on, .row .cell.tonic.on{
+  background:var(--note);
+  border-right-color:var(--note);border-bottom-color:var(--note)}
+.row .cell.on.beat,.row.alt .cell.on.beat,
+.row .cell.on.barln,.row.alt .cell.on.barln{border-left-color:var(--note)}
+.cell.runstart{border-top-left-radius:4px;border-bottom-left-radius:4px}
+.cell.runend{border-top-right-radius:4px;border-bottom-right-radius:4px}
+.cell.brk::before{content:'';position:absolute;left:-1px;top:2px;bottom:2px;width:2px;
+  background:#fff;opacity:.9;z-index:1}
+.cell .ly{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;pointer-events:none;z-index:2;
+  text-shadow:0 1px 2px rgba(20,15,60,.55)}
+.cell .acc{position:absolute;top:-3px;right:0;font-size:9px;color:#fff;
+  pointer-events:none;z-index:2;text-shadow:0 1px 2px rgba(20,15,60,.6)}
+.cell.playing{outline:2px solid var(--sel);outline-offset:-1px;z-index:3}
+#playhead{position:absolute;top:0;width:var(--cw);background:rgba(75,69,198,.18);
+  border-left:1px solid var(--accent);pointer-events:none;display:none;z-index:1}
+#menu{position:fixed;display:none;background:#fff;border:1px solid var(--line2);
+  border-radius:8px;padding:4px;z-index:50;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+#menu button{display:block;width:100%;text-align:left;border:none;padding:5px 12px;
+  border-radius:5px;font-size:12px}
+#menu button:hover{background:#f2f0fb;color:var(--accent)}
+.transport{display:flex;gap:8px;align-items:center;margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--line);flex-wrap:wrap}
+.transport .sp{flex:1}
+label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:12px;cursor:pointer}
+#tip{transition:color .2s}
+#tip.flash{color:var(--accent);font-weight:600}
+#overlay{position:fixed;inset:0;background:rgba(30,28,40,.45);display:none;z-index:90;
+  align-items:center;justify-content:center}
+#overlay.show{display:flex}
+#exbox{background:#fff;border-radius:12px;width:min(560px,94vw);max-height:88vh;
+  display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+#exbox .hd{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+#exbox .hd h3{margin:0;font-size:14px}
+#exbox .hd .sp{flex:1}
+#exbody{padding:14px 16px;overflow-y:auto;font-size:12px}
+#exbody .row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+#nameInput{width:100%;font-size:14px;padding:8px 10px;border:1px solid var(--line2);
+  border-radius:8px;outline:none}
+
+/* ===== 草稿区：常驻页面下方，不再弹窗 ===== */
+.dock{margin:0 18px 40px;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px 6px}
+.dock .dk-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.dock .dk-h h2{font-size:13px;font-weight:600;margin:0}
+.dock .dk-h .cnt{color:var(--muted);font-size:12px}
+.dock .dk-h .sp{flex:1}
+.dock .dk-h .hint{margin:0}
+.dcraft{border-top:1px solid var(--line)}
+.dcraft:first-child{border-top:0}
+.dline{display:flex;align-items:center;gap:8px;padding:7px 2px}
+.dline .dname{font-weight:600;color:var(--accent);cursor:pointer;font-size:13px;line-height:1.3}
+.dline .dname:hover{text-decoration:underline}
+.dline .dmeta{color:var(--muted);font-size:11px}
+.dline .dmeta .wn{color:#b45309}
+.dline .sp{flex:1}
+.dline .del{color:#a33;border-color:#e3c8c8}
+.dline .del:hover{background:#fdeeee;border-color:#a33;color:#a33}
+.dline .del.armed{background:#a33;border-color:#a33;color:#fff}
+.cur-tag{font-size:10px;color:#0f6e56;background:#e1f5ee;border-radius:4px;
+  padding:1px 5px;white-space:nowrap}
+.dcraft .jp{display:none;background:#fbf9f2;border:1px solid var(--line);
+  border-radius:8px;padding:10px 12px;margin:2px 0 10px;max-height:340px;overflow:auto}
+.dcraft.open .jp{display:block}
+
+/* 真简谱 */
+.jpscore{font-family:"Songti SC","SimSun",serif;color:#2f2a22;user-select:text}
+.jphead{font-size:11px;color:#8a7d63;margin-bottom:8px;letter-spacing:.3px}
+.jprow{display:flex;flex-wrap:nowrap;align-items:flex-start;padding:6px 0 2px;border-bottom:1px dashed #e6dfcc;overflow-x:auto}
+.jprow:last-child{border-bottom:0}
+.jpbar{color:#b5a98f;font-size:13px;width:12px;text-align:center;line-height:60px;height:60px;flex:0 0 auto}
+.jp-t{display:inline-flex;flex-direction:column;align-items:center;width:30px;line-height:1;flex:0 0 auto}
+.jp-dots{height:9px;font-size:9px;color:#2f2a22;letter-spacing:1px}
+.jp-digit{font-family:"Times New Roman","Songti SC",SimSun,serif;font-size:18px;line-height:19px;
+  padding:0 1px;white-space:nowrap;letter-spacing:.5px}
+.jp-gap{display:block;height:8px;width:100%}
+.jp-l{font-size:12px;color:#4a4338;height:15px;line-height:15px;width:100%;text-align:center;white-space:nowrap}
+.jp-grp{display:inline-flex;align-items:flex-start;flex:0 0 auto;
+  background-image:linear-gradient(#2f2a22,#2f2a22);background-size:calc(100% - 14px) 1.4px;
+  background-position:7px 37px;background-repeat:no-repeat}
+.jp-b2{background-image:linear-gradient(#2f2a22,#2f2a22);background-size:calc(100% - 18px) 1.4px;
+  background-position:9px 41.5px;background-repeat:no-repeat}
+.jp-dash{font-family:"Times New Roman",SimSun,serif;font-size:16px;color:#2f2a22;width:24px;
+  text-align:center;line-height:19px;padding-top:17px;height:60px;flex:0 0 auto}
+.jp-skip{font-size:11px;color:#a99;padding:0 6px;align-self:center;flex:0 0 auto}
+.jpnote{font-size:10.5px;color:#a29580;margin-top:8px;line-height:1.6}
+.site-foot{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;justify-content:center;
+  padding:16px 18px 26px;font-size:11.5px;color:#a29580;border-top:1px dashed var(--line2);margin-top:16px}
+.site-foot a{color:#7a6f5e;text-decoration:none;border-bottom:1px dotted #c9bfae;padding-bottom:1px}
+.site-foot a:hover{color:#2f2a22;border-bottom-color:#2f2a22}
+.site-foot .dot{color:#d4cabb}
+.empty{color:var(--muted);text-align:center;padding:20px 0}
+</style>
+<!-- 百度统计：只统计打开次数与按钮点击，不收集任何创作内容 -->
+<script>
+/* 匿名埋点：只记事件名，不记任何创作内容；统计脚本被拦截时静默跳过 */
+function track(cat, act, label){
+  try { if (window._hmt) _hmt.push(['_trackEvent', cat, act, label == null ? '' : String(label)]); } catch(e){}
+}
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?56e1596c13377b27aa2766b1fa9ae5ee";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</head>
+<body>
+<header>
+  <h1>画出原创歌曲</h1>
+  <span class="sub">v1.3 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+</header>
+
+<div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
+
+<div class="bar">
+  <div class="field"><label>调式</label>
+    <select id="root"></select>
+    <select id="mode"><option value="minor">小调</option><option value="major">大调</option></select>
+  </div>
+  <div class="field"><label>速度</label><input id="bpm" type="number" min="40" max="200" step="1" value="66"><span style="color:var(--muted);font-size:12px">BPM</span></div>
+  <div class="field"><label>拍号</label>
+    <select id="sig">
+      <option value="4/4">4/4</option><option value="3/4">3/4</option>
+      <option value="2/4">2/4</option><option value="6/8">6/8</option>
+    </select>
+  </div>
+  <div class="field"><label>小节</label><input id="measures" type="number" min="2" max="128" step="1" value="16"></div>
+  <div class="field"><label>格子</label>
+    <select id="zoom">
+      <option value="14">标准</option>
+      <option value="18">大</option>
+      <option value="22">特大</option>
+    </select>
+  </div>
+  <button id="btnPlay" class="primary big" title="一个键：开始播放；正在放的时候再按一次＝停止">▶ 播放</button>
+  <div class="timb" title="可多选：最多三个同时响，叠起来听更接近成品"><label>音色</label>
+    <button class="tbtn on" id="tPiano">钢琴</button>
+    <button class="tbtn" id="tStrings">弦乐</button>
+    <button class="tbtn" id="tFlute">笛子</button>
+  </div>
+  <button id="btnHelp" class="primary big" style="margin-left:auto" title="第一次来一定点这里，一分钟就会用">使用方法</button>
+</div>
+
+<div class="wrap">
+  <aside class="left">
+    <div class="card">
+      <h2>歌词（整段粘贴即可）</h2>
+      <textarea id="lyrics" placeholder="整段歌词粘贴到这里，标点自动忽略"></textarea>
+      <div class="stat" id="stat"></div>
+    </div>
+  </aside>
+
+  <section class="stage">
+    <div class="ruler" id="ruler"></div>
+    <div class="gridwrap">
+      <div class="labels" id="labels"></div>
+      <div class="scroller" id="scroller">
+        <div class="grid" id="grid"></div>
+        <div id="playhead"></div>
+      </div>
+    </div>
+    <div class="transport">
+      <button id="btnDraft" class="primary">💾 保存草稿</button>
+      <label class="chk"><input id="metro" type="checkbox">节拍器</label>
+      <button id="btnBreak" class="mini">断音笔</button>
+      <button id="btnUndo" class="mini">撤销</button>
+      <button id="btnClear" class="mini">清空</button>
+      <span class="sp"></span>
+      <span class="hint" id="tip">点下面的草稿名字＝放回画布并展开简谱，再按 ▶ 播放 就是这一稿的声音。</span>
+    </div>
+  </section>
+</div>
+
+<section class="dock">
+  <div class="dk-h">
+    <h2>我的草稿</h2>
+    <span class="cnt" id="dockCount"></span>
+    <span class="sp"></span>
+    <button class="mini" id="btnBackup" title="把全部草稿和当前画面存成一个备份文件（换浏览器、换网址、换电脑都能搬过去）">⇩ 备份全部</button>
+    <button class="mini" id="btnRestore" title="从备份文件把草稿导进来">⇧ 导入备份</button>
+    <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
+  </div>
+  <div class="hint" style="margin:0 0 6px">点名字＝放回画布＋展开简谱（数字正对着它唱的那个字）；⬇ 乐谱＝带词的 .musicxml；MIDI＝只带音</div>
+  <div id="draftList"></div>
+</section>
+
+<footer class="site-foot">
+  <span>画出原创歌曲 v1.3 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span class="dot">·</span>
+  <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
+  <span class="dot">·</span>
+  <a href="https://gitee.com/draw-your-song/draw-your-song" target="_blank" rel="noopener">源码</a>
+</footer>
+
+<div id="menu">
+  <button data-acc="1">♯　升半音</button>
+  <button data-acc="-1">♭　降半音</button>
+  <button data-acc="0">♮　还原</button>
+</div>
+
+<div id="overlay">
+  <div id="exbox">
+    <div class="hd">
+      <h3 id="extitle">导出</h3>
+      <span class="sp"></span>
+      <button class="mini" id="exclose">关闭</button>
+    </div>
+    <div id="exbody"></div>
+  </div>
+</div>
+
+<script>
+let CELL_W = 14, ROW_H = 20;
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const MAJOR = [0,2,4,5,7,9,11];
+const MINOR = [0,2,3,5,7,8,10];
+const SOLFEGE = ['1','2','3','4','5','6','7'];
+const ACC_MARK = { '1':'♯', '-1':'♭' };
+
+const S = {
+  root: 9, mode: 'minor', bpm: 66, sig: [4,4], measures: 16,
+  cells: new Set(), breaks: new Set(), accs: {}, lyricsText: ''
+};
+let pitches = [], cellMap = new Map(), undoStack = [], drag = null, breakMode = false;
+
+const $ = id => document.getElementById(id);
+const gridEl = $('grid'), labelsEl = $('labels'), rulerEl = $('ruler'), scrollerEl = $('scroller');
+
+function colsPerMeasure(){ return S.sig[0] * 16 / S.sig[1]; }
+function totalCols(){ return colsPerMeasure() * S.measures; }
+function beatCols(){ return 16 / S.sig[1]; }
+
+function buildPitchesArr(root, mode){
+  const sc = mode === 'major' ? MAJOR : MINOR;
+  const arr = [];
+  for (const oct of [0,1,2]) for (let d=0; d<7; d++){
+    arr.push({ midi: 48 + root + oct*12 + sc[d], degree: d, oct });
+  }
+  arr.push({ midi: 48 + root + 36, degree: 0, oct: 3 });
+  return arr.reverse();
+}
+function buildPitches(){ pitches = buildPitchesArr(S.root, S.mode); return pitches; }
+
+function labelFor(p){
+  const mark = p.oct === 0 ? ',' : (p.oct === 1 ? '' : "'");
+  return SOLFEGE[p.degree] + mark;
+}
+
+function snapshot(){
+  return { cells: new Set(S.cells), breaks: new Set(S.breaks), accs: Object.assign({}, S.accs) };
+}
+function restore(s){
+  S.cells = new Set(s.cells); S.breaks = new Set(s.breaks); S.accs = Object.assign({}, s.accs);
+}
+
+function rebuild(){
+  buildPitches();
+  cellMap.clear();
+  gridEl.innerHTML = '';
+  labelsEl.innerHTML = '';
+  rulerEl.innerHTML = '';
+
+  const cpm = colsPerMeasure(), tc = totalCols(), bc = beatCols();
+
+  for (let m=0; m<S.measures; m++){
+    const d = document.createElement('div');
+    d.className = 'm';
+    d.style.width = (cpm * CELL_W) + 'px';
+    d.textContent = m + 1 + (m === 0 ? '  ' + S.sig[0] + '/' + S.sig[1] : '');
+    rulerEl.appendChild(d);
+  }
+
+  pitches.forEach((p, r) => {
+    const lab = document.createElement('div');
+    lab.className = 'lab' + (p.degree === 0 ? ' tonic' : '');
+    lab.textContent = labelFor(p);
+    labelsEl.appendChild(lab);
+
+    const row = document.createElement('div');
+    row.className = 'row' + (r % 2 ? ' alt' : '');
+    for (let c=0; c<tc; c++){
+      const cell = document.createElement('div');
+      let cls = 'cell';
+      if (c % cpm === 0) cls += ' barln';
+      else if (c % bc === 0) cls += ' beat';
+      if (p.degree === 0) cls += ' tonic';
+      cell.className = cls;
+      cell.dataset.r = r; cell.dataset.c = c;
+      if (S.cells.has(r + ':' + c)) cell.classList.add('on');
+      row.appendChild(cell);
+      cellMap.set(r + ':' + c, cell);
+    }
+    gridEl.appendChild(row);
+  });
+
+  $('playhead').style.height = (pitches.length * ROW_H) + 'px';
+  updateRuns();
+  renderDecor();
+  updateStat();
+}
+
+function paint(cell, r, c){
+  const k = r + ':' + c;
+  if (drag === 'erase') S.cells.delete(k);
+  else S.cells.add(k);
+}
+
+function toggleBreak(r, c){
+  const k = r + ':' + c;
+  if (!S.cells.has(k)) return;
+  if (!S.cells.has(r + ':' + (c-1))) { flashTip('这里前面没有同音，断不开'); return; }
+  if (S.breaks.has(k)) S.breaks.delete(k); else S.breaks.add(k);
+  updateRuns(); renderDecor(); updateStat(); saveLocal();
+}
+
+gridEl.addEventListener('pointerdown', e => {
+  const cell = e.target.closest('.cell');
+  if (!cell) return;
+  const r = +cell.dataset.r, c = +cell.dataset.c;
+  undoStack.push(snapshot());
+  if (undoStack.length > 60) undoStack.shift();
+  if (breakMode || e.altKey){
+    toggleBreak(r, c);
+    return;
+  }
+  drag = S.cells.has(r + ':' + c) ? 'erase' : 'paint';
+  paint(cell, r, c);
+  if (drag === 'paint') blip(pitches[r].midi + (S.accs[r + ':' + c] || 0));
+  gridEl.setPointerCapture(e.pointerId);
+});
+
+gridEl.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const cell = el && el.closest ? el.closest('.cell') : null;
+  if (!cell) return;
+  const r = +cell.dataset.r, c = +cell.dataset.c, k = r + ':' + c;
+  if (drag === 'paint' && S.cells.has(k)) return;
+  if (drag === 'erase' && !S.cells.has(k)) return;
+  paint(cell, r, c);
+  if (drag === 'paint') blip(pitches[r].midi + (S.accs[k] || 0));
+});
+
+function endDrag(){
+  if (!drag) return;
+  drag = null;
+  updateRuns(); renderDecor(); updateStat();
+  let maxCol = -1;
+  S.cells.forEach(k => { const c = +k.split(':')[1]; if (c > maxCol) maxCol = c; });
+  if (maxCol >= totalCols() - 4){ S.measures += 4; $('measures').value = S.measures; rebuild(); }
+  saveLocal();
+}
+gridEl.addEventListener('pointerup', endDrag);
+gridEl.addEventListener('pointercancel', endDrag);
+
+gridEl.addEventListener('contextmenu', e => {
+  const cell = e.target.closest('.cell');
+  if (!cell) return;
+  e.preventDefault();
+  const r = +cell.dataset.r, c = +cell.dataset.c, k = r + ':' + c;
+  if (!S.cells.has(k)) { flashTip('先画上音符，再右键加升降号'); return; }
+  let s = c;
+  while (S.cells.has(r + ':' + (s-1)) && !S.breaks.has(r + ':' + s)) s--;
+  const menu = $('menu');
+  menu.dataset.target = r + ':' + s;
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 130) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 120) + 'px';
+  menu.style.display = 'block';
+});
+
+$('menu').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const key = $('menu').dataset.target;
+  const v = +b.dataset.acc;
+  undoStack.push(snapshot());
+  if (v === 0) delete S.accs[key]; else S.accs[key] = v;
+  $('menu').style.display = 'none';
+  updateRuns(); renderDecor(); updateStat(); saveLocal();
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#menu')) $('menu').style.display = 'none';
+});
+
+function updateRuns(){
+  cellMap.forEach(cell => cell.classList.remove('runstart','runend','brk','on'));
+  S.cells.forEach(k => {
+    const [r, c] = k.split(':').map(Number);
+    const cell = cellMap.get(k);
+    if (!cell) return;
+    cell.classList.add('on');
+    const left = S.cells.has(r + ':' + (c-1)) && !S.breaks.has(r + ':' + c);
+    const right = S.cells.has(r + ':' + (c+1)) && !S.breaks.has(r + ':' + (c+1));
+    if (!left) cell.classList.add('runstart');
+    if (!right) cell.classList.add('runend');
+    if (S.breaks.has(r + ':' + c)) cell.classList.add('brk');
+  });
+}
+
+function notesFrom(cells, breaks, accs, pitchesArr){
+  const byRow = new Map();
+  cells.forEach(k => {
+    const [r, c] = k.split(':').map(Number);
+    if (!byRow.has(r)) byRow.set(r, []);
+    byRow.get(r).push(c);
+  });
+  const notes = [];
+  byRow.forEach((cols, r) => {
+    cols.sort((a,b) => a-b);
+    let start = cols[0], prev = cols[0];
+    for (let i=1; i<=cols.length; i++){
+      const c = cols[i];
+      const cont = c === prev + 1 && !breaks.has(r + ':' + c);
+      if (cont){ prev = c; continue; }
+      const acc = accs[r + ':' + start] || 0;
+      notes.push({ row: r, col: start, len: prev - start + 1,
+                   midi: pitchesArr[r].midi + acc, acc });
+      start = c; prev = c;
+    }
+  });
+  return notes;
+}
+function computeNotes(){ return notesFrom(S.cells, S.breaks, S.accs, pitches); }
+
+function cleanChars(s){
+  return (s || '').replace(/[^\u4e00-\u9fa5\u3040-\u30ffA-Za-z0-9]/g, '');
+}
+
+function charStream(){
+  return cleanChars(S.lyricsText).split('');
+}
+
+function renderDecor(){
+  cellMap.forEach(cell => {
+    const ly = cell.querySelector('.ly'); if (ly) ly.remove();
+    const ac = cell.querySelector('.acc'); if (ac) ac.remove();
+  });
+  const notes = computeNotes().sort((a,b) => a.col - b.col || a.row - b.row);
+  const chars = charStream();
+
+  notes.forEach((n, i) => {
+    const cell = cellMap.get(n.row + ':' + n.col);
+    if (!cell) return;
+    if (chars[i]){
+      const s = document.createElement('span');
+      s.className = 'ly'; s.textContent = chars[i];
+      cell.appendChild(s);
+    }
+    if (n.acc){
+      const a = document.createElement('span');
+      a.className = 'acc'; a.textContent = ACC_MARK[n.acc] || '';
+      cell.appendChild(a);
+    }
+  });
+}
+
+function updateStat(){
+  const notes = computeNotes();
+  const chars = charStream();
+  if (!notes.length && !chars.length){ $('stat').innerHTML = ''; return; }
+  let html = `${notes.length} 个音 · ${chars.length} 个字`;
+  if (chars.length > notes.length)
+    html += ` <span class="warn">· 有 ${chars.length - notes.length} 个字没有音可唱</span>`;
+  $('stat').innerHTML = html;
+}
+
+$('lyrics').addEventListener('input', () => {
+  S.lyricsText = $('lyrics').value;
+  renderDecor(); updateStat(); saveLocal();
+});
+
+$('btnBreak').onclick = () => {
+  breakMode = !breakMode;
+  $('btnBreak').classList.toggle('on', breakMode);
+  flashTip(breakMode ? '断音笔已亮：点在同音长音的后半截，切开成两个字' : '已回到画笔');
+};
+
+$('btnUndo').onclick = () => {
+  if (!undoStack.length) return;
+  restore(undoStack.pop());
+  updateRuns(); renderDecor(); updateStat(); saveLocal();
+};
+
+/* 两步确认（预览沙箱会拦截 confirm 弹窗，改用按钮二次点击） */
+function armConfirm(btn, armedText, fn){
+  if (btn.dataset.armed){
+    disarm(btn); fn();
+  } else {
+    btn.dataset.armed = '1'; btn.dataset.orig = btn.textContent;
+    btn.textContent = armedText; btn.classList.add('armed');
+    setTimeout(() => disarm(btn), 3000);
+  }
+  function disarm(b){
+    delete b.dataset.armed;
+    if (b.dataset.orig){ b.textContent = b.dataset.orig; delete b.dataset.orig; }
+    b.classList.remove('armed');
+  }
+}
+
+$('btnClear').onclick = function(){
+  if (!S.cells.size) { flashTip('画布已经是空的'); return; }
+  armConfirm(this, '⚠ 再点一次确认清空', () => {
+    undoStack.push(snapshot());
+    S.cells.clear(); S.breaks.clear(); S.accs = {};
+    updateRuns(); renderDecor(); updateStat(); saveLocal();
+    flashTip('已清空（撤销可找回）');
+  });
+};
+
+/* ================= 音色引擎 =================
+   纯 Web Audio 程序化合成，零外部文件、零下载、开源可分发。
+   钢琴：7 个泛音各自独立衰减（高次泛音衰减快＝真实击弦）+ 低八度衬底 + 击弦噪声
+         + 微失谐 + 延音踏板（余音互相重叠，音与音才连得上）+ 生成式混响 + 总线压缩
+   弦乐：三把锯齿波微失谐 + 低通随起音扫开 + 颤音渐入 → 天然连绵，专治钢琴"一颗一颗"
+   笛子：正弦为主 + 少量三角波泛音 + 气声噪声 + 颤音 → 清亮透气 */
+const TIMBRE = { piano: true, strings: false, flute: false };
+const TNAME = { piano: '钢琴', strings: '弦乐', flute: '笛子' };
+const TKEYS = ['piano', 'strings', 'flute'];
+const PEDAL = 1.9;                  /* 延音踏板：余音长度倍数（1.0＝松开踏板） */
+let audioCtx = null, liveOsc = [], playTimer = null, rafId = null;
+const BUS = { built:false, dry:null, send:null };
+let _noiseBuf = null;
+
+function ctxInit(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function mtof(m){ return 440 * Math.pow(2, (m - 69) / 12); }
+
+function noiseBuffer(ctx){
+  if (_noiseBuf) return _noiseBuf;
+  const len = Math.floor(ctx.sampleRate * 0.06);
+  _noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = _noiseBuf.getChannelData(0);
+  for (let i=0;i<len;i++) d[i] = Math.random()*2-1;
+  return _noiseBuf;
+}
+
+/* 混响脉冲响应：指数衰减噪声 + 几个早期反射，立体声随机 → 有空间感不干瘪 */
+function makeIR(ctx, seconds, decay){
+  const len = Math.floor(ctx.sampleRate * seconds);
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch=0; ch<2; ch++){
+    const d = buf.getChannelData(ch);
+    for (let i=0;i<len;i++){
+      const t = i / len;
+      d[i] = (Math.random()*2-1) * Math.pow(1-t, decay) * 0.55;
+    }
+    [0.008,0.017,0.029,0.043,0.061].forEach((s,k) => {
+      const idx = Math.floor(s * ctx.sampleRate * (ch ? 1.03 : 0.97));
+      if (idx < len) d[idx] += (k % 2 ? -0.45 : 0.45);
+    });
+  }
+  return buf;
+}
+
+function audioBus(){
+  const ctx = ctxInit();
+  if (BUS.built) return BUS;
+  /* 阈值放在 -6dB：正常单音（峰值≈0.46）基本不动，只在和弦叠音时轻压，保住钢琴的力度感 */
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -6; comp.knee.value = 10; comp.ratio.value = 2.2;
+  comp.attack.value = 0.004; comp.release.value = 0.20;
+  const master = ctx.createGain(); master.gain.value = 0.95;
+  comp.connect(master); master.connect(ctx.destination);
+
+  /* ConvolverNode 默认 normalize=true，会按 IR 能量归一化，湿声不会盖过干声 */
+  const conv = ctx.createConvolver();
+  conv.buffer = makeIR(ctx, 1.8, 2.9);
+  const wet = ctx.createGain(); wet.gain.value = 0.27;
+  conv.connect(wet); wet.connect(comp);
+
+  const dry = ctx.createGain(); dry.gain.value = 0.94; dry.connect(comp);
+  const send = ctx.createGain(); send.gain.value = 1.0; send.connect(conv);
+
+  BUS.dry = dry; BUS.send = send; BUS.built = true;
+  return BUS;
+}
+
+/* 单个钢琴音。t＝起始时刻，dur＝按住时长（决定余音下限），vel＝力度 0~1 */
+function pianoNote(midi, t, dur, vel){
+  const ctx = ctxInit();
+  const bus = audioBus();
+  const v = vel == null ? 0.95 : vel;
+  const f = mtof(midi);
+  const bright = Math.max(0.30, Math.min(1.0, (midi - 40) / 44));
+  /* 自然余音 → 踏板拉长 → 按音高封顶（低音留得长、高音收得快，不然会糊成一团） */
+  const ring = Math.max(0.70, 2.5 * Math.pow(2, -(midi - 52) / 28));
+  const cap  = 3.2 - Math.max(0, midi - 48) * 0.045;
+  const body = Math.min(cap, Math.max((dur || 0.2) * 1.3, ring * PEDAL));
+
+  const out = ctx.createGain();
+  out.gain.value = 0.34 * v;
+  out.connect(bus.dry); out.connect(bus.send);
+
+  /* [倍频, 振幅, 衰减系数] —— 高次泛音衰减快，这是钢琴"敲下去就散"的关键 */
+  const H = [
+    [1,  1.00, 1.00],
+    [2,  0.46, 0.66],
+    [3,  0.24, 0.50],
+    [4,  0.14, 0.40],
+    [5,  0.09, 0.31],
+    [7,  0.05, 0.24],
+    [11, 0.03, 0.17]
+  ];
+  H.forEach(part => {
+    const mul = part[0], amp = part[1], dec = part[2];
+    const a = amp * (mul <= 2 ? 1 : bright);
+    if (a < 0.01) return;
+    const o = ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = f * mul;
+    o.detune.value = (Math.random()*2-1) * 1.8;   /* 微失谐 → 声音变厚 */
+    const g = ctx.createGain();
+    const d = Math.max(0.3, body * dec * 1.28 + 0.05);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(a, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(a * 0.0015, t + d);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + d + 0.04);
+    liveOsc.push(o);
+  });
+
+  /* 低八度衬底：让单薄的旋律低音有"厚度" */
+  if (midi >= 45){
+    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f * 0.5;
+    const g = ctx.createGain();
+    const d = body * 0.95 + 0.05;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.14, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0012, t + d);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + d + 0.04);
+    liveOsc.push(o);
+  }
+
+  /* 击弦/击槌瞬态：没有这一下，钢琴会像电子琴；给太多就"一颗一颗" */
+  const nb = ctx.createBufferSource();
+  nb.buffer = noiseBuffer(ctx);
+  const bp = ctx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = Math.min(7200, f * 7);
+  bp.Q.value = 0.7;
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(0.075 * v, t);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+  nb.connect(bp); bp.connect(ng); ng.connect(out);
+  nb.start(t); nb.stop(t + 0.07);
+  liveOsc.push(nb);
+}
+
+/* 弦乐：三把微失谐锯齿 + 低通随起音扫开 + 颤音渐入。
+   连续音的起落是"弓"而不是"槌"，所以天生连贯；和钢琴叠在一起，钢琴给颗粒、弦乐给黏性。 */
+function stringsNote(midi, t, dur, vel){
+  const ctx = ctxInit();
+  const bus = audioBus();
+  const v = vel == null ? 0.9 : vel;
+  const f = mtof(midi);
+  const atk = 0.11, rel = 0.32;
+  const hold = Math.max(dur * 0.98, 0.12);
+  const end = t + hold;
+
+  const out = ctx.createGain();
+  out.gain.value = 0.21 * v;
+  out.connect(bus.dry); out.connect(bus.send);
+
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.Q.value = 1.0;
+  lp.frequency.setValueAtTime(Math.min(5200, f * 1.7), t);
+  lp.frequency.linearRampToValueAtTime(Math.min(6200, f * 4.0), t + atk + 0.06);
+  lp.frequency.linearRampToValueAtTime(Math.min(4600, f * 3.2), end);
+  lp.connect(out);
+
+  const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 5.1;
+  const lg = ctx.createGain();
+  lg.gain.setValueAtTime(0, t);
+  lg.gain.linearRampToValueAtTime(f * 0.0052, t + atk + 0.22);
+  lfo.connect(lg);
+  lfo.start(t); lfo.stop(end + rel + 0.1);
+  liveOsc.push(lfo);
+
+  [[-7, 0.60], [0, 1.00], [7, 0.60], [1200, 0.09]].forEach(pair => {
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = f;
+    o.detune.value = pair[0];
+    lg.connect(o.detune);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(pair[1], t + atk);
+    g.gain.setValueAtTime(pair[1], Math.max(t + atk, end));
+    g.gain.exponentialRampToValueAtTime(0.0008, end + rel);
+    o.connect(g); g.connect(lp);
+    o.start(t); o.stop(end + rel + 0.05);
+    liveOsc.push(o);
+  });
+}
+
+/* 笛子：正弦为主 + 两道弱泛音 + 气声噪声 + 颤音。清亮、透气，高音区比钢琴好听。 */
+function fluteNote(midi, t, dur, vel){
+  const ctx = ctxInit();
+  const bus = audioBus();
+  const v = vel == null ? 0.9 : vel;
+  const f = mtof(midi);
+  const atk = 0.06, rel = 0.22;
+  const hold = Math.max(dur * 0.97, 0.10);
+  const end = t + hold;
+
+  const out = ctx.createGain();
+  out.gain.value = 0.30 * v;
+  out.connect(bus.dry); out.connect(bus.send);
+
+  const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 5.6;
+  const lg = ctx.createGain();
+  lg.gain.setValueAtTime(0, t);
+  lg.gain.linearRampToValueAtTime(f * 0.0042, t + atk + 0.20);
+  lfo.connect(lg);
+  lfo.start(t); lfo.stop(end + rel + 0.1);
+  liveOsc.push(lfo);
+
+  [[1, 1.00], [2, 0.19], [3, 0.06]].forEach(pair => {
+    const o = ctx.createOscillator();
+    o.type = pair[0] === 1 ? 'sine' : 'triangle';
+    o.frequency.value = f * pair[0];
+    lg.connect(o.detune);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(pair[1], t + atk);
+    g.gain.setValueAtTime(pair[1] * 0.92, t + atk + 0.04);
+    g.gain.setValueAtTime(pair[1] * 0.92, Math.max(t + atk + 0.04, end));
+    g.gain.exponentialRampToValueAtTime(0.0006, end + rel);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(end + rel + 0.05);
+    liveOsc.push(o);
+  });
+
+  const nb = ctx.createBufferSource();
+  nb.buffer = noiseBuffer(ctx);
+  nb.loop = true;
+  const hp = ctx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 3200;
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.linearRampToValueAtTime(0.019 * v, t + atk + 0.03);
+  ng.gain.setValueAtTime(0.019 * v, Math.max(t + atk + 0.03, end));
+  ng.gain.exponentialRampToValueAtTime(0.0004, end + rel);
+  nb.connect(hp); hp.connect(ng); ng.connect(out);
+  nb.start(t); nb.stop(end + rel + 0.05);
+  liveOsc.push(nb);
+}
+
+function selectedKinds(){ return TKEYS.filter(k => TIMBRE[k]); }
+
+function toneNote(kind, midi, t, dur, vel){
+  if (kind === 'strings') stringsNote(midi, t, dur, vel);
+  else if (kind === 'flute') fluteNote(midi, t, dur, vel);
+  else pianoNote(midi, t, dur, vel);
+}
+
+/* 画音符时的即时试音：短、轻，用当前第一个音色 */
+function blip(midi){
+  const ctx = ctxInit();
+  const kinds = selectedKinds();
+  if (!kinds.length) return;
+  const k = kinds[0];
+  if (k === 'piano') pianoNote(midi, ctx.currentTime + 0.005, 0.18, 0.55);
+  else toneNote(k, midi, ctx.currentTime + 0.005, 0.16, 0.55);
+}
+
+function clearPlaying(){
+  cellMap.forEach(c => c.classList.remove('playing'));
+}
+
+function stopPlay(){
+  liveOsc.forEach(o => { try { o.stop(); } catch(e){} });
+  liveOsc = [];
+  if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  $('playhead').style.display = 'none';
+  $('btnPlay').textContent = '▶ 播放';
+  clearPlaying();
+}
+
+$('btnPlay').onclick = () => {
+  if (playTimer || rafId) { stopPlay(); return; }
+  const notes = computeNotes();
+  if (!notes.length) { flashTip('还没有音符——先在网格上画几个音'); return; }
+  const kinds = selectedKinds();
+  if (!kinds.length) { flashTip('三个音色都关掉了，听不到声音——至少开一个'); return; }
+  track('play','播放', kinds.join('+'));
+  const ctx = ctxInit();
+  audioBus();
+  const sixteenth = 60 / S.bpm / 4;
+  let maxCol = 0;
+  notes.forEach(n => { maxCol = Math.max(maxCol, n.col + n.len); });
+  const start = ctx.currentTime + 0.14;
+  /* 叠三个音色时每路稍微收一点，避免总线被顶到限幅 */
+  const trim = kinds.length > 2 ? 0.72 : (kinds.length > 1 ? 0.84 : 1);
+
+  notes.forEach(n => {
+    const t = start + n.col * sixteenth;
+    const dur = n.len * sixteenth;
+    kinds.forEach(k => toneNote(k, n.midi, t, dur, 0.9 * trim));
+  });
+
+  if ($('metro').checked){
+    const beatDur = (60 / S.bpm) * (4 / S.sig[1]);
+    const beats = Math.ceil(maxCol * sixteenth / beatDur);
+    for (let b=0; b<beats; b++){
+      const t = start + b * beatDur;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = b % S.sig[0] === 0 ? 1320 : 990;
+      g.gain.setValueAtTime(0.045, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+      o.connect(g); g.connect(audioBus().dry);
+      o.start(t); o.stop(t + 0.06);
+      liveOsc.push(o);
+    }
+  }
+
+  $('btnPlay').textContent = '■ 停止';
+  const ph = $('playhead'); ph.style.display = 'block';
+  let lastCol = -1;
+  const tick = () => {
+    const el = ctx.currentTime - start;
+    if (el >= maxCol * sixteenth){ stopPlay(); return; }
+    const col = Math.floor(el / sixteenth);
+    ph.style.left = (el / sixteenth) * CELL_W + 'px';
+    if (col !== lastCol){
+      lastCol = col;
+      clearPlaying();
+      notes.forEach(n => {
+        if (col >= n.col && col < n.col + n.len){
+          for (let c = n.col; c < n.col + n.len; c++){
+            const cell = cellMap.get(n.row + ':' + c);
+            if (cell) cell.classList.add('playing');
+          }
+        }
+      });
+      const x = col * CELL_W;
+      const view = scrollerEl.scrollLeft;
+      if (x < view + 40 || x > view + scrollerEl.clientWidth - 120)
+        scrollerEl.scrollTo({ left: Math.max(0, x - 160), behavior: 'smooth' });
+    }
+    rafId = requestAnimationFrame(tick);
+  };
+  rafId = requestAnimationFrame(tick);
+  playTimer = setTimeout(stopPlay, (maxCol * sixteenth + 2.2) * 1000);
+};
+
+/* ================= 存储 ================= */
+function dataSnapshot(){
+  return { root:S.root, mode:S.mode, bpm:S.bpm, sig:S.sig, measures:S.measures,
+    cells:[...S.cells], breaks:[...S.breaks], accs:S.accs, lyricsText:S.lyricsText };
+}
+function loadData(d){
+  S.root = d.root; S.mode = d.mode; S.bpm = d.bpm;
+  S.sig = d.sig; S.measures = d.measures;
+  S.cells = new Set(d.cells || []);
+  S.breaks = new Set(d.breaks || []);
+  S.accs = d.accs || {};
+  S.lyricsText = d.lyricsText || '';
+  $('root').value = S.root; $('mode').value = S.mode;
+  $('bpm').value = S.bpm; $('measures').value = S.measures;
+  $('sig').value = S.sig.join('/'); $('lyrics').value = S.lyricsText;
+  undoStack = [];
+  rebuild();
+}
+
+function saveLocal(){
+  try {
+    localStorage.setItem('hycyg_v05', JSON.stringify(dataSnapshot()));
+  } catch(e){}
+}
+
+let STORAGE_OK = true;
+try {
+  const k = '__hycyg_probe__';
+  localStorage.setItem(k, '1');
+  if (localStorage.getItem(k) !== '1') throw new Error('读写不一致');
+  localStorage.removeItem(k);
+} catch(e) {
+  STORAGE_OK = false;
+  const bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#8b2f2f;color:#fff;padding:8px 14px;font-size:13px;line-height:1.5';
+  bar.innerHTML = '⚠️ 当前环境<b>禁用了本地存储</b>（预览面板沙箱）——草稿/画面<b>保存不会生效</b>。请把本文件在系统浏览器中打开（双击 html 文件，或拖进 Edge/Chrome 窗口），那里存储长期可靠、导出下载也正常。';
+  document.body.appendChild(bar);
+}
+
+function loadDrafts(){
+  try { return JSON.parse(localStorage.getItem('hycyg_drafts') || '[]'); }
+  catch(e){ return []; }
+}
+function saveDrafts(list){
+  try { localStorage.setItem('hycyg_drafts', JSON.stringify(list)); }
+  catch(e){ STORAGE_OK = false; throw e; }
+}
+
+function snapSign(d){
+  const cells = [...(d.cells || [])].sort();
+  const breaks = [...(d.breaks || [])].sort();
+  const accs = {};
+  Object.keys(d.accs || {}).sort().forEach(k => { accs[k] = d.accs[k]; });
+  return JSON.stringify([d.root, d.mode, d.bpm, d.sig, d.measures, cells, breaks, accs, d.lyricsText || '']);
+}
+
+/* 载入别的草稿前，先把画布上现有内容存一份，绝不静默丢稿（同内容不重复存） */
+function autoBackup(tag){
+  if (!S.cells.size) return false;
+  const cur = dataSnapshot();
+  const sig = snapSign(cur);
+  const list = loadDrafts();
+  if (list.some(x => snapSign(x.data) === sig)) return false;
+  list.unshift({ id: Date.now() + Math.floor(Math.random()*1000),
+    name: '⟲ 自动备份' + (tag ? '·' + tag : '') + ' ' +
+      new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
+    time: new Date().toLocaleString('zh-CN'), data: cur });
+  if (list.length > 40) list.length = 40;
+  try { saveDrafts(list); } catch(e){ return false; }
+  return true;
+}
+
+/* 起名弹窗（预览沙箱拦截原生 prompt，故自制） */
+function askName(title, def, cb){
+  openExport(title, `
+    <div style="padding:4px 0">
+      <input type="text" id="nameInput" value="${esc(def)}" placeholder="给这个草稿起个名字">
+      <div class="row" style="margin-top:12px">
+        <button class="mini primary" id="nameOk">保存</button>
+        <button class="mini" id="nameCancel">取消</button>
+      </div>
+    </div>`);
+  const inp = $('nameInput');
+  inp.focus(); inp.select();
+  $('nameOk').onclick = () => {
+    const n = inp.value.trim() || '未命名';
+    $('overlay').classList.remove('show');
+    cb(n);
+  };
+  $('nameCancel').onclick = () => $('overlay').classList.remove('show');
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') $('nameOk').click(); });
+}
+
+/* ================= 草稿区（常驻，不弹窗） ================= */
+function renderDrafts(){
+  const list = loadDrafts();
+  const curSig = S.cells.size ? snapSign(dataSnapshot()) : null;
+  $('dockCount').textContent = list.length ? '（' + list.length + ' 份）' : '';
+  const box = $('draftList');
+  if (!list.length){
+    box.innerHTML = '<div class="empty">还没有草稿——上面画好旋律、按 ▶ 听顺了，就按「💾 保存草稿」。</div>';
+    return;
+  }
+  box.innerHTML = list.map(d => {
+    const ps = buildPitchesArr(d.data.root, d.data.mode);
+    const n = notesFrom(new Set(d.data.cells), new Set(d.data.breaks), d.data.accs || {}, ps).length;
+    const chars = cleanChars(d.data.lyricsText).length;
+    const isCur = curSig && snapSign(d.data) === curSig;
+    const warn = chars > n ? `<span class="wn">⚠ ${chars-n} 字无音</span> · ` : '';
+    return `<div class="dcraft" data-id="${d.id}">
+      <div class="dline">
+        <b class="dname" title="点这里：放回画布并展开简谱">${esc(d.name)}</b>
+        ${isCur ? '<span class="cur-tag">画布上</span>' : ''}
+        <span class="dmeta">${warn}${n} 音 · ${chars} 字 · ${NOTE_NAMES[d.data.root]}${d.data.mode === 'major' ? '大' : '小'}调 · ${d.data.sig.join('/')} · ${d.data.bpm}BPM</span>
+        <span class="sp"></span>
+        <button class="mini dl" title="下载带词的乐谱 .musicxml（MuseScore/Sibelius/Dorico 都能开，词逐字绑在音符上）">⬇ 乐谱</button>
+        <button class="mini mid" title="下载 MIDI .mid（只带音，不带词；给库乐队/FL/Cubase 换乐器、加伴奏用）">MIDI</button>
+        <button class="mini del" title="删除这一稿（会先问一次）">删除</button>
+      </div>
+      <div class="jp"></div>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('.dcraft').forEach(el => {
+    const id = +el.dataset.id;
+    const d = list.find(x => x.id === id);
+    if (!d) return;
+
+    el.querySelector('.del').onclick = function(){
+      armConfirm(this, '确认删?', () => {
+        saveDrafts(loadDrafts().filter(x => x.id !== id));
+        flashTip('已删除草稿「' + d.name + '」');
+        renderDrafts();
+      });
+    };
+
+    el.querySelector('.dname').onclick = () => openDraft(id);
+    el.querySelector('.dl').onclick = () => downloadDraft(id);
+    el.querySelector('.mid').onclick = () => downloadMidi(id);
+  });
+}
+
+/* 点草稿名字：放回画布 + 展开简谱（简谱数字正对它唱的那个字） */
+function openDraft(id){
+  const d = loadDrafts().find(x => x.id === id);
+  if (!d) return;
+  const same = S.cells.size > 0 && snapSign(dataSnapshot()) === snapSign(d.data);
+  let backed = false;
+  if (!same){
+    backed = autoBackup('载入前');
+    loadData(d.data);
+    saveLocal();
+  }
+  renderDrafts();
+  expandOnly(id, d);
+  if (!same) stopPlay();
+  flashTip(same
+    ? '画布上已经是「' + d.name + '」——按 ▶ 播放 就能听这一稿的钢琴'
+    : '✓ 已放回画布：按 ▶ 播放 听这一稿的钢琴' + (backed ? '（原画面已存为「⟲ 自动备份」）' : ''));
+}
+
+function expandOnly(id, d){
+  const el = document.querySelector('.dcraft[data-id="' + id + '"]');
+  if (!el) return;
+  const data = d || loadDrafts().find(x => x.id === id);
+  const jp = el.querySelector('.jp');
+  if (data && !jp.innerHTML) jp.innerHTML = jianpuHTML(data.data);
+  document.querySelectorAll('.dcraft.open').forEach(x => { if (x !== el) x.classList.remove('open'); });
+  el.classList.add('open');
+  el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+$('btnDraft').onclick = () => {
+  if (!S.cells.size) { flashTip('还没有音符，先画一段再存草稿'); return; }
+  if (!STORAGE_OK) { flashTip('⚠️ 此环境禁用了本地存储，保存不会生效——请把本文件用系统浏览器打开后操作'); return; }
+  askName('💾 保存草稿',
+    '草稿 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}),
+    name => {
+      try {
+        const list = loadDrafts();
+        const item = { id: Date.now(), name: name,
+          time: new Date().toLocaleString('zh-CN'), data: dataSnapshot() };
+        list.unshift(item);
+        saveDrafts(list);
+        renderDrafts();
+        expandOnly(item.id, item);
+        track('draft','保存', list.length);
+        flashTip('✓ 草稿「' + name + '」已保存（共 ' + list.length + ' 份）');
+      } catch(e) {
+        flashTip('⚠️ 保存失败：环境禁用了本地存储——请用系统浏览器打开本文件再操作');
+      }
+    });
+};
+
+function safeName(s){ return String(s).replace(/[\\/:*?"<>|]/g, '_') || 'melody'; }
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function openExport(title, bodyHtml){
+  $('extitle').textContent = title;
+  $('exbody').innerHTML = bodyHtml;
+  $('overlay').classList.add('show');
+}
+$('exclose').onclick = () => $('overlay').classList.remove('show');
+$('overlay').addEventListener('click', e => {
+  if (e.target === $('overlay')) $('overlay').classList.remove('show');
+});
+
+function tryDownload(name, blob){
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    return true;
+  } catch(e){ return false; }
+}
+
+/* ================= 真简谱 =================
+   数字＝音级；点上／下＝高低八度；♯♭ 在数字前；·＝附点；
+   短于一拍的音＝符杠连组（同拍内连续短音共用一条杠，十六分再加第二条）；
+   —＝延长一拍（每满一拍一条）；0＝休止；字压在所唱的音正下方。 */
+function jianpuHTML(data){
+  const ps = buildPitchesArr(data.root, data.mode);
+  const notes = notesFrom(new Set(data.cells), new Set(data.breaks), data.accs || {}, ps)
+    .sort((a,b) => a.col - b.col || a.row - b.row);
+  const chars = cleanChars(data.lyricsText || '').split('');
+  const spb = 16 / data.sig[1];
+  const spm = data.sig[0] * spb;
+  const startAt = new Map();
+  notes.forEach((n, i) => startAt.set(n.col, i));
+
+  const perM = [];
+  for (let m = 0; m < data.measures; m++){
+    const toks = [];
+    const end = (m + 1) * spm;
+    let c = m * spm;
+    while (c < end){
+      const ni = startAt.get(c);
+      if (ni !== undefined){
+        const n = notes[ni];
+        const len = Math.min(n.len, end - c);
+        toks.push({ t:'n', start:c, len, n, ch: chars[ni] || '' });
+        c += len;
+      } else {
+        let run = 1;
+        while (c + run < end && startAt.get(c + run) === undefined) run++;
+        toks.push({ t:'r', start:c, len:run });
+        c += run;
+      }
+    }
+    perM.push(toks);
+  }
+
+  const hasNote = ts => ts.some(t => t.t === 'n');
+  let first = -1, last = -1;
+  perM.forEach((ts, i) => { if (hasNote(ts)){ if (first < 0) first = i; last = i; } });
+  if (last < 0) return '<div class="jpscore"><div class="jphead">这一稿还没有音符</div></div>';
+
+  const isDotted = L => L === Math.round(spb * 0.75);
+
+  const glyph = (ev, dotted) => {
+    if (ev.t === 'r'){
+      return '<span class="jp-t"><span class="jp-dots"></span>'
+        + '<span class="jp-digit">0</span>'
+        + '<span class="jp-dots"></span><span class="jp-gap"></span>'
+        + '<span class="jp-l"></span></span>';
+    }
+    const p = ps[ev.n.row];
+    const acc = ev.n.acc === 1 ? '♯' : (ev.n.acc === -1 ? '♭' : '');
+    const top = p.oct >= 3 ? '··' : (p.oct === 2 ? '·' : '');
+    const bot = p.oct <= 0 ? '·' : '';
+    return '<span class="jp-t"><span class="jp-dots">' + top + '</span>'
+      + '<span class="jp-digit">' + acc + SOLFEGE[p.degree] + (dotted ? '·' : '') + '</span>'
+      + '<span class="jp-dots">' + bot + '</span><span class="jp-gap"></span>'
+      + '<span class="jp-l">' + esc(ev.ch) + '</span></span>';
+  };
+
+  const measureHTML = toks => {
+    let out = '';
+    let i = 0;
+    while (i < toks.length){
+      const ev = toks[i];
+      if (ev.len >= spb){
+        out += glyph(ev, ev.len % spb === spb / 2);
+        const full = Math.floor(ev.len / spb);
+        for (let k = 1; k < full; k++) out += '<span class="jp-dash">—</span>';
+        i++;
+      } else {
+        const beatEnd = (Math.floor(ev.start / spb) + 1) * spb;
+        let grp = '';
+        let j = i;
+        while (j < toks.length && toks[j].len < spb && toks[j].start < beatEnd){
+          const e2 = toks[j];
+          const need2 = e2.len < spb / 2;
+          grp += need2
+            ? glyph(e2, isDotted(e2.len)).replace('<span class="jp-t">', '<span class="jp-t jp-b2">')
+            : glyph(e2, isDotted(e2.len));
+          j++;
+        }
+        out += '<span class="jp-grp">' + grp + '</span>';
+        i = j;
+      }
+    }
+    return out;
+  };
+
+  let rows = '', buf = '', count = 0, run = 0;
+  const flushRun = () => {
+    if (run){ buf += '<span class="jp-skip">（空 ' + run + ' 小节）</span>'; run = 0; }
+  };
+  const flushRow = () => {
+    if (!buf) return;
+    rows += '<div class="jprow">' + buf + '<span class="jpbar">|</span></div>';
+    buf = ''; count = 0;
+  };
+  for (let m = first; m <= last; m++){
+    if (!hasNote(perM[m])){ run++; continue; }
+    flushRun();
+    buf += '<span class="jpbar">|</span>' + measureHTML(perM[m]);
+    if (++count === 2) flushRow();
+  }
+  flushRun();
+  flushRow();
+
+  const head = `1 = ${NOTE_NAMES[data.root]}　${data.mode === 'major' ? '大调' : '小调'}　${data.sig[0]}/${data.sig[1]}　♩=${data.bpm}　`
+             + `共 ${data.measures} 小节 · ${notes.length} 个音 · ${chars.length} 字`;
+  const foot = chars.length > notes.length
+    ? `<div class="jpnote" style="color:#b45309">⚠ 歌词有 ${chars.length} 字，但只有 ${notes.length} 个音——每音对一字，多出的 ${chars.length - notes.length} 字没有音符可唱（以画布上的字为准）</div>`
+    : '';
+  return `<div class="jpscore"><div class="jphead">${head}</div>${rows}
+    <div class="jpnote">数字＝音级；点上／下＝高／低八度；·＝附点；短于一拍的音共用一条符杠，十六分音符加第二条；—＝延长一拍；“0”＝休止。每个字正对它所唱的那个音。</div>${foot}</div>`;
+}
+
+/* ================= MusicXML 导出（带词的二次创作文件） =================
+   .musicxml 是通用乐谱交换格式：MuseScore / Sibelius / Dorico / Finale / 手机上的
+   各类乐谱 App 都能打开，打开就是"音符 + 每个音符下面的歌词"，改配器、加和弦、
+   换音色、导 MIDI 都从这里走。这是把词和曲绑死带走的唯一无损方式。 */
+const STEP_SHARP = [['C',0],['C',1],['D',0],['D',1],['E',0],['F',0],['F',1],['G',0],['G',1],['A',0],['A',1],['B',0]];
+const STEP_FLAT  = [['C',0],['D',-1],['D',0],['E',-1],['E',0],['F',0],['G',-1],['G',0],['A',-1],['A',0],['B',-1],['B',0]];
+const MAJ_F = {0:0,7:1,2:2,9:3,4:4,11:5,6:6,5:-1,10:-2,3:-3,8:-4,1:-5};
+const MIN_F = {9:0,4:1,11:2,6:3,1:4,8:5,3:6,2:-1,7:-2,0:-3,5:-4,10:-5};
+
+const TYPE_MAP = [
+  [1920,'whole',0],[1440,'half',1],[960,'half',0],[720,'quarter',1],
+  [480,'quarter',0],[360,'eighth',1],[240,'eighth',0],[180,'16th',1],[120,'16th',0],[60,'32nd',0]
+];
+function typeFor(d){
+  let best = TYPE_MAP[0], bd = 1e9;
+  TYPE_MAP.forEach(t => { const diff = Math.abs(t[0] - d); if (diff < bd){ bd = diff; best = t; } });
+  return [best[1], best[2]];
+}
+
+function musicXML(data, title){
+  const ps = buildPitchesArr(data.root, data.mode);
+  const notes = notesFrom(new Set(data.cells), new Set(data.breaks), data.accs || {}, ps)
+    .sort((a,b) => a.col - b.col || a.row - b.row);
+  if (!notes.length) return null;
+  const chars = cleanChars(data.lyricsText || '').split('');
+  const U = 120;                                   /* 每 16 分音符 = 120 divisions */
+  const spb = 16 / data.sig[1];
+  const measLen = data.sig[0] * spb * U;
+
+  /* 把跨小节的音拆成段，用 tie 连起来（MusicXML 不允许一个 note 越过小节线） */
+  const segs = [];
+  notes.forEach((n, i) => {
+    let cur = n.col * U, remain = n.len * U;
+    const parts = [];
+    while (remain > 0){
+      const mEnd = (Math.floor(cur / measLen) + 1) * measLen;
+      const d = Math.min(remain, mEnd - cur);
+      parts.push({ tick: cur, dur: d });
+      cur += d; remain -= d;
+    }
+    parts.forEach((p, pi) => {
+      segs.push({
+        tick: p.tick, dur: p.dur, midi: n.midi,
+        ch: pi === 0 ? (chars[i] || '') : '',
+        tieS: parts.length > 1 && pi < parts.length - 1,
+        tieE: parts.length > 1 && pi > 0
+      });
+    });
+  });
+  segs.sort((a,b) => a.tick - b.tick);
+
+  const fifths = (data.mode === 'major' ? MAJ_F : MIN_F)[data.root];
+  const F = fifths == null ? 0 : fifths;
+  const names = F < 0 ? STEP_FLAT : STEP_SHARP;
+
+  const noteXML = s => {
+    const pc = ((s.midi % 12) + 12) % 12;
+    const oct = Math.floor(s.midi / 12) - 1;
+    const nm = names[pc];
+    let x = '      <note>\n        <pitch><step>' + nm[0] + '</step>'
+          + (nm[1] ? '<alter>' + nm[1] + '</alter>' : '')
+          + '<octave>' + oct + '</octave></pitch>\n'
+          + '        <duration>' + s.dur + '</duration>\n';
+    if (s.tieS) x += '        <tie type="start"/>\n';
+    if (s.tieE) x += '        <tie type="stop"/>\n';
+    x += '        <voice>1</voice>\n';
+    const t = typeFor(s.dur);
+    x += '        <type>' + t[0] + '</type>\n';
+    if (t[1]) x += '        <dot/>\n';
+    if (s.tieS || s.tieE){
+      const ts = [];
+      if (s.tieE) ts.push('<tied type="stop"/>');
+      if (s.tieS) ts.push('<tied type="start"/>');
+      x += '        <notations>' + ts.join('') + '</notations>\n';
+    }
+    if (s.ch) x += '        <lyric number="1"><syllabic>single</syllabic><text>'
+                + esc(s.ch) + '</text></lyric>\n';
+    x += '      </note>\n';
+    return x;
+  };
+
+  const restXML = d => {
+    const t = typeFor(d);
+    return '      <note><rest/><duration>' + d + '</duration><voice>1</voice><type>'
+      + t[0] + '</type>' + (t[1] ? '<dot/>' : '') + '</note>\n';
+  };
+
+  let body = '';
+  for (let m = 0; m < data.measures; m++){
+    const start = m * measLen, end = start + measLen;
+    body += '    <measure number="' + (m + 1) + '">\n';
+    if (m === 0){
+      body += '      <attributes>\n'
+        + '        <divisions>' + U + '</divisions>\n'
+        + '        <key><fifths>' + F + '</fifths><mode>' + (data.mode === 'major' ? 'major' : 'minor') + '</mode></key>\n'
+        + '        <time><beats>' + data.sig[0] + '</beats><beat-type>' + data.sig[1] + '</beat-type></time>\n'
+        + '        <clef><sign>G</sign><line>2</line></clef>\n'
+        + '      </attributes>\n'
+        + '      <direction placement="above">\n'
+        + '        <direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>'
+        + data.bpm + '</per-minute></metronome></direction-type>\n'
+        + '        <sound tempo="' + data.bpm + '"/>\n'
+        + '      </direction>\n';
+    }
+    let cur = start;
+    segs.forEach(s => {
+      if (s.tick < start || s.tick >= end) return;
+      if (s.tick > cur){ body += restXML(s.tick - cur); cur = s.tick; }
+      body += noteXML(s);
+      cur = s.tick + s.dur;
+    });
+    if (cur < end) body += restXML(end - cur);
+    body += '    </measure>\n';
+  }
+
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n'
+    + '<score-partwise version="4.0">\n'
+    + '  <work><work-title>' + esc(title || '未命名') + '</work-title></work>\n'
+    + '  <identification><creator type="composer">画出原创歌曲</creator>'
+    + '<encoding><software>画出原创歌曲 v1.0</software></encoding></identification>\n'
+    + '  <part-list>\n    <score-part id="P1">\n      <part-name>人声旋律</part-name>\n'
+    + '      <score-instrument id="P1-I1"><instrument-name>Voice</instrument-name></score-instrument>\n'
+    + '      <midi-instrument id="P1-I1"><midi-channel>1</midi-channel><midi-program>54</midi-program></midi-instrument>\n'
+    + '    </score-part>\n  </part-list>\n'
+    + '  <part id="P1">\n' + body + '  </part>\n</score-partwise>\n';
+}
+
+function downloadDraft(id){
+  const d = loadDrafts().find(x => x.id === id);
+  if (!d) return;
+  const xml = musicXML(d.data, d.name);
+  if (!xml){ flashTip('这一稿还没有音符，没什么可导出的'); return; }
+  const fn = safeName(d.name) + '.musicxml';
+  const ok = tryDownload(fn, new Blob([xml], {type:'application/vnd.recordare.musicxml+xml'}));
+  if (ok) track('export','musicxml');
+  flashTip(ok
+    ? '✓ 已下载「' + fn + '」——用 MuseScore（免费）打开就是音符+歌词，可改配器、出伴奏、导 MIDI'
+    : '下载被预览面板拦截——请用系统浏览器打开本文件后重试');
+}
+
+/* ================= MIDI 导出 =================
+   .mid 只装"哪个音、什么时候响、响多久"，不带电子音色。好处是几乎所有音乐软件都认识它：
+   库乐队(iPhone 自带)、FL Studio、Cubase、Logic、Studio One、手机上的各种编曲 App，拖进去就能
+   换钢琴/弦乐/合成器、叠鼓、配和弦、改速度。词的对应关系不进 MIDI（部分软件会读 lyric 事件，
+   但支持很差），要带走词必须用 .musicxml。 */
+function vlq(n){
+  const b = [n & 0x7f];
+  n >>>= 7;
+  while (n){ b.unshift((n & 0x7f) | 0x80); n >>>= 7; }
+  return b;
+}
+
+function midiBytes(data, title){
+  const ps = buildPitchesArr(data.root, data.mode);
+  const notes = notesFrom(new Set(data.cells), new Set(data.breaks), data.accs || {}, ps)
+    .sort((a,b) => a.col - b.col || a.row - b.row);
+  if (!notes.length) return null;
+  const chars = cleanChars(data.lyricsText || '').split('');
+  const U = 120;
+  const evs = [];
+  notes.forEach((n, i) => {
+    const t0 = n.col * U, t1 = t0 + n.len * U;
+    if (chars[i]){
+      const by = Array.from(new TextEncoder().encode(chars[i]));
+      evs.push({ t: t0, k: 1, m: [0xFF, 0x05].concat(vlq(by.length), by) });
+    }
+    evs.push({ t: t0, k: 2, m: [0x90, n.midi & 0x7f, 96] });
+    evs.push({ t: t1, k: 0, m: [0x80, n.midi & 0x7f, 64] });
+  });
+  evs.sort((a,b) => a.t - b.t || a.k - b.k);
+
+  const tr = [];
+  const put = arr => { for (let i=0;i<arr.length;i++) tr.push(arr[i] & 0xff); };
+  const nb = Array.from(new TextEncoder().encode(title || '未命名'));
+  put([0x00, 0xFF, 0x03].concat(vlq(nb.length), nb));
+  const us = Math.round(60000000 / data.bpm);
+  put([0x00, 0xFF, 0x51, 0x03, (us >> 16) & 0xff, (us >> 8) & 0xff, us & 0xff]);
+  const dd = Math.round(Math.log(data.sig[1]) / Math.LN2);
+  put([0x00, 0xFF, 0x58, 0x04, data.sig[0], dd, 24, 8]);
+  const sf = ((data.mode === 'major' ? MAJ_F : MIN_F)[data.root]) || 0;
+  put([0x00, 0xFF, 0x59, 0x02, sf & 0xff, data.mode === 'major' ? 0 : 1]);
+
+  let prev = 0;
+  evs.forEach(e => {
+    put(vlq(e.t - prev));
+    prev = e.t;
+    put(e.m);
+  });
+  put([0x00, 0xFF, 0x2F, 0x00]);
+
+  const header = [0x4D,0x54,0x68,0x64, 0,0,0,6, 0,1, 0,1, (480 >> 8) & 0xff, 480 & 0xff];
+  const len = tr.length;
+  const trk = [0x4D,0x54,0x72,0x6B,
+    (len >>> 24) & 0xff, (len >>> 16) & 0xff, (len >>> 8) & 0xff, len & 0xff].concat(tr);
+  return new Uint8Array(header.concat(trk));
+}
+
+function downloadMidi(id){
+  const d = loadDrafts().find(x => x.id === id);
+  if (!d) return;
+  let b = null;
+  try { b = midiBytes(d.data, d.name); } catch(e){ flashTip('生成 MIDI 失败：' + e.message); return; }
+  if (!b){ flashTip('这一稿还没有音符'); return; }
+  const fn = safeName(d.name) + '.mid';
+  const ok = tryDownload(fn, new Blob([b], { type: 'audio/midi' }));
+  if (ok) track('export','midi');
+  flashTip(ok
+    ? '✓ 已下载「' + fn + '」——拖进库乐队/FL/Cubase 能换乐器、加伴奏；MIDI 只带音，词要带走请用 ⬇ 乐谱'
+    : '下载被预览面板拦截——请用系统浏览器打开本文件后重试');
+}
+
+/* ================= 草稿备份 / 迁移 =================
+   草稿存在浏览器本地，按"网址来源"隔离：本机文件、预览面板、线上链接是三个互不相通的仓库，
+   所以换网址必须搬一次。搬的方式以"复制文字"为主——浏览器经常拦截批量下载，文件会找不到。 */
+function ymd(){
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate());
+}
+
+function payloadOf(){
+  return { app: '画出原创歌曲', version: 1, exportedAt: new Date().toISOString(),
+           current: dataSnapshot(), drafts: loadDrafts() };
+}
+
+function openTransfer(mode){
+  const isOut = mode === 'out';
+  const n = loadDrafts().length;
+  openExport(isOut ? '⇩ 备份全部草稿' : '⇧ 导入草稿', `
+    <div class="hint" style="margin:0 0 8px;line-height:1.75">
+      ${isOut
+        ? `下面这段文字就是你的全部草稿（<b>${n} 份</b>＋当前画布）。点「复制这段文字」，<br>
+           再到另一个网址点「⇧ 导入备份」把它粘进去就搬过去了。<br>
+           <span style="color:#a33">注意：本机文件和线上网页是两个互不相通的仓库，a 里的草稿不会自动出现在 b 里。</span>`
+        : '把之前复制的那段文字粘到下面，点「导入」。也可以点「选备份文件…」直接选中之前另存的 .json 备份文件。重复的会自动跳过。'}
+    </div>
+    <textarea id="trBox" ${isOut ? 'readonly' : ''}
+      placeholder="${isOut ? '' : '在这里粘贴备份文字（Ctrl+V）……'}"
+      style="width:100%;height:170px;font-family:ui-monospace,Consolas,monospace;font-size:11px;
+      line-height:1.5;border:1px solid var(--line2);border-radius:8px;padding:8px;
+      background:#fffdf8;outline:none;resize:vertical"></textarea>
+    <div class="row" style="margin-top:10px">
+      ${isOut
+        ? '<button class="mini primary" id="trCopy">复制这段文字</button><button class="mini" id="trFile">另外存成文件</button>'
+        : '<button class="mini primary" id="trDo">导入</button><button class="mini" id="trPick">选备份文件…</button>'}
+      <span class="hint" id="trMsg" style="margin:0"></span>
+    </div>`);
+
+  const box = $('trBox');
+  if (isOut){
+    box.value = JSON.stringify(payloadOf());
+    $('trCopy').onclick = () => {
+      box.focus(); box.select(); box.setSelectionRange(0, box.value.length);
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { $('trMsg').textContent = '✓ 已复制 ' + n + ' 份草稿，去另一个网址粘贴'; }
+      else if (navigator.clipboard){
+        navigator.clipboard.writeText(box.value)
+          .then(() => { $('trMsg').textContent = '✓ 已复制 ' + n + ' 份草稿'; })
+          .catch(() => { $('trMsg').textContent = '自动复制被拦：请在框里按 Ctrl+A 再 Ctrl+C'; });
+      } else {
+        $('trMsg').textContent = '请在框里按 Ctrl+A 再 Ctrl+C 手动复制';
+      }
+    };
+    $('trFile').onclick = () => {
+      const fn = '画出原创歌曲_草稿备份_' + ymd() + '.json';
+      const ok = tryDownload(fn, new Blob([box.value], { type: 'application/json' }));
+      $('trMsg').textContent = ok ? '已存成 ' + fn + '（通常在「下载」文件夹）' : '下载被浏览器拦了，请用上面的复制';
+    };
+  } else {
+    box.focus();
+    $('trDo').onclick = () => doImport(box.value, $('trMsg'));
+    $('trPick').onclick = () => $('fileRestore').click();
+  }
+}
+
+function doImport(txt, msgEl){
+  const say = s => { if (msgEl) msgEl.textContent = s; else flashTip(s); };
+  let obj = null;
+  try { obj = JSON.parse(String(txt).trim()); } catch(e){ say('⚠ 这段文字读不出来，可能没复制完整'); return; }
+  let incoming = obj && obj.drafts ? obj.drafts : (Array.isArray(obj) ? obj : []);
+  if (!incoming.length && obj && obj.cells){ incoming = [{ name: obj.name || '导入的草稿', data: obj }]; }
+  if (!incoming.length){ say('⚠ 里面没有找到草稿'); return; }
+  const list = loadDrafts();
+  let added = 0, skipped = 0;
+  incoming.forEach(d => {
+    if (!d || !d.data || !d.data.cells) { skipped++; return; }
+    const sig = snapSign(d.data);
+    if (list.some(x => snapSign(x.data) === sig)) { skipped++; return; }
+    const useId = (d.id && !list.some(x => x.id === d.id)) ? d.id : Date.now() + Math.floor(Math.random()*9999);
+    list.unshift({ id: useId, name: d.name || '导入的草稿', time: d.time || '', data: d.data });
+    added++;
+  });
+  if (added){
+    try { saveDrafts(list); }
+    catch(e){ say('⚠ 保存失败：这个环境禁用了本地存储'); return; }
+  }
+  renderDrafts();
+  say('✓ 导入 ' + added + ' 份' + (skipped ? '，跳过 ' + skipped + ' 份（重复或无音符）' : '') + '——关掉这个框就能看到');
+  if (msgEl) setTimeout(() => { $('overlay').classList.remove('show'); }, 1100);
+}
+
+$('btnBackup').onclick = () => openTransfer('out');
+$('btnRestore').onclick = () => openTransfer('in');
+$('fileRestore').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  if (f){
+    const fr = new FileReader();
+    fr.onload = () => doImport(fr.result, null);
+    fr.readAsText(f);
+  }
+  e.target.value = '';
+};
+
+function hardConfirmDelete(id, name, btn){
+  armConfirm(btn, '确认删?', () => {
+    saveDrafts(loadDrafts().filter(x => x.id !== id));
+    flashTip('已删除草稿「' + name + '」');
+    renderDrafts();
+  });
+}
+
+function flashTip(msg){
+  const t = $('tip');
+  t.textContent = msg;
+  t.classList.add('flash');
+  clearTimeout(flashTip._h);
+  flashTip._h = setTimeout(() => t.classList.remove('flash'), 4500);
+}
+
+/* ---------- 顶部控件 ---------- */
+['root','mode'].forEach(id => $(id).onchange = () => {
+  const keep = new Set(S.cells);
+  S.root = +$('root').value; S.mode = $('mode').value;
+  buildPitches();
+  cellMap.forEach((cell, k) => {
+    const r = +k.split(':')[0];
+    cell.classList.toggle('on', keep.has(k));
+    cell.dataset.r = r;
+  });
+  labelsEl.querySelectorAll('.lab').forEach((lab, r) => {
+    lab.textContent = labelFor(pitches[r]);
+    lab.classList.toggle('tonic', pitches[r].degree === 0);
+  });
+  updateRuns(); renderDecor(); updateStat(); saveLocal();
+});
+
+$('bpm').onchange = () => { S.bpm = Math.max(40, Math.min(200, +$('bpm').value || 66)); $('bpm').value = S.bpm; saveLocal(); };
+
+$('sig').onchange = () => {
+  S.sig = $('sig').value.split('/').map(Number);
+  rebuild(); saveLocal();
+  if (S.cells.size) flashTip('拍号已改为 ' + S.sig.join('/') + '——音符保留原位置，网格含义变了，请播放自查');
+};
+
+$('measures').onchange = () => {
+  const n = Math.max(2, Math.min(128, +$('measures').value || 16));
+  S.measures = n; $('measures').value = n;
+  const tc = colsPerMeasure() * n;
+  S.cells = new Set([...S.cells].filter(k => +k.split(':')[1] < tc));
+  S.breaks = new Set([...S.breaks].filter(k => +k.split(':')[1] < tc));
+  rebuild(); saveLocal();
+  flashTip('小节已设为 ' + n + '——超出范围的音符已移除');
+};
+
+$('zoom').onchange = () => {
+  CELL_W = +$('zoom').value || 14;
+  ROW_H = CELL_W + 6;
+  document.documentElement.style.setProperty('--cw', CELL_W + 'px');
+  document.documentElement.style.setProperty('--rh', ROW_H + 'px');
+  rebuild(); saveLocal();
+};
+
+/* ---------- 音色：可多选，至少留一个；偏好存本地，不进草稿数据 ---------- */
+function timbreBtn(k){ return $('t' + k[0].toUpperCase() + k.slice(1)); }
+TKEYS.forEach(k => {
+  timbreBtn(k).onclick = () => {
+    if (TIMBRE[k] && selectedKinds().length === 1){
+      flashTip('至少留一个音色，不然按播放听不到声音'); return;
+    }
+    TIMBRE[k] = !TIMBRE[k];
+    timbreBtn(k).classList.toggle('on', TIMBRE[k]);
+    try { localStorage.setItem('hycyg_timbre', JSON.stringify(TIMBRE)); } catch(e){}
+    flashTip('音色：' + selectedKinds().map(x => TNAME[x]).join(' + ') + '——按 ▶ 播放 听这一套');
+  };
+});
+
+/* ---------- 使用方法（原来堆在左侧的说明，全部收进这里） ---------- */
+function guideHTML(){
+  return `<div class="guide">
+  <h4>这是什么</h4>
+  <p>把脑子里那段旋律<b>画</b>出来，贴上词，当场听，满意了就带走一份「每个字都绑在音上」的乐谱。
+     不用识五线谱，不用会乐器，不用装任何软件。</p>
+
+  <h4>一、画旋律</h4>
+  <ul>
+    <li>横轴＝时间（<b>每格 1/16 音符</b>）；纵轴＝音高，共三个八度。行首写着 1 2 3 4 5 6 7 就是简谱的七个音。</li>
+    <li>行首的记号：<b>无点＝中音</b>，<b>逗号（1,）＝低八度</b>，<b>撇号（1'）＝高八度</b>；每个从「1」开始的淡紫行＝一个八度。</li>
+    <li><b>画音</b>：按住拖动，划过去就有一条旋律。在已有的音上再点一下＝擦掉。</li>
+    <li><b>断音笔</b>：同一个音要唱两个字（比如「面」和「具」都在咪上，前面那个是附点）→ 点亮断音笔，
+        在长音的<b>后半截</b>点一下，出现白缝就是切开了。也可以按住 <b>Alt</b> 直接点。</li>
+    <li><b>右键音符</b> → 升半音 ♯ / 降半音 ♭ / 还原 ♮。</li>
+    <li>画到最右端会自动加长 4 小节，不够长就继续往右画。</li>
+  </ul>
+
+  <h4>二、贴词</h4>
+  <ul>
+    <li>左边框里<b>整段粘贴</b>，标点、空格自动忽略。</li>
+    <li>字按时间顺序落到音符上，<b>一个音一个字</b>。画布上每格上方会直接显示它唱的那个字。</li>
+    <li>字比音多，框下面会红字提醒——补旋律，或用断音笔把长音切开。<b>以画布为准</b>，多出来的字不会硬塞。</li>
+  </ul>
+
+  <h4>三、听（重点）</h4>
+  <ul>
+    <li><b>▶ 播放</b>＝开始，正在放的时候按钮变成 <b>■ 停止</b>，再按一下就停。只有一个键。</li>
+    <li>音色可以<b>多选，最多三个同时响</b>：
+      <ul>
+        <li><b>钢琴</b>——颗粒清楚，核对每个音准不准最可靠。</li>
+        <li><b>弦乐</b>——弓弦连绵不断。如果觉得钢琴听着「一个一个的」，加上弦乐就顺了。</li>
+        <li><b>笛子</b>——清亮透气，高音区比钢琴好听。</li>
+      </ul>
+    </li>
+    <li>建议先开「钢琴 + 弦乐」整体听顺不顺，再单独开钢琴逐个音核对。</li>
+    <li><b>节拍器</b>在画布下方，跟着咔嗒声画更容易卡准拍子。</li>
+  </ul>
+
+  <h4>四、存草稿 / 带走</h4>
+  <ul>
+    <li>听顺了就按 <b>💾 保存草稿</b>。稿子留在页面下方的草稿区，存在你自己的浏览器里，不会自己消失。</li>
+    <li><b>防丢习惯</b>：清浏览器缓存、换电脑、换浏览器都会让草稿不在——画完就点 <b>⇩ 备份全部</b>，把那段文字存进<b>你自己电脑</b>的记事本或文档里保管，或另存成 .json 文件。</li>
+    <li><b>点草稿的名字</b>＝把它放回画布，并展开简谱——简谱的数字正对着它唱的那个字，一眼看出词曲对不对。放回之前画布上的内容会自动存一份「⟲ 自动备份」。</li>
+    <li><b>⬇ 乐谱</b>＝<b>.musicxml</b>，带词的乐谱。用免费的 MuseScore 打开就是五线谱＋歌词，可以改配器、出伴奏、再导 MIDI。这是能把词曲一起带走的方式。</li>
+    <li><b>MIDI</b>＝<b>.mid</b>，只带音不带词。iPhone 自带的库乐队、FL、Cubase、Logic 都能开，换乐器、加鼓、配和弦、改速度一键完成。</li>
+    <li><b>删除</b>＝这一稿不要了，会先问一次再删。</li>
+  </ul>
+
+  <h4>五、换电脑 / 换网址 / 备份</h4>
+  <p>草稿存在你自己的浏览器里，<b>按网址分开存</b>——本机文件、线上链接是互不相通的仓库，换地址就要搬一次家。
+     有内容时关闭或刷新页面会弹提醒；但最稳妥的办法是<b>离开前点「⇩ 备份全部」</b>，把文字存到你自己的电脑里。
+     搬去别处：到新的那边点 <b>⇧ 导入备份</b>，粘贴备份文字，或点「选备份文件…」选中之前存的 .json。</p>
+  <p><b>临时试用</b>：走之前记得备份到自己电脑。<b>长期使用</b>：目前请以「⇩ 备份全部」为准；云端存档（登录后草稿随身带）在开发计划中。</p>
+
+  <h4>六、版权与隐私：作品是你的</h4>
+  <p><b>你画出来的旋律、贴上去的词，著作权归你自己</b>，本工具不主张任何权利。
+     本工具<b>不上传你的任何内容</b>——草稿、歌词、画的曲，全部只存在你自己的浏览器里，关掉网页也还在。
+     页面使用匿名访问统计，只统计打开次数和按钮点击次数，不涉及你创作的内容。</p>
+  </div>`;
+}
+$('btnHelp').onclick = () => openExport('使用方法', guideHTML());
+
+(function init(){
+  for (let i=0; i<12; i++){
+    const o = document.createElement('option');
+    o.value = i; o.textContent = NOTE_NAMES[i];
+    $('root').appendChild(o);
+  }
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('hycyg_v05') || 'null'); } catch(e){}
+  /* 音色偏好是个人口味，单独存，不进草稿（否则每份稿都会互相改掉音色） */
+  try {
+    const tp = JSON.parse(localStorage.getItem('hycyg_timbre') || 'null');
+    if (tp) TKEYS.forEach(k => { if (typeof tp[k] === 'boolean') TIMBRE[k] = tp[k]; });
+  } catch(e){}
+  if (!selectedKinds().length) TIMBRE.piano = true;
+  TKEYS.forEach(k => timbreBtn(k).classList.toggle('on', TIMBRE[k]));
+  if (saved && saved.cells && saved.cells.length){
+    S.root = saved.root; S.mode = saved.mode; S.bpm = saved.bpm;
+    S.sig = saved.sig; S.measures = saved.measures;
+    S.cells = new Set(saved.cells);
+    S.breaks = new Set(saved.breaks || []);
+    S.accs = saved.accs || {};
+    S.lyricsText = saved.lyricsText || '';
+    $('root').value = S.root; $('mode').value = S.mode;
+    $('bpm').value = S.bpm; $('measures').value = S.measures;
+    $('sig').value = S.sig.join('/'); $('lyrics').value = S.lyricsText;
+  }
+  rebuild();
+  renderDrafts();
+})();
+
+/* ---------- 安全网 v1.3：存储检测 / 首次引导 / 关闭提醒 ---------- */
+(function safetyNet(){
+  const hint = document.getElementById('svHint');
+  if (!hint) return;
+  let storageOK = true;
+  try { localStorage.setItem('hycyg_probe','1'); localStorage.removeItem('hycyg_probe'); }
+  catch(e){ storageOK = false; }
+  if (!storageOK){
+    hint.style.display = 'block';
+    hint.style.background = '#fdecea'; hint.style.border = '1px solid #e53935'; hint.style.color = '#b71c1c';
+    hint.innerHTML = '<b>⚠ 此环境无法保存草稿</b>（浏览器沙箱或隐私模式拦住了本地存储）。可以正常画和听，'
+      + '但<b>关闭后内容会消失</b>——请先点「⇩ 备份全部」复制保存，或改用普通浏览器窗口打开本页。';
+    return;
+  }
+  try {
+    if (!localStorage.getItem('hycyg_seen')){
+      hint.style.display = 'block';
+      hint.style.background = '#fff8e1'; hint.style.border = '1px solid #f9a825'; hint.style.color = '#6d4c00';
+      hint.innerHTML = '<b>第一次来？先按 Ctrl+D 收藏本页</b>——草稿保存在你自己的浏览器里（按网址分开），收藏后才找得到回来；换电脑 / 换浏览器用「⇩ 备份全部 → 导入备份」搬运。'
+        + ' <button class="mini" id="svOk">知道了</button>';
+      document.getElementById('svOk').onclick = function(){
+        try { localStorage.setItem('hycyg_seen','1'); } catch(e){}
+        hint.style.display = 'none';
+      };
+    }
+  } catch(e){}
+  window.addEventListener('beforeunload', (e) => {
+    let has = false;
+    try { has = (typeof S !== 'undefined' && S.cells && S.cells.size > 0) || loadDrafts().length > 0; } catch(err){}
+    if (has){ e.preventDefault(); e.returnValue = ''; }
+  });
+})();
+
+$('lnkFeedback').onclick = () => track('feedback','点击');
+</script>
+</body>
+</html>
