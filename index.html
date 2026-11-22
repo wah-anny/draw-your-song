@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.16</title>
+<title>画出原创歌曲 v1.17</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
 <meta property="og:description" content="不替你生成，帮你把脑中的旋律画下来。画格子写旋律、贴歌词，浏览器实时合成试音，导出带词乐谱和 MIDI。免费开源，草稿只存在你自己的浏览器里。">
 <meta property="og:url" content="https://draw-your-song.app.workbuddy.host/?sharecode=X7VJNMU5NF">
 <meta property="og:image" content="https://draw-your-song.app.workbuddy.host/og-cover.png?sharecode=X7VJNMU5NF">
+<script defer src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234b45c6'/%3E%3Cpath d='M12 24V9l10-2v13' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='10' cy='24' r='3' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -264,7 +265,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.16 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.17 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -337,6 +338,7 @@ var _hmt = _hmt || [];
     <span class="sp"></span>
     <button class="mini" id="btnBackup" title="把全部草稿和当前画面存成一个备份文件（换浏览器、换网址、换电脑都能搬过去）">⇩ 备份全部</button>
     <button class="mini" id="btnStamp" title="存证：计算作品指纹（SHA-256）+ OpenTimestamps 独立时间锚定，下载存证卡与规范作品文件——给作品带上可独立验证的时间证据">🛡 存证</button>
+    <button class="mini" id="btnLogin" title="登录 / 注册：把存证记录与你的身份绑定，著作权登记时才认。手机验证码，一分钟">登录</button>
     <button class="mini" id="btnRestore" title="从备份文件把草稿导进来">⇧ 导入备份</button>
     <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
   </div>
@@ -345,7 +347,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.16 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.17 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1142,6 +1144,7 @@ function renderDrafts(){
         <span class="dmeta">${warn}${n} 音 · ${chars} 字 · ${NOTE_NAMES[d.data.root]}${d.data.mode === 'major' ? '大' : '小'}调 · ${d.data.sig.join('/')} · ${d.data.bpm}BPM</span>
         <span class="sp"></span>
         <button class="mini dl" title="下载带词的乐谱 .musicxml（MuseScore/Sibelius/Dorico 都能开，词逐字绑在音符上）">⬇ 乐谱</button>
+        <button class="mini png" title="下载简谱图片 .png（自带指纹水印，可直接用作著作权登记的作品样本）">⬇ 图</button>
         <button class="mini mid" title="下载 MIDI .mid（只带音，不带词；给库乐队/FL/Cubase 换乐器、加伴奏用）">MIDI</button>
         <button class="mini del" title="删除这一稿（会先问一次）">删除</button>
       </div>
@@ -1164,6 +1167,7 @@ function renderDrafts(){
 
     el.querySelector('.dname').onclick = () => openDraft(id);
     el.querySelector('.dl').onclick = () => downloadDraft(id);
+    el.querySelector('.png').onclick = () => exportJianpuPNG(id);
     el.querySelector('.mid').onclick = () => downloadMidi(id);
   });
 }
@@ -1883,7 +1887,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.16 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+/* v1.17 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
    v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
@@ -1904,7 +1908,7 @@ window.addEventListener('resize', rotUpdate);
 window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
 setTimeout(rotUpdate, 600);
 
-/* ================= v1.16 哼唱输入 + 作品存证 ================= */
+/* ================= v1.17 哼唱输入 + 作品存证 ================= */
 
 /* ---- 哼唱：录音 → 音高检测 → 落草稿 ---- */
 let humState = { recording:false, recorder:null, chunks:[], ctx:null, stream:null };
@@ -2064,7 +2068,7 @@ function humLand(){ /* 落格已在分析完成时自动完成，此按钮留作
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.16';
+const APP_VER = 'v1.17';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2121,16 +2125,29 @@ $('btnStamp').onclick = async () => {
   track('stamp','打开');
   const data = dataSnapshot();
   if (!S.cells.size){ flashTip('画布是空的——先画（或哼）出旋律再存证'); return; }
-  const canon = snapSign(data);
+  const user = await getSessionSafe();
+  if (!user){
+    openLoginModal('要让这份存证<b>成为著作权登记可用的身份绑定证据</b>，需要先登录（手机验证码，一分钟搞定）。'
+      + '登录后，存证记录与你的账号绑定——"这个作品在何时存在、归属哪个账号"才站得住。作品内容本身仍然不出你的电脑。', () => startStampFlow());
+    return;
+  }
+  startStampFlow();
+};
+
+function startStampFlow(){
+  const canon = snapSign(dataSnapshot());
   openExport('🛡 作品存证——给这首曲子生成可独立验证的证据包', `
     <div style="max-width:560px;line-height:1.8;font-size:14px">
-      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网），并生成<b>存证卡 + 规范作品文件</b>供下载。</p>
+      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网），并生成<b>存证卡 + 规范作品文件</b>供下载；存证记录同步云端存证库，与你的登录账号绑定。</p>
+      <p style="margin:10px 0 4px">作品名称（用于存证卡与云端登记，建议填写）：</p>
+      <input id="stampTitle" type="text" maxlength="40" placeholder="例如：给妈妈的歌" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px">
       <div style="margin:10px 0"><button class="primary" id="stampGo">开始存证</button> <button class="mini" id="stampClose">取消</button></div>
       <div id="stampStatus" style="color:var(--muted)">待开始。</div>
     </div>`);
   document.getElementById('stampClose').onclick = () => $('overlay').classList.remove('show');
   document.getElementById('stampGo').onclick = async () => {
     const st = document.getElementById('stampStatus');
+    const title = (document.getElementById('stampTitle').value || '').trim().slice(0, 40);
     try{
       st.textContent = '计算指纹……';
       const fp = await sha256Hex(canon);
@@ -2139,7 +2156,7 @@ $('btnStamp').onclick = async () => {
       const chain = loadChain();
       const prev = chain.length ? chain[chain.length - 1].fp : '';
       const entry = { fp, prev, t: tLocal, utc: now.toISOString(),
-        meta: NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + '小节',
+        meta: (title ? title + ' · ' : '') + NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + '小节',
         ver: APP_VER };
       chain.push(entry); saveChain(chain);
       const tsName = 'song-' + now.getTime() + '.ots';
@@ -2149,15 +2166,206 @@ $('btnStamp').onclick = async () => {
       tryDownload(canonName, new Blob([canon], { type: 'application/json' }));
       tryDownload('evidence-card-' + now.getTime() + '.html', new Blob([buildCertCard(entry, chain, !!ots, ots ? tsName : '')], { type: 'text/html' }));
       if (ots) tryDownload(tsName, ots);
-      st.innerHTML = '✅ 存证完成。已下载：<br>①规范作品文件（' + canonName + '，它的 SHA-256 就是指纹）<br>②存证卡（含全部指纹与验证步骤）'
+      let cloudMsg = '';
+      try{
+        const c = cloudReady();
+        if (c && _sessUser){
+          const { error } = await c.database.from('song_evidence').insert({
+            fingerprint: fp, title: title || null, version: APP_VER, anchored: !!ots,
+            owner_name: _sessUser.name || null
+          }).select();
+          cloudMsg = error ? '<br>⚠ 云端登记未成功（' + esc(error.message || '未知原因') + '）——本地证据仍然有效，可稍后重新存证' : '<br>✅ 已同步云端存证库，与你的账号绑定';
+        }
+      }catch(e){ cloudMsg = '<br>⚠ 云端登记未成功——本地证据仍然有效'; }
+      st.innerHTML = '✅ 存证完成。已下载到浏览器「下载」文件夹：<br>①规范作品文件（' + canonName + '，它的 SHA-256 就是指纹）<br>②存证卡（含全部指纹与验证步骤）'
         + (ots ? '<br>③独立时间戳证明（' + tsName + '，几小时后可在 opentimestamps.org 独立验证）'
-             : '<br>③<b>未锚定</b>（网络不通或日历不可达）——本地证据已生成，联网后重新点一次存证即可补锚定');
+             : '<br>③<b>未锚定</b>（网络不通或日历不可达）——本地证据已生成，联网后重新点一次存证即可补锚定')
+        + cloudMsg;
       track('stamp', '完成', ots ? 'ots' : 'local');
     }catch(e){
       st.textContent = '存证失败：' + (e.message || e);
     }
   };
+}
+
+/* ================= v1.17 登录（手机验证码）+ 简谱图片导出 ================= */
+const WB_CFG = {
+  endpoint: 'https://draw-your-song.app.workbuddy.host',
+  oauthRelayBaseUrl: 'https://www.workbuddy.cn/v2/as/genie-baas/oauth',
+  publishableKey: 'wbpk_Ni7TTLVvRkXKB9IiJJe77l_tEJlIHgiXe9da2Aw6gA1XtlzXugO3roD'
 };
+let _cloud = null, _sessUser = null, _pendingOtp = null, _cdTimer = null, _afterLogin = null;
+function cloudReady(){
+  if (_cloud) return _cloud;
+  if (!window.WorkBuddyCloud) return null;
+  try { _cloud = WorkBuddyCloud.createWorkBuddyCloud(WB_CFG); } catch(e){ return null; }
+  return _cloud;
+}
+async function getSessionSafe(){
+  const c = cloudReady(); if (!c) return null;
+  try{
+    const { data, error } = await c.auth.getSession();
+    if (error || !data || !data.session) return null;
+    _sessUser = data.session.user;
+    return _sessUser;
+  }catch(e){ return null; }
+}
+function maskId(s){
+  s = (s || '').replace(/^(\+86)/, '');
+  return s.length > 6 ? s.slice(0, 3) + '****' + s.slice(-4) : s;
+}
+function refreshLoginBtn(){
+  $('btnLogin').textContent = _sessUser ? '👤 ' + maskId(_sessUser.phone || _sessUser.email || '已登录') : '登录';
+}
+function openLoginModal(reason, afterLogin){
+  const c = cloudReady();
+  if (!c){ flashTip('登录服务暂时不可用（网络未就绪）——可稍后再试，或先只做本地存证'); return; }
+  _afterLogin = afterLogin || null;
+  _pendingOtp = null;
+  if (_cdTimer){ clearInterval(_cdTimer); _cdTimer = null; }
+  openExport('登录 · 绑定你的身份', `
+    <div style="max-width:560px;line-height:1.8;font-size:14px">
+      <p style="background:#f4f2fb;border:1px solid #cfc8ec;border-radius:10px;padding:10px 12px">${reason}</p>
+      <p style="margin:10px 0 4px"><b>手机号：</b></p>
+      <div style="display:flex;gap:8px">
+        <input id="lgPhone" type="tel" maxlength="11" placeholder="11 位手机号" style="flex:1;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px">
+        <button class="mini" id="lgSend" type="button">获取验证码</button>
+      </div>
+      <p id="lgPhoneErr" style="color:#c0392b;font-size:12.5px;min-height:18px;margin:2px 0"></p>
+      <div style="display:flex;gap:8px">
+        <input id="lgCode" type="text" inputmode="numeric" maxlength="6" placeholder="6 位验证码" style="flex:1;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px">
+        <button class="primary" id="lgGo">登录 / 注册</button>
+      </div>
+      <p id="lgErr" style="color:#c0392b;font-size:12.5px;min-height:18px;margin:6px 0 0"></p>
+      <p style="color:var(--muted);font-size:12.5px;margin-top:8px">新手机号验证后自动注册，无需密码。只发验证码短信，无营销信息。</p>
+      <div style="margin-top:6px"><button class="mini" id="lgSkip">先不登录</button></div>
+    </div>`);
+  const phoneErr = document.getElementById('lgPhoneErr');
+  const sendBtn = document.getElementById('lgSend');
+  document.getElementById('lgPhone').addEventListener('input', () => { phoneErr.textContent = ''; });
+  document.getElementById('lgSkip').onclick = () => $('overlay').classList.remove('show');
+  sendBtn.onclick = async () => {
+    const phone = document.getElementById('lgPhone').value.trim();
+    if (!/^1\d{10}$/.test(phone)){ phoneErr.textContent = '请输入正确的 11 位手机号'; return; }
+    phoneErr.textContent = '';
+    sendBtn.disabled = true; sendBtn.textContent = '发送中…';
+    const sent = await c.auth.sendOtp({ phone });
+    sendBtn.disabled = false;
+    if (sent.error){
+      phoneErr.textContent = sent.error.message || '发送失败，请稍后再试';
+      sendBtn.textContent = '获取验证码';
+      return;
+    }
+    _pendingOtp = { phone, verificationId: sent.data.verificationId, isExistingUser: sent.data.isExistingUser };
+    sendBtn.textContent = '已发送 60s';
+    let left = 60;
+    _cdTimer = setInterval(() => {
+      left--;
+      if (left <= 0){ clearInterval(_cdTimer); _cdTimer = null; sendBtn.textContent = '重新获取'; sendBtn.disabled = false; }
+      else sendBtn.textContent = '已发送 ' + left + 's';
+    }, 1000);
+  };
+  document.getElementById('lgGo').onclick = async () => {
+    const errEl = document.getElementById('lgErr');
+    const phone = document.getElementById('lgPhone').value.trim();
+    if (!_pendingOtp || _pendingOtp.phone !== phone){
+      errEl.textContent = '请先为当前手机号获取验证码'; return;
+    }
+    const code = document.getElementById('lgCode').value.trim();
+    if (!code){ errEl.textContent = '请输入验证码'; return; }
+    errEl.textContent = '';
+    const goBtn = document.getElementById('lgGo');
+    goBtn.disabled = true; goBtn.textContent = '登录中…';
+    const completed = await c.auth.verifyOtp({
+      phone: _pendingOtp.phone,
+      verificationId: _pendingOtp.verificationId,
+      isExistingUser: _pendingOtp.isExistingUser,
+      token: code
+    });
+    goBtn.disabled = false; goBtn.textContent = '登录 / 注册';
+    if (completed.error){ errEl.textContent = completed.error.message || '验证失败，请检查验证码'; return; }
+    _pendingOtp = null;
+    _sessUser = completed.data.user;
+    refreshLoginBtn();
+    $('overlay').classList.remove('show');
+    flashTip('✅ 已登录 ' + maskId(_sessUser.phone || '') + '——存证将与你的账号绑定');
+    track('auth', 'login-ok');
+    const cb = _afterLogin; _afterLogin = null;
+    if (cb) cb();
+  };
+}
+$('btnLogin').onclick = async () => {
+  if (_sessUser){
+    armConfirm($('btnLogin'), '退出?', async () => {
+      const c = cloudReady(); if (c) await c.auth.signOut();
+      _sessUser = null; refreshLoginBtn();
+      flashTip('已退出登录');
+    });
+    return;
+  }
+  openLoginModal('登录后，你的存证记录会与账号绑定——"这个作品在何时存在、归属哪个账号"才站得住，著作权登记时才有身份证据。作品内容本身仍然不出你的电脑。', null);
+};
+window.addEventListener('load', async () => { await getSessionSafe(); refreshLoginBtn(); });
+
+/* ---- 简谱图片导出（著作权登记的作品样本直接可用） ---- */
+const JP_CSS = '.jpscore{font-family:"Songti SC","SimSun",serif;color:#2f2a22}'
+  + '.jphead{font-size:11px;color:#8a7d63;margin-bottom:8px;letter-spacing:.3px}'
+  + '.jprow{display:flex;flex-wrap:nowrap;align-items:flex-start;padding:6px 0 2px;border-bottom:1px dashed #e6dfcc}'
+  + '.jprow:last-child{border-bottom:0}'
+  + '.jpbar{color:#b5a98f;font-size:13px;width:12px;text-align:center;line-height:60px;height:60px;flex:0 0 auto}'
+  + '.jp-t{display:inline-flex;flex-direction:column;align-items:center;width:30px;line-height:1;flex:0 0 auto}'
+  + '.jp-dots{height:9px;font-size:9px;color:#2f2a22;letter-spacing:1px}'
+  + '.jp-digit{font-family:"Times New Roman","Songti SC",SimSun,serif;font-size:18px;line-height:19px;padding:0 1px;white-space:nowrap;letter-spacing:.5px}'
+  + '.jp-gap{display:block;height:8px;width:100%}'
+  + '.jp-l{font-size:12px;color:#4a4338;height:15px;line-height:15px;width:100%;text-align:center;white-space:nowrap}'
+  + '.jp-grp{display:inline-flex;align-items:flex-start;flex:0 0 auto;background-image:linear-gradient(#2f2a22,#2f2a22);background-size:calc(100% - 14px) 1.4px;background-position:7px 37px;background-repeat:no-repeat}'
+  + '.jp-b2{background-image:linear-gradient(#2f2a22,#2f2a22);background-size:calc(100% - 18px) 1.4px;background-position:9px 41.5px;background-repeat:no-repeat}'
+  + '.jp-dash{font-family:"Times New Roman",SimSun,serif;font-size:16px;color:#2f2a22;width:24px;text-align:center;line-height:19px;padding-top:17px;height:60px;flex:0 0 auto}'
+  + '.jp-skip{font-size:11px;color:#a99;padding:0 6px;align-self:center;flex:0 0 auto}';
+async function exportJianpuPNG(id){
+  const d = loadDrafts().find(x => x.id === id);
+  if (!d) return;
+  const inner = jianpuHTML(d.data);
+  if (inner.indexOf('还没有音符') >= 0){ flashTip('这一稿还没有音符，没什么可导出的'); return; }
+  try{
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position:fixed;left:-99999px;top:0;width:760px;';
+    holder.innerHTML = '<style>' + JP_CSS + '</style>'
+      + '<div style="background:#fbf9f2;padding:26px 30px 34px;border-radius:12px">'
+      + '<div class="jpscore">' + inner + '</div></div>';
+    document.body.appendChild(holder);
+    await new Promise(r => setTimeout(r, 80));
+    const cap = holder.children[1];
+    const w = Math.ceil(cap.offsetWidth), h = Math.ceil(cap.offsetHeight);
+    const ser = new XMLSerializer().serializeToString(cap);
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
+      + '<foreignObject width="100%" height="100%">' + ser + '</foreignObject></svg>';
+    const img = new Image();
+    await new Promise((res, rej) => {
+      img.onload = res; img.onerror = () => rej(new Error('图片渲染失败'));
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+    const scale = 2;
+    const cv = document.createElement('canvas');
+    cv.width = w * scale; cv.height = h * scale;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#fbf9f2'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(img, 0, 0, w, h);
+    const fp = await sha256Hex(snapSign(d.data));
+    ctx.font = '11px sans-serif'; ctx.fillStyle = '#8a7d63';
+    ctx.fillText('画出原创歌曲 ' + APP_VER + ' · 作品指纹 SHA-256: ' + fp.slice(0, 32) + '…（完整指纹见存证卡）', 14, h - 10);
+    holder.remove();
+    cv.toBlob(b => {
+      if (b){
+        tryDownload(safeName(d.name) + '.png', b);
+        track('export', 'png');
+        flashTip('✓ 已下载简谱图片「' + safeName(d.name) + '.png」——可直接用作著作权登记的作品样本');
+      } else flashTip('导出失败——请换 Chrome/Edge 浏览器重试');
+    }, 'image/png');
+  }catch(e){
+    flashTip('导出失败：' + (e.message || e));
+  }
+}
 </script>
 </body>
 </html>
