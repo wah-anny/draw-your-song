@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.26</title>
+<title>画出原创歌曲 v1.27</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -353,7 +353,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.26 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.27 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -437,7 +437,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.26 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.27 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1194,6 +1194,25 @@ function snapSign(d){
   const accs = {};
   Object.keys(d.accs || {}).sort().forEach(k => { accs[k] = d.accs[k]; });
   return JSON.stringify([d.root, d.mode, d.bpm, d.sig, d.measures, cells, breaks, accs, d.lyricsText || '']);
+}
+
+/* 规范作品文件（存证包第 2 样）：人类可读的规范化数据；它的 SHA-256 ＝ 作品指纹 */
+function canonJSON(d){
+  return JSON.stringify({
+    "_说明": "画出原创歌曲 规范作品文件。本文件（原样字节）的 SHA-256 即作品指纹/存证指纹。音符格为「行:列」文本，行＝音高行（从高到低），列＝节拍格；断音为切开长音的位置；升降音为该音符格的半音偏移（1=升♯，-1=降♭）。",
+    "基本信息": {
+      "调性": (NOTE_NAMES[d.root] || d.root) + (d.mode === 'major' ? '大调' : '小调'),
+      "拍号": (d.sig || [4,4]).join('/'),
+      "速度BPM": d.bpm,
+      "小节数": d.measures,
+      "音域扩展(高八度行数)": d.octUp || 0,
+      "音域扩展(低八度行数)": d.octDown || 0
+    },
+    "音符格_cells": [...(d.cells || [])].sort(),
+    "断音_breaks": [...(d.breaks || [])].sort(),
+    "升降音_accs": d.accs || {},
+    "歌词_lyricsText": d.lyricsText || ''
+  }, null, 2);
 }
 
 /* 载入别的草稿前，先把画布上现有内容存一份，绝不静默丢稿（同内容不重复存） */
@@ -2229,7 +2248,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.26';
+const APP_VER = 'v1.27';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2360,7 +2379,7 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
   }
   const draftRef = d;
   const dataSnap = d.data;
-  const canon = snapSign(dataSnap);
+  const canon = canonJSON(dataSnap);
   const nCells = new Set(dataSnap.cells).size;
   const lyCount = (dataSnap.lyricsText || '').replace(/\s/g, '').length;
   const whatDesc = '草稿「' + draftRef.name + '」这一稿——' + nCells + ' 个音符格 · '
@@ -2407,14 +2426,15 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
         + '生成时间：' + tLocal + '\n'
         + (title ? '作品名称：' + title + '\n' : '')
         + '作品指纹（SHA-256）：' + fp + '\n'
-        + '\n包内文件：\n'
-        + '  1_简谱图片(作品样本).png —— 著作权登记时作为作品样本直接上传\n'
-        + '  2_规范作品文件.canon.json —— 作品的规范化数据，它的 SHA-256 就是上面这个指纹\n'
-        + '  3_存证卡.html —— 双击用浏览器打开：含指纹、独立验证方法、创作说明模板（登记时照抄进「创作说明」栏）\n'
+        + '\n包内文件（怎么打开）：\n'
+        + '  1_简谱图片(作品样本).png —— 双击用看图软件打开。歌词逐字印在音符正下方。著作权登记时作为作品样本直接上传\n'
+        + '  2_规范作品文件.canon.json —— 右键→记事本打开（是给验证用的数据文件，不是乐谱；不用 Word/WPS 打开）。它的 SHA-256 就是上面这个指纹\n'
+        + '  3_存证卡.html —— 双击用浏览器（Edge/Chrome）打开：含指纹、独立验证方法、创作说明模板（登记时照抄进「创作说明」栏）\n'
         + (ots
-          ? '  4_独立时间戳证明.ots —— 比特币区块链独立时间锚定；几小时后可在 opentimestamps.org 上传第 2、4 两样完成验证\n'
-          : '  4_未锚定说明.txt —— 这次没连上公共日历；联网后重新点一次「存证」即可补上时间锚定\n')
-        + '\n歌词就在包里：印在「1_简谱图片」的音符正下方，也存在「2_规范作品文件」里。\n'
+          ? '  4_独立时间戳证明.ots —— 不用打开，验证时在 opentimestamps.org 上传第 2、4 两样即可；比特币区块链独立时间锚定\n'
+          : '  4_未锚定说明.txt —— 记事本打开。这次没连上公共日历；联网后重新点一次「存证」即可补上时间锚定\n')
+        + '\n提示：png 看图软件 / json 记事本 / html 浏览器，都不需要安装别的软件，Windows 自带就够。\n'
+        + '\n歌词就在包里：印在「1_简谱图片」的音符正下方，也存在「2_规范作品文件」的「歌词_lyricsText」里。\n'
         + '\n著作权登记时：样本上传第 1 样，创作说明抄存证卡里的模板按实际改一改。\n') });
       try{
         const png = await jianpuPNGBlob(dataSnap, fp);
@@ -2672,12 +2692,12 @@ async function jianpuPNGBlob(data, fp){
   if (inner.indexOf('还没有音符') >= 0) return null;
   const holder = document.createElement('div');
   holder.style.cssText = 'position:fixed;left:-99999px;top:0;width:760px;';
-  holder.innerHTML = '<style>' + JP_CSS + '</style>'
-    + '<div style="background:#fbf9f2;padding:26px 30px 34px;border-radius:12px">'
+  holder.innerHTML = '<div style="background:#fbf9f2;padding:26px 30px 34px;border-radius:12px">'
+    + '<style>' + JP_CSS + '</style>'
     + '<div class="jpscore">' + inner + '</div></div>';
   document.body.appendChild(holder);
   await new Promise(r => setTimeout(r, 80));
-  const cap = holder.children[1];
+  const cap = holder.children[0];   /* 样式必须在被抓取元素内部，否则 foreignObject 渲染丢排版 */
   const w = Math.ceil(cap.offsetWidth), h = Math.ceil(cap.offsetHeight);
   const ser = new XMLSerializer().serializeToString(cap);
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
@@ -2702,7 +2722,7 @@ async function exportJianpuPNG(id){
   const d = loadDrafts().find(x => x.id === id);
   if (!d) return;
   try{
-    const fp = await sha256Hex(snapSign(d.data));
+    const fp = await sha256Hex(canonJSON(d.data));
     const b = await jianpuPNGBlob(d.data, fp);
     if (!b){ flashTip('这一稿还没有音符，没什么可导出的'); return; }
     tryDownload(safeName(d.name) + '.png', b);
