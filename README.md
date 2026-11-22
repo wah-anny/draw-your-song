@@ -51,6 +51,8 @@ AI 一键生成的音乐，内容著作权至今没有定论——国内外都�
 
 打开即用：<https://draw-your-song.app.workbuddy.host/?sharecode=X7VJNMU5NF>
 
+**新手推荐先看**：[轻松给最爱的人写首歌 · 四步完整路径](https://draw-your-song.app.workbuddy.host/song-guide.html?sharecode=X7VJNMU5NF)——画旋律 → 贴歌词 → 带走简谱/MIDI → 下一步怎么走，一个下午就够。
+
 ## 本地运行
 
 无需安装任何东西：直接双击 `index.html`，用浏览器打开即可。
