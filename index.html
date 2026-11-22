@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.17</title>
+<title>画出原创歌曲 v1.18</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -63,6 +63,9 @@ button.armed:hover{color:#fff}
 .tbtn{padding:4px 10px;font-size:12px;border-radius:6px;background:#fff}
 .tbtn.on{background:#efedfb;border-color:var(--accent);color:var(--accent);font-weight:600}
 
+.toplink{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;padding:6px 8px;font-family:inherit}
+.toplink:hover{text-decoration:underline}
+#humRec.rec-on{background:#c0392b}
 /* 使用方法弹窗 */
 .guide h4{font-size:12px;margin:16px 0 6px;color:var(--accent);letter-spacing:.5px}
 .guide h4:first-child{margin-top:0}
@@ -265,7 +268,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.17 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.18 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -297,6 +300,8 @@ var _hmt = _hmt || [];
     <button class="tbtn" id="tFlute">笛子</button>
   </div>
   <button id="btnHelp" class="primary big" style="margin-left:auto" title="第一次来一定点这里，一分钟就会用">使用方法</button>
+  <button id="btnStamp" class="toplink" title="存证：作品指纹（SHA-256）+ 独立时间戳 + 存证卡——给作品带上可独立验证、可绑定身份的时间证据，著作权登记可用">🛡 存证</button>
+  <button id="btnLogin" class="toplink" title="登录 / 注册：把存证记录与你的身份绑定，著作权登记时才认。手机验证码，一分钟">登录</button>
 </div>
 
 <div class="wrap">
@@ -320,6 +325,7 @@ var _hmt = _hmt || [];
     <div class="mscroll" id="mscroll"><div class="pad"></div></div>
     <div class="transport">
       <button id="btnDraft" class="primary">💾 保存草稿</button>
+      <button id="btnNew" class="primary" title="把当前画面自动存入草稿箱，然后清空画布——快速开始新的一页">✚ 新建</button>
       <button id="btnHum" class="primary" title="哼唱落格：用麦克风哼一段旋律，自动落到格子上成为草稿，你再逐音修改">🎙 哼唱</button>
       <label class="chk"><input id="metro" type="checkbox">节拍器</label>
       <button id="btnBreak" class="mini">断音笔</button>
@@ -337,8 +343,6 @@ var _hmt = _hmt || [];
     <span class="cnt" id="dockCount"></span>
     <span class="sp"></span>
     <button class="mini" id="btnBackup" title="把全部草稿和当前画面存成一个备份文件（换浏览器、换网址、换电脑都能搬过去）">⇩ 备份全部</button>
-    <button class="mini" id="btnStamp" title="存证：计算作品指纹（SHA-256）+ OpenTimestamps 独立时间锚定，下载存证卡与规范作品文件——给作品带上可独立验证的时间证据">🛡 存证</button>
-    <button class="mini" id="btnLogin" title="登录 / 注册：把存证记录与你的身份绑定，著作权登记时才认。手机验证码，一分钟">登录</button>
     <button class="mini" id="btnRestore" title="从备份文件把草稿导进来">⇧ 导入备份</button>
     <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
   </div>
@@ -347,7 +351,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.17 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.18 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1224,6 +1228,26 @@ $('btnDraft').onclick = () => {
     });
 };
 
+$('btnNew').onclick = function(){
+  if (!S.cells.size) { flashTip('已经是新的一页，直接开画'); return; }
+  if (!STORAGE_OK) { flashTip('⚠️ 此环境禁用了本地存储——新建前请先「⇩ 备份全部」或「💾 保存草稿」'); return; }
+  armConfirm(this, '⚠ 再点一次：当前画面自动存草稿 → 清空开新页', () => {
+    let ok = true;
+    try {
+      const list = loadDrafts();
+      const name = '自动保存 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+      const item = { id: Date.now(), name: name, time: new Date().toLocaleString('zh-CN'), data: dataSnapshot() };
+      list.unshift(item); saveDrafts(list); renderDrafts();
+      flashTip('✓ 已自动存为「' + name + '」');
+    } catch(e) { ok = false; }
+    if (!ok) { flashTip('⚠️ 自动保存失败——已停止新建，请手动「💾 保存草稿」后再清空'); return; }
+    undoStack.push(snapshot());
+    S.cells.clear(); S.breaks.clear(); S.accs = {};
+    updateRuns(); renderDecor(); updateStat(); saveLocal();
+    track('canvas','新建');
+  });
+};
+
 function safeName(s){ return String(s).replace(/[\\/:*?"<>|]/g, '_') || 'melody'; }
 
 function esc(s){
@@ -1887,7 +1911,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.17 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+/* v1.18 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
    v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
@@ -1908,35 +1932,39 @@ window.addEventListener('resize', rotUpdate);
 window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
 setTimeout(rotUpdate, 600);
 
-/* ================= v1.17 哼唱输入 + 作品存证 ================= */
+/* ================= v1.18 哼唱输入 + 作品存证 ================= */
 
 /* ---- 哼唱：录音 → 音高检测 → 落草稿 ---- */
 let humState = { recording:false, recorder:null, chunks:[], ctx:null, stream:null };
 
 $('btnHum').onclick = () => {
   track('hum','打开');
+  const repChecked = S.cells.size ? '' : 'checked';
+  const appChecked = S.cells.size ? 'checked' : '';
   openExport('🎙 哼唱落格——哼几句，音符自动落到格子上，你再逐音修', `
     <div style="max-width:560px;line-height:1.8;font-size:14px">
-      <p><b>怎么哼：</b>安静房间，离麦克风近一点，用「啦/啊」稳稳地哼<b>单音旋律</b>（一次一个音，别哼和弦）。速度按你心里唱的来，落格后可调。</p>
+      <p><b>怎么哼：</b>安静房间，离麦克风近一点，用「啦/啊」稳稳地哼<b>单音旋律</b>（一次一个音，别哼和弦）。<b>每个音哼清楚、音与音之间稍微断开</b>，识别会准很多。哼完软件会自动对速度、落格子，落格后按 ▶ 试听逐个修。</p>
       <p style="color:var(--muted)">音频只在你电脑里分析，不上传任何服务器。</p>
-      <div style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="primary" id="humStart">● 开始录音</button>
-        <button class="mini" id="humStop" disabled>■ 停止</button>
-        <button class="mini primary" id="humLand" disabled>⇩ 落到画布</button>
-        <button class="mini" id="humCancel">取消</button>
+      <div style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="primary" id="humRec">🎙 按一下开始录音</button>
+        <button class="mini" id="humBack">返回</button>
       </div>
-      <div id="humStatus" style="color:var(--muted)">尚未录音。</div>
+      <div style="margin:4px 0 10px;color:var(--muted);font-size:13px">
+        落格方式：
+        <label style="margin-right:12px"><input type="radio" name="humMode" value="replace" ${repChecked}> 清空画布后落格（开新页推荐）</label>
+        <label><input type="radio" name="humMode" value="append" ${appChecked}> 接在现有音符后面</label>
+      </div>
+      <div id="humStatus" style="color:var(--muted)">按一下「开始录音」就开始，再按一下就停止并自动落格。</div>
     </div>`);
   const $h = id => document.getElementById(id);
   humState.chunks = [];
-  $h('humStart').onclick = humStartRec;
-  $h('humStop').onclick = humStopRec;
-  $h('humCancel').onclick = () => { humCleanup(); $('overlay').classList.remove('show'); };
-  $h('humLand').onclick = humLand;
+  $h('humRec').onclick = humToggleRec;
+  $h('humBack').onclick = () => { humCleanup(); $('overlay').classList.remove('show'); };
 };
 
-async function humStartRec(){
+async function humToggleRec(){
   const $h = id => document.getElementById(id);
+  if (humState.recording){ humStopRec(); return; }
   try{
     humState.stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:true } });
   }catch(e){ $h('humStatus').textContent = '拿不到麦克风：请允许浏览器使用麦克风（本页是 HTTPS，可以直接允许）。'; return; }
@@ -1946,15 +1974,18 @@ async function humStartRec(){
   humState.recorder.onstop = humAnalyse;
   humState.recorder.start();
   humState.recording = true;
-  $h('humStart').disabled = true; $h('humStop').disabled = false; $h('humLand').disabled = true;
-  $h('humStatus').textContent = '录音中……稳稳地哼你的旋律，哼完点「停止」。建议 5–30 秒。';
+  $h('humRec').textContent = '■ 停止（自动落格）';
+  $h('humRec').classList.add('rec-on');
+  $h('humStatus').textContent = '录音中……稳稳地哼你的旋律，每个音哼清楚、音与音稍断开。再按一下就停止。建议 5–30 秒。';
 }
 
 function humStopRec(){
   if (!humState.recording) return;
   humState.recording = false;
   const $h = id => document.getElementById(id);
-  $h('humStop').disabled = true;
+  $h('humRec').disabled = true;
+  $h('humRec').textContent = '🎙 按一下开始录音';
+  $h('humRec').classList.remove('rec-on');
   $h('humStatus').textContent = '分析中……（音频越长越慢，请稍等）';
   try { humState.recorder.stop(); } catch(e){}
 }
@@ -1979,12 +2010,19 @@ async function humAnalyse(){
     const WIN = 1024, HOP = 256;
     const frames = Math.max(0, Math.floor((pcm.length - WIN) / HOP));
     const mids = new Array(frames).fill(-1);
+    /* 先扫一遍能量，做自适应静音阈值（比固定 0.006 强得多：小声哼和安静房间都能用） */
+    const rmsArr = new Float32Array(frames);
+    for (let i = 0; i < frames; i++){
+      const seg = pcm.slice(i * HOP, i * HOP + WIN);
+      let r = 0; for (let k = 0; k < WIN; k++) r += seg[k] * seg[k];
+      rmsArr[i] = Math.sqrt(r / WIN);
+    }
+    let humPeak = 0; for (let i = 0; i < frames; i++) humPeak = Math.max(humPeak, rmsArr[i]);
+    const silThr = Math.max(0.008, humPeak * 0.12);
     let done = 0;
     const detectFrame = i => {
       const seg = pcm.slice(i * HOP, i * HOP + WIN);
-      let rms = 0; for (let k = 0; k < WIN; k++) rms += seg[k] * seg[k];
-      rms = Math.sqrt(rms / WIN);
-      if (rms < 0.006) return -1;
+      if (rmsArr[i] < silThr) return -1;
       /* 自相关找基频 */
       const c = new Float32Array(WIN);
       for (let lag = 20; lag < 700; lag++){          /* 22050/700≈31Hz ~ 22050/20≈1100Hz */
@@ -1995,7 +2033,7 @@ async function humAnalyse(){
       for (let lag = 21; lag < 700; lag++){
         if (c[lag] > c[lag - 1] && c[lag] >= c[lag + 1] && c[lag] > bv){ bv = c[lag]; best = lag; }
       }
-      if (best < 0 || bv < rms * rms * WIN * 0.35) return -1;
+      if (best < 0 || bv < rmsArr[i] * rmsArr[i] * WIN * 0.30) return -1;
       const freq = 22050 / best;
       const m = Math.round(69 + 12 * Math.log2(freq / 440));
       return (m >= 24 && m <= 96) ? m : -1;
@@ -2012,34 +2050,57 @@ async function humAnalyse(){
       const w = mids.slice(Math.max(0, i - 2), i + 3).filter(x => x > 0).sort((a, b) => a - b);
       return w.length ? w[Math.floor(w.length / 2)] : -1;
     });
-    /* 分段成音 → 量化到 16 分格 */
-    const sixteenth = 60 / S.bpm / 4;
+    /* 分段成音（阈值自适应 + 同音碎段合并） */
     const frameSec = HOP / sr;
-    const raw = [];
+    const raw0 = [];
     let s0 = -1, cur = -1;
     for (let i = 0; i <= sm.length; i++){
       const m = i < sm.length ? sm[i] : -2;
       if (m !== cur){
         if (cur > 0 && s0 >= 0){
           const dur = (i - s0) * frameSec;
-          if (dur >= 0.09) raw.push({ m: cur, t0: s0 * frameSec, dur });
+          if (dur >= 0.07) raw0.push({ m: cur, t0: s0 * frameSec, dur });
         }
         s0 = i; cur = m;
       }
     }
+    /* 合并：同音高、间隔极短的碎段（换气/检测抖动造成的假断开） */
+    const raw = [];
+    raw0.forEach(x => {
+      const p = raw[raw.length - 1];
+      if (p && p.m === x.m && x.t0 - (p.t0 + p.dur) < 0.08){ p.dur = x.t0 + x.dur - p.t0; }
+      else raw.push(x);
+    });
     if (!raw.length){ $h('humStatus').textContent = '没有识别到清晰的音——再试一次：离麦克风近点、用「啦」哼、一次一个音。'; humCleanup(); return; }
+    /* 节拍拟合：扫描 40–200 全部 BPM，找让起音和时值都最贴合格子的那一档（解决"哼的速度≠格子速度"导致的错位） */
+    let bestBpm = S.bpm, bestScore = 1e9;
+    for (let b = 40; b <= 200; b++){
+      const s = 60 / (b * 4);
+      let sum = 0;
+      raw.forEach(x => {
+        const dOn = Math.abs(x.t0 / s - Math.round(x.t0 / s)) * s;
+        const dDu = Math.abs(x.dur / s - Math.max(1, Math.round(x.dur / s))) * s;
+        sum += dOn / s + 0.5 * dDu / s;
+      });
+      sum /= raw.length;
+      if (sum < bestScore){ bestScore = sum; bestBpm = b; }
+    }
+    const s16 = 60 / (bestBpm * 4);
     /* 八度自适应：整体移到画布音域内 */
     const lo = Math.min(...raw.map(x => x.m)), hi = Math.max(...raw.map(x => x.m));
     let shift = 0;
     const top = Math.max(...pitches.map(p => p.midi)), bot = Math.min(...pitches.map(p => p.midi));
     while (hi + shift > top) shift -= 12;
     while (lo + shift < bot) shift += 12;
-    /* 落格 */
+    /* 落格：替换（开新页默认）或追加 */
+    const humMode = (document.querySelector('input[name="humMode"]:checked') || {}).value || 'replace';
     undoStack.push(snapshot());
     if (undoStack.length > 60) undoStack.shift();
+    if (humMode === 'replace' && S.cells.size){ S.cells.clear(); S.breaks.clear(); S.accs = {}; }
+    if (humMode === 'replace' && bestBpm !== S.bpm){ S.bpm = bestBpm; $('bpm').value = bestBpm; }
     let landed = 0, maxCol = -1;
-    const sixteens = raw.map(x => ({ col: Math.round(x.t0 / sixteenth),
-                                     len: Math.max(1, Math.round(x.dur / sixteenth)),
+    const sixteens = raw.map(x => ({ col: Math.round(x.t0 / s16),
+                                     len: Math.max(1, Math.round(x.dur / s16)),
                                      midi: x.m + shift }));
     sixteens.forEach(n => { maxCol = Math.max(maxCol, n.col + n.len - 1); });
     if (maxCol >= totalCols() - 4){ S.measures += Math.ceil((maxCol + 5 - totalCols()) / 16) * 4; $('measures').value = S.measures; }
@@ -2052,10 +2113,10 @@ async function humAnalyse(){
         if (!S.cells.has(k)){ S.cells.add(k); landed++; }
       }
     });
-    if (maxCol >= totalCols() - 4 || $('measures').value !== String(S.measures)) rebuild(); else rebuild();
+    rebuild();
     saveLocal(); updateStat();
-    $h('humStatus').textContent = '✅ 识别并落格 ' + landed + ' 个音（共识别 ' + raw.length + ' 音）。点「取消」回画布，按 ▶ 试听，逐音修改——落格只是草稿。';
-    $h('humLand').disabled = true; $h('humLand').style.display = 'none';
+    $h('humStatus').textContent = '✅ 识别并落格 ' + landed + ' 个音（共识别 ' + raw.length + ' 音，拟合速度 ' + bestBpm + ' BPM）。点「返回」回画布，按 ▶ 试听，逐音修改——落格只是草稿。';
+    if ($h('humRec')) $h('humRec').disabled = false;
     track('hum','落格', landed);
     humCleanup();
   }catch(e){
@@ -2064,11 +2125,9 @@ async function humAnalyse(){
   }
 }
 
-function humLand(){ /* 落格已在分析完成时自动完成，此按钮留作占位 */ }
-
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.17';
+const APP_VER = 'v1.18';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2188,7 +2247,7 @@ function startStampFlow(){
   };
 }
 
-/* ================= v1.17 登录（手机验证码）+ 简谱图片导出 ================= */
+/* ================= v1.18 登录（手机验证码）+ 简谱图片导出 ================= */
 const WB_CFG = {
   endpoint: 'https://draw-your-song.app.workbuddy.host',
   oauthRelayBaseUrl: 'https://www.workbuddy.cn/v2/as/genie-baas/oauth',
