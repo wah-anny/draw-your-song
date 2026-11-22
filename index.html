@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.23</title>
+<title>画出原创歌曲 v1.24</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -354,7 +354,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.23 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.24 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -385,7 +385,7 @@ var _hmt = _hmt || [];
     <button class="tbtn" id="tStrings">弦乐</button>
     <button class="tbtn" id="tFlute">笛子</button>
   </div>
-  <button id="btnStamp" class="primary big stampbtn" title="最重要：作品指纹 + 独立时间戳 + 存证卡 + 创作说明——著作权登记要用的证据文件，存证后自动下载" style="margin-left:auto">🛡 存证</button>
+  <button id="btnStamp" class="primary big stampbtn" title="存证的是当前画布上正在做的这一首（不是草稿箱里的草稿——想存哪份先点它的名字放回画布）。完成后自动下载 1 个存证压缩包，解压后简谱图片、规范作品文件、存证卡、时间戳证明都在里面" style="margin-left:auto">🛡 存证</button>
   <button id="btnLogin" class="primary big" title="登录 / 注册：存证需要登录才有归属，著作权登记时才认得上；登录后草稿自动云端随身带。手机验证码，一分钟">登录</button>
   <button id="btnHelp" class="primary big" title="第一次来一定点这里，一分钟就会用">使用方法</button>
 </div>
@@ -439,7 +439,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.23 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.24 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1900,6 +1900,7 @@ function guideHTML(){
 
   <h3 class="gsec gold">🛡 存证——最重要的一步</h3>
   <ul>
+    <li>存证存的是<b>当前画布上正在做的这一首</b>（音符＋歌词一起打包）——不是草稿箱里的草稿。想存草稿箱里的哪一首：先点它的名字放回画布，再点存证。</li>
     <li>画完点右上<b>「🛡 存证」按钮</b>。第一次会让你<b>手机验证码登录</b>——这是必须的：登录后存证记录与账号绑定，著作权登记时才认「这是谁的」。</li>
     <li>存证完成，自动下载 <b>1 个存证压缩包</b>到你电脑的「下载」文件夹，<b>解压后 4 样文件都在里面</b>：<b>简谱图片 PNG（作品样本）、规范作品文件、存证卡（含验证器与创作说明模板）、时间戳证明</b>——整个包留存好即可，不用一项项另存。</li>
     <li>存证卡里附<b>创作说明模板</b>——照着抄进登记表「创作说明」栏，按实际改一改就行。</li>
@@ -2223,7 +2224,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.23';
+const APP_VER = 'v1.24';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2359,8 +2360,15 @@ $('btnStamp').onclick = async () => {
 function startStampFlow(){
   const dataSnap = dataSnapshot();
   const canon = snapSign(dataSnap);
+  const lyCount = (S.lyricsText || '').replace(/\s/g, '').length;
+  const whatDesc = '当前画布上正在做的这一首——' + S.cells.size + ' 个音符格 · '
+    + NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + ' 小节'
+    + (lyCount ? ' · 歌词 ' + lyCount + ' 字' : ' · （还没贴歌词）');
   openExport('🛡 作品存证——给这首曲子生成可独立验证的证据包', `
     <div style="max-width:560px;line-height:1.8;font-size:14px">
+      <p style="background:#fff9ec;border:1px solid #d9bd85;border-radius:8px;padding:9px 12px;margin:0 0 10px">
+        <b>这次存证的对象：</b>${esc(whatDesc)}。<br>
+        存证永远只存<b>当前画布</b>，不是草稿箱里的任何一份。想存草稿箱里的哪一首：先点它的名字放回画布，再点「🛡 存证」。</p>
       <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网）；完成后<b>打包成 1 个存证压缩包</b>下载——解压后简谱图片、规范作品文件、存证卡、时间戳证明都在里面；存证记录同步云端存证库，与你的登录账号绑定。</p>
       <p style="margin:10px 0 4px">作品名称（用于存证卡与云端登记，建议填写）：</p>
       <input id="stampTitle" type="text" maxlength="40" placeholder="例如：给妈妈的歌" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px">
@@ -2404,6 +2412,7 @@ function startStampFlow(){
         + (ots
           ? '  4_独立时间戳证明.ots —— 比特币区块链独立时间锚定；几小时后可在 opentimestamps.org 上传第 2、4 两样完成验证\n'
           : '  4_未锚定说明.txt —— 这次没连上公共日历；联网后重新点一次「存证」即可补上时间锚定\n')
+        + '\n歌词就在包里：印在「1_简谱图片」的音符正下方，也存在「2_规范作品文件」里。\n'
         + '\n著作权登记时：样本上传第 1 样，创作说明抄存证卡里的模板按实际改一改。\n') });
       try{
         const png = await jianpuPNGBlob(dataSnap, fp);
