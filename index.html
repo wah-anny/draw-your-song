@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.20</title>
+<title>画出原创歌曲 v1.21</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -67,30 +67,43 @@ button.armed:hover{color:#fff}
 .toplink:hover{text-decoration:underline}
 #humRec.rec-on{background:#c0392b}
 .stampbtn{background:#b07d2b}
-/* ===== v1.20 入口封面：整页 hero，先说能得到什么 ===== */
-#welcome{display:none;min-height:100vh;padding:52px 16px 36px;
-  background:radial-gradient(880px 400px at 50% -60px,#eceaf8 0%,rgba(236,234,248,0) 62%),var(--bg)}
-.wcv{max-width:700px;margin:0 auto;text-align:center}
-.wcv .mk{font-size:12px;letter-spacing:4px;color:var(--muted)}
-.wcv .big{font-size:40px;font-weight:800;color:var(--ink);margin:14px 0 8px;letter-spacing:2px;line-height:1.45}
-.wcv .tag{font-size:15px;color:var(--muted);letter-spacing:.5px}
-.wmini{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:44px;margin:26px auto 0;max-width:400px}
-.wmini i{display:block;width:17px;border-radius:3px;background:#e7e4f4}
-.wmini i.on{background:linear-gradient(180deg,#5b53d6,#4b45c6)}
-.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0 6px;text-align:left}
-.wcell{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 17px 13px;box-shadow:0 3px 10px rgba(34,32,28,.05)}
-.wcell .ic{font-size:19px;margin-right:6px}
-.wcell b{font-size:15.5px;color:var(--ink)}
-.wcell span{display:block;margin-top:5px;color:var(--muted);font-size:13px;line-height:1.75}
-.wcell.gold{border-color:#dcc084;background:#fffdf7}
-.wcell.gold b{color:#8a611d}
-.wcv .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-.wcv .btns .primary.big{padding:13px 26px;font-size:16.5px;border-radius:12px}
-.wcv .note{font-size:13.5px;color:var(--muted);margin:16px auto 0;max-width:560px;line-height:1.9}
-@media (max-width:640px){.wcv .big{font-size:28px}.wgrid{grid-template-columns:1fr}}
+/* ===== v1.21 入口封面：版权主题 · 暖色调 · 页面式布局 ===== */
+#welcome{display:none;min-height:100vh;padding:0;
+  background:linear-gradient(180deg,#fbf7ee 0%,#f6efe1 55%,#f0e6d2 100%)}
+.wcv{max-width:880px;margin:0 auto;padding:40px 30px 18px;display:flex;flex-direction:column;min-height:100vh}
+.wbrand{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #e6dcc6;padding-bottom:14px;flex-wrap:wrap}
+.wbrand .en{font-size:12.5px;letter-spacing:3.5px;color:#a58e5e;font-weight:600}
+.wbrand .cn{font-size:20px;font-weight:800;color:#3a3225}
+.wbrand .dom{margin-left:auto;font-size:12px;color:#a49877}
+.whero{margin:36px 0 4px}
+.whero .kick{font-size:13.5px;letter-spacing:2px;color:#b07d2b;font-weight:700}
+.whero .big{font-size:33px;font-weight:800;color:#322b20;line-height:1.5;margin:10px 0 8px;letter-spacing:1px}
+.whero .sub{font-size:15px;color:#7d7159;line-height:1.8}
+.wrows{margin:26px 0 6px;display:flex;flex-direction:column;gap:10px}
+.wrow{display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #ebe1c9;border-radius:12px;padding:14px 18px;box-shadow:0 2px 6px rgba(90,70,30,.04)}
+.wrow .ic{font-size:21px;flex:0 0 auto}
+.wrow .tt{font-size:16px;font-weight:700;color:#322b20;white-space:nowrap}
+.wrow .ds{font-size:13.5px;color:#7d7159;line-height:1.7;flex:1;min-width:0}
+.wrow .tag{font-size:12px;padding:3px 11px;border-radius:999px;background:#f0e7d3;color:#8a611d;white-space:nowrap;flex:0 0 auto}
+.wrow.gold{border-color:#d9bd85;background:#fff9ec}
+.wrow.gold .tt{color:#8a611d}
+.wcta{display:flex;gap:14px;align-items:center;margin:22px 0 6px;flex-wrap:wrap}
+.wcta .ask{font-size:14.5px;color:#5a4d33;font-weight:600}
+.wbtn{border:none;border-radius:11px;padding:12px 30px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;color:#fff;background:#b07d2b;box-shadow:0 3px 10px rgba(140,100,40,.22)}
+.wbtn:hover{background:#9c6d22}
+.wbtn.ghost{background:#fffdf8;border:1.5px solid #cdbb92;color:#5a4d33;box-shadow:none}
+.wbtn.ghost:hover{background:#faf4e6}
+.wfoot{margin-top:auto;padding:16px 0 4px;border-top:1px solid #e6dcc6;display:flex;gap:16px;flex-wrap:wrap;color:#a49877;font-size:12.5px;line-height:1.7}
+@media (max-width:640px){
+  .wcv{padding:26px 16px 12px}
+  .whero .big{font-size:24px}
+  .wrow{flex-wrap:wrap}
+  .wrow .tt{white-space:normal}
+  .wbrand .dom{margin-left:0;flex-basis:100%}
+}
 body.welcome-show header,body.welcome-show #svHint,body.welcome-show .bar,
 body.welcome-show .wrap,body.welcome-show .dock,body.welcome-show .site-foot,body.welcome-show #rot{display:none}
-/* v1.20 使用方法分节 */
+/* v1.21 使用方法分节 */
 .guide{font-size:15px;line-height:1.9}
 .guide h3.gsec{margin:18px 0 8px;padding:9px 14px;background:#f4f2fb;border-left:4px solid var(--accent);border-radius:6px;font-size:16.5px;color:var(--ink)}
 .guide h3.gsec.gold{background:#faf5ea;border-left-color:#b07d2b}
@@ -297,31 +310,36 @@ var _hmt = _hmt || [];
 
 <div id="welcome">
   <div class="wcv">
-    <div class="mk">DRAW YOUR SONG · 画出原创歌曲</div>
-    <div class="big">轻松给最爱的人<br>写一首你自己的歌</div>
-    <div class="tag">免费网页工具 · 电脑浏览器打开 · 不用下载，不用懂乐理</div>
-    <div class="wmini" aria-hidden="true">
-      <i style="height:10px"></i><i style="height:14px"></i><i class="on" style="height:24px"></i><i style="height:12px"></i><i class="on" style="height:30px"></i><i class="on" style="height:34px"></i><i style="height:16px"></i><i class="on" style="height:26px"></i><i style="height:10px"></i><i class="on" style="height:38px"></i><i class="on" style="height:30px"></i><i style="height:14px"></i><i class="on" style="height:22px"></i><i style="height:12px"></i><i class="on" style="height:32px"></i><i style="height:16px"></i><i style="height:10px"></i>
+    <div class="wbrand">
+      <span class="cn">画出原创歌曲</span>
+      <span class="en">DRAW YOUR SONG</span>
+      <span class="dom">wah-anny.github.io/draw-your-song</span>
     </div>
-    <div class="wgrid">
-      <div class="wcell"><span class="ic">🎵</span><b>画格子 · 哼唱都行</b><span>在格子上点一点，旋律立刻能听；或者对着麦克风哼几句，音符自动落到画布上，你再逐音修。</span></div>
-      <div class="wcell"><span class="ic">📖</span><b>自动出简谱</b><span>贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span></div>
-      <div class="wcell"><span class="ic">⬇</span><b>文件全带走</b><span>简谱图片、乐谱、MIDI 全部下载到<b>你自己的电脑</b>，打印、发人、交材料都随你。</span></div>
-      <div class="wcell gold"><span class="ic">🛡</span><b>一键存证</b><span>作品指纹＋独立时间戳＋存证卡＋创作说明——<b>著作权登记要的证据一次备齐</b>。</span></div>
+    <div class="whero">
+      <div class="kick">轻松创作 · 版权有据</div>
+      <div class="big">轻松创作你的乐曲，<br>我们为你的著作权申报备齐文件</div>
+      <div class="sub">免费网页工具，电脑浏览器打开即用。旋律你亲手放、歌词你亲手贴——作品完完整整是你的，证据也完完整整是你的。</div>
     </div>
-    <div class="btns">
-      <button class="primary big stampbtn" id="wLogin">🛡 登录 / 注册——为存证绑定身份</button>
-      <button class="primary big" id="wTry">先试一试 →</button>
+    <div class="wrows">
+      <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子作曲</span><span class="ds">在格子上点一点，旋律立刻能听——不用懂乐理，不用会乐器。</span><span class="tag">创作</span></div>
+      <div class="wrow"><span class="ic">📖</span><span class="tt">自动出简谱</span><span class="ds">贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span><span class="tag">成谱</span></div>
+      <div class="wrow"><span class="ic">⬇</span><span class="tt">文件全带走</span><span class="ds">简谱图片、乐谱、MIDI 全部下载到你的电脑，打印、发人、交材料随你用。</span><span class="tag">交付</span></div>
+      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要的证据，一次备齐。</span><span class="tag">核心</span></div>
     </div>
-    <div class="note">要把作品拿去著作权登记，<b>登录是必要条件</b>（手机验证码，一分钟）——存证记录与账号绑定，才证得到「这作品是谁的」。<br>
-      只想先玩玩？点「先试一试」，随时点右上「登录」补上，作品不会丢；登录后草稿自动云端随身带，换电脑也不丢。</div>
+    <div class="wcta">
+      <span class="ask">需要著作权认证文件？</span><button class="wbtn" id="wLogin">登录</button>
+      <span class="ask">只想先试试？</span><button class="wbtn ghost" id="wTry">先试一试 →</button>
+    </div>
+    <div class="wfoot">
+      <span>免费使用</span><span>代码开源（MIT）</span><span>作品数据不出你的电脑</span><span>登录仅需手机验证码，一分钟</span><span>登录后草稿云端随身带</span><span>© 2026 充电器</span>
+    </div>
   </div>
 </div>
 
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.20 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.21 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -353,7 +371,7 @@ var _hmt = _hmt || [];
     <button class="tbtn" id="tFlute">笛子</button>
   </div>
   <button id="btnStamp" class="primary big stampbtn" title="最重要：作品指纹 + 独立时间戳 + 存证卡 + 创作说明——著作权登记的证据一次备齐" style="margin-left:auto">🛡 存证</button>
-  <button id="btnLogin" class="primary big" title="登录 / 注册：把存证记录与你的身份绑定，著作权登记时才认；登录后草稿自动云端随身带。手机验证码，一分钟">登录</button>
+  <button id="btnLogin" class="primary big" title="登录 / 注册：存证需要登录才有归属，著作权登记时才认得上；登录后草稿自动云端随身带。手机验证码，一分钟">登录</button>
   <button id="btnHelp" class="primary big" title="第一次来一定点这里，一分钟就会用">使用方法</button>
 </div>
 
@@ -404,7 +422,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.20 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.21 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1922,7 +1940,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
       + '但<b>关闭后内容会消失</b>——请先点「⇩ 备份全部」复制保存，或改用普通浏览器窗口打开本页。';
     return;
   }
-  /* v1.20：首次收藏提示条已移除——入口封面已承担说明职责，不再打扰 */
+  /* v1.21：首次收藏提示条已移除——入口封面已承担说明职责，不再打扰 */
   window.addEventListener('beforeunload', (e) => {
     let has = false;
     try { has = (typeof S !== 'undefined' && S.cells && S.cells.size > 0) || loadDrafts().length > 0; } catch(err){}
@@ -1932,7 +1950,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.20 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+/* v1.21 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
    v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
@@ -1953,7 +1971,7 @@ window.addEventListener('resize', rotUpdate);
 window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
 setTimeout(rotUpdate, 600);
 
-/* ================= v1.20 哼唱输入 + 作品存证 ================= */
+/* ================= v1.21 哼唱输入 + 作品存证 ================= */
 
 /* ---- 哼唱：录音 → 音高检测 → 落草稿 ---- */
 let humState = { recording:false, recorder:null, chunks:[], ctx:null, stream:null };
@@ -2156,7 +2174,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.20';
+const APP_VER = 'v1.21';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2223,8 +2241,7 @@ $('btnStamp').onclick = async () => {
   if (!S.cells.size){ flashTip('画布是空的——先画（或哼）出旋律再存证'); return; }
   const user = await getSessionSafe();
   if (!user){
-    openLoginModal('要让这份存证<b>成为著作权登记可用的身份绑定证据</b>，需要先登录（手机验证码，一分钟搞定）。'
-      + '登录后，存证记录与你的账号绑定——"这个作品在何时存在、归属哪个账号"才站得住。作品内容本身仍然不出你的电脑。', () => startStampFlow());
+    openLoginModal('生成著作权登记用的存证文件，需要先登录（手机验证码，一分钟）。登录后这份存证才有归属，登记时才认得上。作品内容本身仍然不出你的电脑。', () => startStampFlow());
     return;
   }
   startStampFlow();
@@ -2286,7 +2303,7 @@ function startStampFlow(){
   };
 }
 
-/* ================= v1.20 登录（手机验证码）+ 简谱图片导出 ================= */
+/* ================= v1.21 登录（手机验证码）+ 简谱图片导出 ================= */
 const WB_CFG = {
   endpoint: 'https://draw-your-song.app.workbuddy.host',
   oauthRelayBaseUrl: 'https://www.workbuddy.cn/v2/as/genie-baas/oauth',
@@ -2300,6 +2317,7 @@ function cloudReady(){
   return _cloud;
 }
 async function getSessionSafe(){
+  if (_sessUser) return _sessUser;   /* 已登录直接信任本地状态——不重复探测（网络抖动会误判成未登录） */
   const c = cloudReady(); if (!c) return null;
   try{
     const { data, error } = await c.auth.getSession();
@@ -2321,7 +2339,7 @@ function openLoginModal(reason, afterLogin){
   _afterLogin = afterLogin || null;
   _pendingOtp = null;
   if (_cdTimer){ clearInterval(_cdTimer); _cdTimer = null; }
-  openExport('登录 · 绑定你的身份', `
+  openExport('登录', `
     <div style="max-width:560px;line-height:1.8;font-size:14px">
       <p style="background:#f4f2fb;border:1px solid #cfc8ec;border-radius:10px;padding:10px 12px">${reason}</p>
       <p style="margin:10px 0 4px"><b>手机号：</b></p>
@@ -2403,7 +2421,7 @@ $('btnLogin').onclick = async () => {
     });
     return;
   }
-  openLoginModal('登录后，你的存证记录会与账号绑定——"这个作品在何时存在、归属哪个账号"才站得住，著作权登记时才有身份证据。作品内容本身仍然不出你的电脑。', null);
+  openLoginModal('登录后，你的存证记录才有归属，著作权登记时才认得上。作品内容本身仍然不出你的电脑。', null);
 };
 window.addEventListener('load', async () => {
   await getSessionSafe(); refreshLoginBtn();
@@ -2415,7 +2433,7 @@ window.addEventListener('load', async () => {
   }
 });
 
-/* ===== v1.20 入口欢迎卡：先说能得到什么；登录为存证必要条件 ===== */
+/* ===== v1.21 入口欢迎卡：先说能得到什么；登录为存证必要条件 ===== */
 function showWelcome(){
   const el = document.getElementById('welcome');
   if (!el) return;
@@ -2429,11 +2447,11 @@ function hideWelcome(){
 }
 $('wLogin').onclick = () => {
   hideWelcome(); track('welcome', 'login');
-  openLoginModal('要把作品拿去<b>著作权登记</b>，登录是必要条件——存证记录与账号绑定后，"作品在何时存在、归属哪个账号"才站得住。作品内容本身仍然不出你的电脑。', null);
+  openLoginModal('要把作品拿去著作权登记，登录是必要条件——登录后存证才有归属，登记时才认得上。作品内容本身仍然不出你的电脑。', null);
 };
 $('wTry').onclick = () => { hideWelcome(); track('welcome', 'try'); };
 
-/* ===== v1.20 云端草稿箱：登录后草稿随身同步，换设备/清缓存不丢 ===== */
+/* ===== v1.21 云端草稿箱：登录后草稿随身同步，换设备/清缓存不丢 ===== */
 let _cloudSyncWarnAt = 0;
 function cloudSyncWarn(msg){
   if (Date.now() - _cloudSyncWarnAt < 60000) return;
