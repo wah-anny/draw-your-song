@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.15</title>
+<title>画出原创歌曲 v1.16</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -264,7 +264,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.15 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.16 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -319,6 +319,7 @@ var _hmt = _hmt || [];
     <div class="mscroll" id="mscroll"><div class="pad"></div></div>
     <div class="transport">
       <button id="btnDraft" class="primary">💾 保存草稿</button>
+      <button id="btnHum" class="primary" title="哼唱落格：用麦克风哼一段旋律，自动落到格子上成为草稿，你再逐音修改">🎙 哼唱</button>
       <label class="chk"><input id="metro" type="checkbox">节拍器</label>
       <button id="btnBreak" class="mini">断音笔</button>
       <button id="btnUndo" class="mini">撤销</button>
@@ -335,6 +336,7 @@ var _hmt = _hmt || [];
     <span class="cnt" id="dockCount"></span>
     <span class="sp"></span>
     <button class="mini" id="btnBackup" title="把全部草稿和当前画面存成一个备份文件（换浏览器、换网址、换电脑都能搬过去）">⇩ 备份全部</button>
+    <button class="mini" id="btnStamp" title="存证：计算作品指纹（SHA-256）+ OpenTimestamps 独立时间锚定，下载存证卡与规范作品文件——给作品带上可独立验证的时间证据">🛡 存证</button>
     <button class="mini" id="btnRestore" title="从备份文件把草稿导进来">⇧ 导入备份</button>
     <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
   </div>
@@ -343,7 +345,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.15 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.16 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1881,7 +1883,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.15 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+/* v1.16 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
    v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
@@ -1901,6 +1903,261 @@ rotUpdate();
 window.addEventListener('resize', rotUpdate);
 window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
 setTimeout(rotUpdate, 600);
+
+/* ================= v1.16 哼唱输入 + 作品存证 ================= */
+
+/* ---- 哼唱：录音 → 音高检测 → 落草稿 ---- */
+let humState = { recording:false, recorder:null, chunks:[], ctx:null, stream:null };
+
+$('btnHum').onclick = () => {
+  track('hum','打开');
+  openExport('🎙 哼唱落格——哼几句，音符自动落到格子上，你再逐音修', `
+    <div style="max-width:560px;line-height:1.8;font-size:14px">
+      <p><b>怎么哼：</b>安静房间，离麦克风近一点，用「啦/啊」稳稳地哼<b>单音旋律</b>（一次一个音，别哼和弦）。速度按你心里唱的来，落格后可调。</p>
+      <p style="color:var(--muted)">音频只在你电脑里分析，不上传任何服务器。</p>
+      <div style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="primary" id="humStart">● 开始录音</button>
+        <button class="mini" id="humStop" disabled>■ 停止</button>
+        <button class="mini primary" id="humLand" disabled>⇩ 落到画布</button>
+        <button class="mini" id="humCancel">取消</button>
+      </div>
+      <div id="humStatus" style="color:var(--muted)">尚未录音。</div>
+    </div>`);
+  const $h = id => document.getElementById(id);
+  humState.chunks = [];
+  $h('humStart').onclick = humStartRec;
+  $h('humStop').onclick = humStopRec;
+  $h('humCancel').onclick = () => { humCleanup(); $('overlay').classList.remove('show'); };
+  $h('humLand').onclick = humLand;
+};
+
+async function humStartRec(){
+  const $h = id => document.getElementById(id);
+  try{
+    humState.stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:true } });
+  }catch(e){ $h('humStatus').textContent = '拿不到麦克风：请允许浏览器使用麦克风（本页是 HTTPS，可以直接允许）。'; return; }
+  humState.chunks = [];
+  humState.recorder = new MediaRecorder(humState.stream);
+  humState.recorder.ondataavailable = ev => { if (ev.data.size) humState.chunks.push(ev.data); };
+  humState.recorder.onstop = humAnalyse;
+  humState.recorder.start();
+  humState.recording = true;
+  $h('humStart').disabled = true; $h('humStop').disabled = false; $h('humLand').disabled = true;
+  $h('humStatus').textContent = '录音中……稳稳地哼你的旋律，哼完点「停止」。建议 5–30 秒。';
+}
+
+function humStopRec(){
+  if (!humState.recording) return;
+  humState.recording = false;
+  const $h = id => document.getElementById(id);
+  $h('humStop').disabled = true;
+  $h('humStatus').textContent = '分析中……（音频越长越慢，请稍等）';
+  try { humState.recorder.stop(); } catch(e){}
+}
+
+function humCleanup(){
+  if (humState.stream){ humState.stream.getTracks().forEach(t => t.stop()); humState.stream = null; }
+}
+
+async function humAnalyse(){
+  try{
+    const blob = new Blob(humState.chunks, { type: humState.chunks[0] ? humState.chunks[0].type : 'audio/webm' });
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await ac.decodeAudioData(await blob.arrayBuffer());
+    ac.close();
+    /* 重采样到 22050 单声道，省算力 */
+    const off = new OfflineAudioContext(1, Math.max(1, Math.ceil(buf.duration * 22050)), 22050);
+    const src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start();
+    const rnd = await off.startRendering();
+    const pcm = rnd.getChannelData(0), sr = 22050;
+
+    const $h = id => document.getElementById(id);
+    const WIN = 1024, HOP = 256;
+    const frames = Math.max(0, Math.floor((pcm.length - WIN) / HOP));
+    const mids = new Array(frames).fill(-1);
+    let done = 0;
+    const detectFrame = i => {
+      const seg = pcm.slice(i * HOP, i * HOP + WIN);
+      let rms = 0; for (let k = 0; k < WIN; k++) rms += seg[k] * seg[k];
+      rms = Math.sqrt(rms / WIN);
+      if (rms < 0.006) return -1;
+      /* 自相关找基频 */
+      const c = new Float32Array(WIN);
+      for (let lag = 20; lag < 700; lag++){          /* 22050/700≈31Hz ~ 22050/20≈1100Hz */
+        let s = 0; for (let k = 0; k < WIN - lag; k++) s += seg[k] * seg[k + lag];
+        c[lag] = s;
+      }
+      let best = -1, bv = 0;
+      for (let lag = 21; lag < 700; lag++){
+        if (c[lag] > c[lag - 1] && c[lag] >= c[lag + 1] && c[lag] > bv){ bv = c[lag]; best = lag; }
+      }
+      if (best < 0 || bv < rms * rms * WIN * 0.35) return -1;
+      const freq = 22050 / best;
+      const m = Math.round(69 + 12 * Math.log2(freq / 440));
+      return (m >= 24 && m <= 96) ? m : -1;
+    };
+    for (let i = 0; i < frames; i++){
+      mids[i] = detectFrame(i);
+      if (++done % 40 === 0){
+        $h('humStatus').textContent = '分析中…… ' + Math.round(done / frames * 100) + '%';
+        await new Promise(r => setTimeout(r));
+      }
+    }
+    /* 5 帧中值滤波去毛刺 */
+    const sm = mids.map((_, i) => {
+      const w = mids.slice(Math.max(0, i - 2), i + 3).filter(x => x > 0).sort((a, b) => a - b);
+      return w.length ? w[Math.floor(w.length / 2)] : -1;
+    });
+    /* 分段成音 → 量化到 16 分格 */
+    const sixteenth = 60 / S.bpm / 4;
+    const frameSec = HOP / sr;
+    const raw = [];
+    let s0 = -1, cur = -1;
+    for (let i = 0; i <= sm.length; i++){
+      const m = i < sm.length ? sm[i] : -2;
+      if (m !== cur){
+        if (cur > 0 && s0 >= 0){
+          const dur = (i - s0) * frameSec;
+          if (dur >= 0.09) raw.push({ m: cur, t0: s0 * frameSec, dur });
+        }
+        s0 = i; cur = m;
+      }
+    }
+    if (!raw.length){ $h('humStatus').textContent = '没有识别到清晰的音——再试一次：离麦克风近点、用「啦」哼、一次一个音。'; humCleanup(); return; }
+    /* 八度自适应：整体移到画布音域内 */
+    const lo = Math.min(...raw.map(x => x.m)), hi = Math.max(...raw.map(x => x.m));
+    let shift = 0;
+    const top = Math.max(...pitches.map(p => p.midi)), bot = Math.min(...pitches.map(p => p.midi));
+    while (hi + shift > top) shift -= 12;
+    while (lo + shift < bot) shift += 12;
+    /* 落格 */
+    undoStack.push(snapshot());
+    if (undoStack.length > 60) undoStack.shift();
+    let landed = 0, maxCol = -1;
+    const sixteens = raw.map(x => ({ col: Math.round(x.t0 / sixteenth),
+                                     len: Math.max(1, Math.round(x.dur / sixteenth)),
+                                     midi: x.m + shift }));
+    sixteens.forEach(n => { maxCol = Math.max(maxCol, n.col + n.len - 1); });
+    if (maxCol >= totalCols() - 4){ S.measures += Math.ceil((maxCol + 5 - totalCols()) / 16) * 4; $('measures').value = S.measures; }
+    buildPitches();
+    sixteens.forEach(n => {
+      let r = -1, bestD = 999;
+      pitches.forEach((p, ri) => { const d = Math.abs(p.midi - n.midi); if (d < bestD){ bestD = d; r = ri; } });
+      for (let c = Math.max(0, n.col); c < Math.min(totalCols(), n.col + n.len); c++){
+        const k = r + ':' + c;
+        if (!S.cells.has(k)){ S.cells.add(k); landed++; }
+      }
+    });
+    if (maxCol >= totalCols() - 4 || $('measures').value !== String(S.measures)) rebuild(); else rebuild();
+    saveLocal(); updateStat();
+    $h('humStatus').textContent = '✅ 识别并落格 ' + landed + ' 个音（共识别 ' + raw.length + ' 音）。点「取消」回画布，按 ▶ 试听，逐音修改——落格只是草稿。';
+    $h('humLand').disabled = true; $h('humLand').style.display = 'none';
+    track('hum','落格', landed);
+    humCleanup();
+  }catch(e){
+    document.getElementById('humStatus').textContent = '分析失败：' + (e.message || e) + '——换短一点的录音再试。';
+    humCleanup();
+  }
+}
+
+function humLand(){ /* 落格已在分析完成时自动完成，此按钮留作占位 */ }
+
+/* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
+const CHAIN_KEY = 'hycyg_evchain';
+const APP_VER = 'v1.16';
+
+function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
+function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
+
+async function sha256Hex(str){
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function otsStamp(fpHex, statusCb){
+  const bytes = new Uint8Array(fpHex.match(/.{2}/g).map(h => parseInt(h, 16)));
+  const cals = ['https://alice.btc.calendar.opentimestamps.org/digest',
+                'https://bob.btc.calendar.opentimestamps.org/digest',
+                'https://finney.calendar.eternitywall.com/digest'];
+  for (const url of cals){
+    try{
+      statusCb('锚定中……（' + new URL(url).host + '）');
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 9000);
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes, signal: ctl.signal });
+      clearTimeout(to);
+      if (!res.ok) continue;
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > 10) return new Blob([buf], { type: 'application/octet-stream' });
+    }catch(e){}
+  }
+  return null;
+}
+
+function buildCertCard(entry, chain, anchored, otsName){
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const rows = chain.map((e, i) => '<tr><td>#' + (i + 1) + '</td><td style="font-family:monospace">' + esc(e.fp) + '</td><td>' + esc(e.t) + '</td><td>' + (i ? esc(e.prev.slice(0, 16)) + '…' : '（起点）') + '</td></tr>').join('');
+  return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>存证卡 ' + esc(entry.fp.slice(0, 12)) + '</title>'
+  + '<style>body{font-family:system-ui,Microsoft YaHei,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222;line-height:1.7}h1{font-size:20px}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #bbb;padding:4px 6px;text-align:left}code{background:#f2f0e8;padding:1px 4px;word-break:break-all}button{padding:6px 14px}#r{font-weight:bold;margin:8px 0}</style></head><body>'
+  + '<h1>画出原创歌曲 · 作品存证卡</h1>'
+  + '<p>本卡由软件 ' + APP_VER + ' 在用户浏览器内本地生成。指纹由作品内容（音符+歌词+调性+速度+拍号）经规范化序列化后计算 SHA-256 得出。</p>'
+  + '<ul>'
+  + '<li><b>本作品指纹：</b><code>' + esc(entry.fp) + '</code></li>'
+  + '<li><b>生成时间（本地）：</b>' + esc(entry.t) + '</li>'
+  + '<li><b>独立时间锚定：</b>' + (anchored ? '已提交 OpenTimestamps（证明文件 ' + esc(otsName) + '，数小时内可经比特币区块链独立验证）' : '未完成（离线或日历不可达）——指纹与哈希链仍然有效，可稍后重新存证补锚定') + '</li>'
+  + '<li><b>作者账号：</b>未登录（本地生成）——本卡证明「作品在此时已存在」，作者身份请结合账号/实名/版权登记使用</li>'
+  + '<li><b>调性/速度：</b>' + esc(entry.meta) + '</li>'
+  + '</ul>'
+  + '<h3>验证方法（不需要经过本软件，任何人都可独立完成）</h3>'
+  + '<ol><li>方法一：用任一 SHA-256 工具对随包的规范作品文件 <code>' + esc(entry.canonName) + '</code> 计算哈希，比对上方指纹。</li>'
+  + '<li>方法二（如已锚定）：在 opentimestamps.org 官网验证器上传 <code>' + esc(entry.canonName) + '</code> 与 <code>' + esc(otsName) + '</code>，由比特币区块链独立确认时间。</li>'
+  + '<li>方法三：在下方选择规范作品文件，本页本地重算并比对（不需联网）。</li></ol>'
+  + '<p><input type="file" id="f"><button id="v" style="margin-left:8px">本地重算比对</button></p><div id="r"></div>'
+  + '<h3>哈希链（创作/存证历史）</h3><table><tr><th>#</th><th>指纹</th><th>时间</th><th>接续上一条</th></tr>' + rows + '</table>'
+  + '<p style="color:#666;font-size:12px">诚实说明：本卡证明「该作品内容在 T 时刻已存在且未被篡改」，不直接证明作者身份；用于著作权登记时，请连同身份证明与登记申请一并提交。法律依据：最高人民法院《关于互联网法院审理案件若干问题的规定》第十一条。</p>'
+  + '<script>document.getElementById("v").onclick=function(){var f=document.getElementById("f").files[0];if(!f){document.getElementById("r").textContent="请先选择文件";return}var rd=new FileReader();rd.onload=async function(){var txt=rd.result;var hashHex;try{var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt));hashHex=[...new Uint8Array(d)].map(function(b){return b.toString(16).padStart(2,"0")}).join("")}catch(e){document.getElementById("r").textContent="本浏览器不支持本地计算";return}document.getElementById("r").textContent="所选文件 SHA-256 = "+hashHex+"\\n"+(hashHex==="' + esc(entry.fp) + '"?"✅ 与指纹一致——文件自本存证卡生成以来未被改动":"❌ 与指纹不一致——若这是另一版本，请对应哈希链中的对应条目")};rd.readAsText(f)}<\/script></body></html>';
+}
+
+$('btnStamp').onclick = async () => {
+  track('stamp','打开');
+  const data = dataSnapshot();
+  if (!S.cells.size){ flashTip('画布是空的——先画（或哼）出旋律再存证'); return; }
+  const canon = snapSign(data);
+  openExport('🛡 作品存证——给这首曲子生成可独立验证的证据包', `
+    <div style="max-width:560px;line-height:1.8;font-size:14px">
+      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网），并生成<b>存证卡 + 规范作品文件</b>供下载。</p>
+      <div style="margin:10px 0"><button class="primary" id="stampGo">开始存证</button> <button class="mini" id="stampClose">取消</button></div>
+      <div id="stampStatus" style="color:var(--muted)">待开始。</div>
+    </div>`);
+  document.getElementById('stampClose').onclick = () => $('overlay').classList.remove('show');
+  document.getElementById('stampGo').onclick = async () => {
+    const st = document.getElementById('stampStatus');
+    try{
+      st.textContent = '计算指纹……';
+      const fp = await sha256Hex(canon);
+      const now = new Date();
+      const tLocal = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      const chain = loadChain();
+      const prev = chain.length ? chain[chain.length - 1].fp : '';
+      const entry = { fp, prev, t: tLocal, utc: now.toISOString(),
+        meta: NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + '小节',
+        ver: APP_VER };
+      chain.push(entry); saveChain(chain);
+      const tsName = 'song-' + now.getTime() + '.ots';
+      st.textContent = '指纹完成：' + fp.slice(0, 16) + '…  正在请求独立时间锚定……';
+      const ots = await otsStamp(fp, s => { st.textContent = s; });
+      const canonName = 'song-' + now.getTime() + '.canon.json';
+      tryDownload(canonName, new Blob([canon], { type: 'application/json' }));
+      tryDownload('evidence-card-' + now.getTime() + '.html', new Blob([buildCertCard(entry, chain, !!ots, ots ? tsName : '')], { type: 'text/html' }));
+      if (ots) tryDownload(tsName, ots);
+      st.innerHTML = '✅ 存证完成。已下载：<br>①规范作品文件（' + canonName + '，它的 SHA-256 就是指纹）<br>②存证卡（含全部指纹与验证步骤）'
+        + (ots ? '<br>③独立时间戳证明（' + tsName + '，几小时后可在 opentimestamps.org 独立验证）'
+             : '<br>③<b>未锚定</b>（网络不通或日历不可达）——本地证据已生成，联网后重新点一次存证即可补锚定');
+      track('stamp', '完成', ots ? 'ots' : 'local');
+    }catch(e){
+      st.textContent = '存证失败：' + (e.message || e);
+    }
+  };
+};
 </script>
 </body>
 </html>
