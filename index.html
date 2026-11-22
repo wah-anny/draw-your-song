@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.14</title>
+<title>画出原创歌曲 v1.15</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -199,7 +199,6 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
 #rot .big{font-size:32px;font-weight:800;color:var(--ink);margin:10px 0 6px;letter-spacing:2px;line-height:1.35}
 #rot .sub{font-size:16px;font-weight:600;color:var(--accent)}
 #rot svg{width:min(72vw,330px);margin:12px auto 2px;display:block;border:1px solid var(--line);border-radius:10px;background:#fbfaf7}
-#rot .hint{font-size:15px;color:var(--ink);margin-top:10px;line-height:1.8}
 #rot .go{margin-top:14px;padding:10px 28px;font-size:16px;border-radius:10px}
 
 /* v1.11 海报显示时隐藏页面其余内容，只留干净一张卡 */
@@ -258,7 +257,6 @@ var _hmt = _hmt || [];
       <text x="30" y="70" font-size="15" fill="#7a7468">1</text>
       <text x="30" y="107" font-size="15" fill="#7a7468">2</text>
     </svg>
-    <div class="hint">手机专用界面制作中 · 完整体验建议先用电脑打开本页</div>
     <button class="primary go" id="rotGo">开始作曲 →</button>
   </div>
 </div>
@@ -266,7 +264,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.14 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.15 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -345,7 +343,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.14 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.15 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1883,7 +1881,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.14 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+/* v1.15 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
    v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
