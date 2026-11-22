@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.21</title>
+<title>画出原创歌曲 v1.22</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -62,6 +62,7 @@ button.armed:hover{color:#fff}
 .timb label{color:var(--muted);font-size:12px}
 .tbtn{padding:4px 10px;font-size:12px;border-radius:6px;background:#fff}
 .tbtn.on{background:#efedfb;border-color:var(--accent);color:var(--accent);font-weight:600}
+.octbtn.on{background:#efedfb;border-color:var(--accent);color:var(--accent);font-weight:600}
 
 .toplink{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;padding:6px 8px;font-family:inherit}
 .toplink:hover{text-decoration:underline}
@@ -317,14 +318,14 @@ var _hmt = _hmt || [];
     </div>
     <div class="whero">
       <div class="kick">轻松创作 · 版权有据</div>
-      <div class="big">轻松创作你的乐曲，<br>我们为你的著作权申报备齐文件</div>
+      <div class="big">轻松创作你的乐曲，<br>我们为你的著作权申报提供文件</div>
       <div class="sub">免费网页工具，电脑浏览器打开即用。旋律你亲手放、歌词你亲手贴——作品完完整整是你的，证据也完完整整是你的。</div>
     </div>
     <div class="wrows">
       <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子作曲</span><span class="ds">在格子上点一点，旋律立刻能听——不用懂乐理，不用会乐器。</span><span class="tag">创作</span></div>
       <div class="wrow"><span class="ic">📖</span><span class="tt">自动出简谱</span><span class="ds">贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span><span class="tag">成谱</span></div>
       <div class="wrow"><span class="ic">⬇</span><span class="tt">文件全带走</span><span class="ds">简谱图片、乐谱、MIDI 全部下载到你的电脑，打印、发人、交材料随你用。</span><span class="tag">交付</span></div>
-      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要的证据，一次备齐。</span><span class="tag">核心</span></div>
+      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要用的证据文件，一键提供。</span><span class="tag">核心</span></div>
     </div>
     <div class="wcta">
       <span class="ask">需要著作权认证文件？</span><button class="wbtn" id="wLogin">登录</button>
@@ -339,7 +340,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.21 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.22 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -370,7 +371,7 @@ var _hmt = _hmt || [];
     <button class="tbtn" id="tStrings">弦乐</button>
     <button class="tbtn" id="tFlute">笛子</button>
   </div>
-  <button id="btnStamp" class="primary big stampbtn" title="最重要：作品指纹 + 独立时间戳 + 存证卡 + 创作说明——著作权登记的证据一次备齐" style="margin-left:auto">🛡 存证</button>
+  <button id="btnStamp" class="primary big stampbtn" title="最重要：作品指纹 + 独立时间戳 + 存证卡 + 创作说明——著作权登记要用的证据文件，存证后自动下载" style="margin-left:auto">🛡 存证</button>
   <button id="btnLogin" class="primary big" title="登录 / 注册：存证需要登录才有归属，著作权登记时才认得上；登录后草稿自动云端随身带。手机验证码，一分钟">登录</button>
   <button id="btnHelp" class="primary big" title="第一次来一定点这里，一分钟就会用">使用方法</button>
 </div>
@@ -402,6 +403,8 @@ var _hmt = _hmt || [];
       <button id="btnBreak" class="mini">断音笔</button>
       <button id="btnUndo" class="mini">撤销</button>
       <button id="btnClear" class="mini">清空</button>
+      <button id="btnOctUp" class="mini octbtn" title="平时三个八度；想要更高的音就点一下，画布多出一行高八度，再点一下收回">＋高八度</button>
+      <button id="btnOctDn" class="mini octbtn" title="平时三个八度；想要更低的音就点一下，画布多出一行低八度，再点一下收回">＋低八度</button>
       <span class="sp"></span>
       <span class="hint" id="tip">点下面的草稿名字＝放回画布并展开简谱，再按 ▶ 播放 就是这一稿的声音。</span>
     </div>
@@ -422,7 +425,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.21 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.22 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -456,7 +459,7 @@ const SOLFEGE = ['1','2','3','4','5','6','7'];
 const ACC_MARK = { '1':'♯', '-1':'♭' };
 
 const S = {
-  root: 9, mode: 'minor', bpm: 66, sig: [4,4], measures: 16,
+  root: 9, mode: 'minor', bpm: 66, sig: [4,4], measures: 16, octUp: 0, octDown: 0,
   cells: new Set(), breaks: new Set(), accs: {}, lyricsText: ''
 };
 let pitches = [], cellMap = new Map(), undoStack = [], drag = null, breakMode = false;
@@ -480,19 +483,20 @@ function colsPerMeasure(){ return S.sig[0] * 16 / S.sig[1]; }
 function totalCols(){ return colsPerMeasure() * S.measures; }
 function beatCols(){ return 16 / S.sig[1]; }
 
-function buildPitchesArr(root, mode){
+function buildPitchesArr(root, mode, octDown, octUp){
   const sc = mode === 'major' ? MAJOR : MINOR;
   const arr = [];
-  for (const oct of [0,1,2]) for (let d=0; d<7; d++){
+  for (let oct = -octDown; oct <= 2 + octUp; oct++) for (let d=0; d<7; d++){
     arr.push({ midi: 48 + root + oct*12 + sc[d], degree: d, oct });
   }
-  arr.push({ midi: 48 + root + 36, degree: 0, oct: 3 });
+  arr.push({ midi: 48 + root + (3 + octUp)*12, degree: 0, oct: 3 + octUp });
   return arr.reverse();
 }
-function buildPitches(){ pitches = buildPitchesArr(S.root, S.mode); return pitches; }
+function buildPitches(){ pitches = buildPitchesArr(S.root, S.mode, S.octDown, S.octUp); return pitches; }
 
 function labelFor(p){
-  const mark = p.oct === 0 ? ',' : (p.oct === 1 ? '' : "'");
+  /* 低八度往下用逗号（低两点＝两个逗号），高八度往上用撇号 */
+  const mark = p.oct <= 0 ? ','.repeat(1 - p.oct) : (p.oct >= 2 ? "'".repeat(p.oct - 1) : '');
   return SOLFEGE[p.degree] + mark;
 }
 
@@ -724,6 +728,22 @@ $('btnBreak').onclick = () => {
   breakMode = !breakMode;
   $('btnBreak').classList.toggle('on', breakMode);
   flashTip(breakMode ? '断音笔已亮：点在同音长音的后半截，切开成两个字' : '已回到画笔');
+};
+
+/* 八度扩展：平时三个八度，需要更高/更低的音各可加一行（再点收回） */
+function setOctBtns(){
+  $('btnOctUp').classList.toggle('on', !!S.octUp);
+  $('btnOctDn').classList.toggle('on', !!S.octDown);
+}
+$('btnOctUp').onclick = () => {
+  S.octUp = S.octUp ? 0 : 1;
+  setOctBtns(); rebuild(); saveLocal();
+  flashTip(S.octUp ? '已加一行高八度（上面多出一行音）' : '已收回高八度');
+};
+$('btnOctDn').onclick = () => {
+  S.octDown = S.octDown ? 0 : 1;
+  setOctBtns(); rebuild(); saveLocal();
+  flashTip(S.octDown ? '已加一行低八度（下面多出一行音）' : '已收回低八度');
 };
 
 $('btnUndo').onclick = () => {
@@ -1106,11 +1126,13 @@ $('btnPlay').onclick = () => {
 /* ================= 存储 ================= */
 function dataSnapshot(){
   return { root:S.root, mode:S.mode, bpm:S.bpm, sig:S.sig, measures:S.measures,
+    octUp:S.octUp||0, octDown:S.octDown||0,
     cells:[...S.cells], breaks:[...S.breaks], accs:S.accs, lyricsText:S.lyricsText };
 }
 function loadData(d){
   S.root = d.root; S.mode = d.mode; S.bpm = d.bpm;
   S.sig = d.sig; S.measures = d.measures;
+  S.octUp = d.octUp || 0; S.octDown = d.octDown || 0;
   S.cells = new Set(d.cells || []);
   S.breaks = new Set(d.breaks || []);
   S.accs = d.accs || {};
@@ -1118,6 +1140,7 @@ function loadData(d){
   $('root').value = S.root; $('mode').value = S.mode;
   $('bpm').value = S.bpm; $('measures').value = S.measures;
   $('sig').value = S.sig.join('/'); $('lyrics').value = S.lyricsText;
+  setOctBtns();
   undoStack = [];
   rebuild();
 }
@@ -1398,8 +1421,8 @@ function jianpuHTML(data){
     }
     const p = ps[ev.n.row];
     const acc = ev.n.acc === 1 ? '♯' : (ev.n.acc === -1 ? '♭' : '');
-    const top = p.oct >= 3 ? '··' : (p.oct === 2 ? '·' : '');
-    const bot = p.oct <= 0 ? '·' : '';
+    const top = p.oct >= 4 ? '···' : (p.oct === 3 ? '··' : (p.oct === 2 ? '·' : ''));
+    const bot = p.oct <= -1 ? '··' : (p.oct === 0 ? '·' : '');
     return '<span class="jp-t"><span class="jp-dots">' + top + '</span>'
       + '<span class="jp-digit">' + acc + SOLFEGE[p.degree] + (dotted ? '·' : '') + '</span>'
       + '<span class="jp-dots">' + bot + '</span><span class="jp-gap"></span>'
@@ -1855,25 +1878,26 @@ function guideHTML(){
   return `<div class="guide">
   <h3 class="gsec gold">🎁 先说你能得到什么</h3>
   <ul>
-    <li><b>一首你自己的歌</b>——旋律＋歌词一体的简谱，照着就能唱。</li>
-    <li><b>全套文件带走</b>：简谱图片（可直接打印 / 交登记材料）、带词乐谱 .musicxml、MIDI。</li>
-    <li><b>著作权证据包</b>：作品指纹＋独立时间戳＋存证卡＋创作说明模板，登记材料一次备齐。</li>
+    <li><b>一份你亲手作出来的旋律谱</b>——格子上每个音都是你自己放的，照着就能唱、能听、能改。</li>
+    <li><b>全套文件带走</b>：简谱图片（可直接打印 / 交登记材料）、乐谱 .musicxml、MIDI。</li>
+    <li><b>著作权证据包</b>：作品指纹＋独立时间戳＋存证卡＋创作说明模板，存证后自动下载，登记时随取随用。</li>
     <li><b>版权完全归你</b>，本工具不主张任何权利。</li>
   </ul>
 
   <h3 class="gsec gold">🛡 存证——最重要的一步</h3>
   <ul>
-    <li>画完点右上<b>金色「🛡 存证」按钮</b>。第一次会让你<b>手机验证码登录</b>——这是必须的：登录后存证记录与账号绑定，著作权登记时才认「这是谁的」。</li>
+    <li>画完点右上<b>「🛡 存证」按钮</b>。第一次会让你<b>手机验证码登录</b>——这是必须的：登录后存证记录与账号绑定，著作权登记时才认「这是谁的」。</li>
     <li>存证完成，自动下载 <b>4 样文件</b>到你电脑的「下载」文件夹：<b>简谱图片 PNG、规范作品文件、存证卡（含验证器）、时间戳证明</b>。</li>
     <li>存证卡里附<b>创作说明模板</b>——照着抄进登记表「创作说明」栏，按实际改一改就行。</li>
     <li>这些文件都在<b>你自己电脑上</b>，留存好；登记时直接上传/打印提交。</li>
   </ul>
 
-  <h3 class="gsec">✍️ 两种方式作曲</h3>
+  <h3 class="gsec">✍️ 怎么作曲——看你的情况选</h3>
   <ul>
-    <li><b>画格子</b>：行首 1–7 就是简谱的七个音；<b>按住拖动</b>划过即成旋律，再点一下＝擦掉。断音笔切开长音（一个音唱两个字），右键升/降半音 ♯♭。</li>
-    <li><b>🎙 哼唱</b>：按一下录音，哼完再按一下，自动落格子。哼的时候<b>一次只哼一个音、音与音稍断开</b>，识别最准。落完逐音修。</li>
-    <li>左边框<b>整段贴歌词</b>，字自动落到音符上，一格一字；字比音多会红字提醒。</li>
+    <li><b>已经有歌词？</b>用<b>画格子</b>：行首 1–7 就是简谱的七个音，<b>按住拖动</b>划过即成旋律，再点一下＝擦掉。断音笔切开长音（一个音唱两个字），右键升/降半音 ♯♭。旋律画好后，左边框<b>整段贴歌词</b>，字自动落到音符上，一格一字——这就是词曲结合。</li>
+    <li><b>只想作曲、还没有词？</b>两条路随你：
+      <br>· <b>画格子</b>：直接在格子上点、拖，怎么好听怎么画；
+      <br>· <b>🎙 哼唱</b>：按一下录音，哼完再按一下，自动落格子——它帮你<b>记下大体的旋律走向</b>，落完你在格子上<b>逐音修整</b>，修好保存即成乐谱。哼的时候一次只哼一个音、音与音稍断开，识别更准。</li>
   </ul>
 
   <h3 class="gsec">▶ 听与修</h3>
@@ -2148,7 +2172,18 @@ async function humAnalyse(){
     let landed = 0, maxCol = -1;
     const sixteens = raw.map(x => ({ col: baseCol + Math.round(x.t0 / s16),
                                      len: Math.max(1, Math.round(x.dur / s16)),
-                                     midi: x.m + shift }));
+                                     midi: x.m + shift, t0: x.t0, dur: x.dur }));
+    /* 接缝整平：人声起音和收音不会精确踩点，四舍五入后音与音之间会留重叠或 1 格小缺口，
+       越往后画面越歪。这里把重叠截短、由圆整造成的小缝补上，让整段连成整齐的格子 */
+    sixteens.sort((a, b) => a.col - b.col);
+    for (let i = 1; i < sixteens.length; i++){
+      const p = sixteens[i-1], n = sixteens[i];
+      if (n.col < p.col + p.len){
+        p.len = Math.max(1, n.col - p.col);                     /* 重叠 → 截短前音 */
+      } else if (n.col - (p.col + p.len) >= 1 && n.t0 - (p.t0 + p.dur) < 0.5 * s16){
+        p.len = n.col - p.col;                                  /* 实际几乎连着 → 补上缝隙 */
+      }
+    }
     sixteens.forEach(n => { maxCol = Math.max(maxCol, n.col + n.len - 1); });
     if (maxCol >= totalCols() - 4){ S.measures += Math.ceil((maxCol + 5 - totalCols()) / 16) * 4; $('measures').value = S.measures; }
     buildPitches();
@@ -2174,7 +2209,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.21';
+const APP_VER = 'v1.22';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
