@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.22</title>
+<title>画出原创歌曲 v1.23</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -71,16 +71,16 @@ button.armed:hover{color:#fff}
 /* ===== v1.21 入口封面：版权主题 · 暖色调 · 页面式布局 ===== */
 #welcome{display:none;min-height:100vh;padding:0;
   background:linear-gradient(180deg,#fbf7ee 0%,#f6efe1 55%,#f0e6d2 100%)}
-.wcv{max-width:880px;margin:0 auto;padding:40px 30px 18px;display:flex;flex-direction:column;min-height:100vh}
-.wbrand{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #e6dcc6;padding-bottom:14px;flex-wrap:wrap}
-.wbrand .en{font-size:12.5px;letter-spacing:3.5px;color:#a58e5e;font-weight:600}
-.wbrand .cn{font-size:20px;font-weight:800;color:#3a3225}
-.wbrand .dom{margin-left:auto;font-size:12px;color:#a49877}
-.whero{margin:36px 0 4px}
+.wcv{max-width:920px;margin:0 auto;padding:48px 34px 20px;display:flex;flex-direction:column;min-height:100vh}
+.wbrand{display:flex;align-items:center;gap:16px;border-bottom:1px solid #e6dcc6;padding-bottom:18px;flex-wrap:wrap}
+.wlogo{width:56px;height:56px;flex:0 0 auto;filter:drop-shadow(0 2px 4px rgba(90,70,30,.10))}
+.wbrandt .cn{font-size:30px;font-weight:800;color:#3a3225;letter-spacing:2px;line-height:1.2}
+.wbrandt .en{font-size:12.5px;letter-spacing:2.5px;color:#a58e5e;font-weight:600;margin-top:6px}
+.whero{margin:52px 0 4px}
 .whero .kick{font-size:13.5px;letter-spacing:2px;color:#b07d2b;font-weight:700}
-.whero .big{font-size:33px;font-weight:800;color:#322b20;line-height:1.5;margin:10px 0 8px;letter-spacing:1px}
+.whero .big{font-size:36px;font-weight:800;color:#322b20;line-height:1.5;margin:12px 0 10px;letter-spacing:1px}
 .whero .sub{font-size:15px;color:#7d7159;line-height:1.8}
-.wrows{margin:26px 0 6px;display:flex;flex-direction:column;gap:10px}
+.wrows{margin:30px 0 6px;display:flex;flex-direction:column;gap:12px}
 .wrow{display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #ebe1c9;border-radius:12px;padding:14px 18px;box-shadow:0 2px 6px rgba(90,70,30,.04)}
 .wrow .ic{font-size:21px;flex:0 0 auto}
 .wrow .tt{font-size:16px;font-weight:700;color:#322b20;white-space:nowrap}
@@ -97,10 +97,12 @@ button.armed:hover{color:#fff}
 .wfoot{margin-top:auto;padding:16px 0 4px;border-top:1px solid #e6dcc6;display:flex;gap:16px;flex-wrap:wrap;color:#a49877;font-size:12.5px;line-height:1.7}
 @media (max-width:640px){
   .wcv{padding:26px 16px 12px}
+  .whero{margin:34px 0 4px}
   .whero .big{font-size:24px}
+  .wlogo{width:44px;height:44px}
+  .wbrandt .cn{font-size:22px}
   .wrow{flex-wrap:wrap}
   .wrow .tt{white-space:normal}
-  .wbrand .dom{margin-left:0;flex-basis:100%}
 }
 body.welcome-show header,body.welcome-show #svHint,body.welcome-show .bar,
 body.welcome-show .wrap,body.welcome-show .dock,body.welcome-show .site-foot,body.welcome-show #rot{display:none}
@@ -312,9 +314,21 @@ var _hmt = _hmt || [];
 <div id="welcome">
   <div class="wcv">
     <div class="wbrand">
-      <span class="cn">画出原创歌曲</span>
-      <span class="en">DRAW YOUR SONG</span>
-      <span class="dom">wah-anny.github.io/draw-your-song</span>
+      <svg class="wlogo" viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="45" height="45" rx="10" fill="#fffdf8" stroke="#cdbb92" stroke-width="1.5"/>
+        <line x1="10" y1="17" x2="38" y2="17" stroke="#e6dcc6" stroke-width="1.6"/>
+        <line x1="10" y1="23" x2="38" y2="23" stroke="#e6dcc6" stroke-width="1.6"/>
+        <line x1="10" y1="29" x2="38" y2="29" stroke="#e6dcc6" stroke-width="1.6"/>
+        <line x1="10" y1="35" x2="38" y2="35" stroke="#e6dcc6" stroke-width="1.6"/>
+        <rect x="11" y="26" width="5.5" height="5.5" rx="1.2" fill="#b07d2b"/>
+        <rect x="17.5" y="20" width="5.5" height="5.5" rx="1.2" fill="#7a5c9e"/>
+        <rect x="24" y="23" width="5.5" height="5.5" rx="1.2" fill="#7a5c9e"/>
+        <rect x="30.5" y="14" width="5.5" height="5.5" rx="1.2" fill="#b07d2b"/>
+      </svg>
+      <div class="wbrandt">
+        <div class="cn">画出原创歌曲</div>
+        <div class="en">DRAW YOUR SONG · wah-anny.github.io/draw-your-song</div>
+      </div>
     </div>
     <div class="whero">
       <div class="kick">轻松创作 · 版权有据</div>
@@ -340,7 +354,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.22 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.23 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -425,7 +439,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.22 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.23 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1887,7 +1901,7 @@ function guideHTML(){
   <h3 class="gsec gold">🛡 存证——最重要的一步</h3>
   <ul>
     <li>画完点右上<b>「🛡 存证」按钮</b>。第一次会让你<b>手机验证码登录</b>——这是必须的：登录后存证记录与账号绑定，著作权登记时才认「这是谁的」。</li>
-    <li>存证完成，自动下载 <b>4 样文件</b>到你电脑的「下载」文件夹：<b>简谱图片 PNG、规范作品文件、存证卡（含验证器）、时间戳证明</b>。</li>
+    <li>存证完成，自动下载 <b>1 个存证压缩包</b>到你电脑的「下载」文件夹，<b>解压后 4 样文件都在里面</b>：<b>简谱图片 PNG（作品样本）、规范作品文件、存证卡（含验证器与创作说明模板）、时间戳证明</b>——整个包留存好即可，不用一项项另存。</li>
     <li>存证卡里附<b>创作说明模板</b>——照着抄进登记表「创作说明」栏，按实际改一改就行。</li>
     <li>这些文件都在<b>你自己电脑上</b>，留存好；登记时直接上传/打印提交。</li>
   </ul>
@@ -2209,7 +2223,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.22';
+const APP_VER = 'v1.23';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2270,6 +2284,66 @@ function buildCertCard(entry, chain, anchored, otsName){
   + '<script>document.getElementById("v").onclick=function(){var f=document.getElementById("f").files[0];if(!f){document.getElementById("r").textContent="请先选择文件";return}var rd=new FileReader();rd.onload=async function(){var txt=rd.result;var hashHex;try{var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt));hashHex=[...new Uint8Array(d)].map(function(b){return b.toString(16).padStart(2,"0")}).join("")}catch(e){document.getElementById("r").textContent="本浏览器不支持本地计算";return}document.getElementById("r").textContent="所选文件 SHA-256 = "+hashHex+"\\n"+(hashHex==="' + esc(entry.fp) + '"?"✅ 与指纹一致——文件自本存证卡生成以来未被改动":"❌ 与指纹不一致——若这是另一版本，请对应哈希链中的对应条目")};rd.readAsText(f)}<\/script></body></html>';
 }
 
+/* ---- 极简 ZIP 打包（仅存储不压缩，零依赖，文件都不大） ---- */
+function crc32(u8){
+  if (!crc32.t){
+    crc32.t = new Int32Array(256);
+    for (let n = 0; n < 256; n++){
+      let c = n;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      crc32.t[n] = c;
+    }
+  }
+  let c = -1;
+  for (let i = 0; i < u8.length; i++) c = crc32.t[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ -1) >>> 0;
+}
+function buildZip(files){   /* files: [{name, u8:Uint8Array}] */
+  const enc = new TextEncoder();
+  const now = new Date();
+  const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+  const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+  const chunks = [], central = [];
+  let offset = 0;
+  files.forEach(f => {
+    const nameU8 = enc.encode(f.name);
+    const crc = crc32(f.u8), size = f.u8.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true);
+    lh.setUint16(4, 20, true);
+    lh.setUint16(6, 0x0800, true);            /* UTF-8 文件名 */
+    lh.setUint16(10, dosTime, true);
+    lh.setUint16(12, dosDate, true);
+    lh.setUint32(14, crc, true);
+    lh.setUint32(18, size, true);
+    lh.setUint32(22, size, true);
+    lh.setUint16(26, nameU8.length, true);
+    chunks.push(new Uint8Array(lh.buffer), nameU8, f.u8);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true);
+    ch.setUint16(4, 20, true);
+    ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0x0800, true);
+    ch.setUint16(12, dosTime, true);
+    ch.setUint16(14, dosDate, true);
+    ch.setUint32(16, crc, true);
+    ch.setUint32(20, size, true);
+    ch.setUint32(24, size, true);
+    ch.setUint16(28, nameU8.length, true);
+    ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), nameU8);
+    offset += 30 + nameU8.length + size;
+  });
+  let cdSize = 0; central.forEach(c => cdSize += c.length);
+  const eocd = new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0, 0x06054b50, true);
+  eocd.setUint16(8, files.length, true);
+  eocd.setUint16(10, files.length, true);
+  eocd.setUint32(12, cdSize, true);
+  eocd.setUint32(16, offset, true);
+  return new Blob([...chunks, ...central, new Uint8Array(eocd.buffer)], { type: 'application/zip' });
+}
+
 $('btnStamp').onclick = async () => {
   track('stamp','打开');
   const data = dataSnapshot();
@@ -2283,10 +2357,11 @@ $('btnStamp').onclick = async () => {
 };
 
 function startStampFlow(){
-  const canon = snapSign(dataSnapshot());
+  const dataSnap = dataSnapshot();
+  const canon = snapSign(dataSnap);
   openExport('🛡 作品存证——给这首曲子生成可独立验证的证据包', `
     <div style="max-width:560px;line-height:1.8;font-size:14px">
-      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网），并生成<b>存证卡 + 规范作品文件</b>供下载；存证记录同步云端存证库，与你的登录账号绑定。</p>
+      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网）；完成后<b>打包成 1 个存证压缩包</b>下载——解压后简谱图片、规范作品文件、存证卡、时间戳证明都在里面；存证记录同步云端存证库，与你的登录账号绑定。</p>
       <p style="margin:10px 0 4px">作品名称（用于存证卡与云端登记，建议填写）：</p>
       <input id="stampTitle" type="text" maxlength="40" placeholder="例如：给妈妈的歌" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px">
       <div style="margin:10px 0"><button class="primary" id="stampGo">开始存证</button> <button class="mini" id="stampClose">取消</button></div>
@@ -2307,15 +2382,40 @@ function startStampFlow(){
         meta: (title ? title + ' · ' : '') + NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + '小节',
         ver: APP_VER };
       entry.title = title;
+      entry.canonName = '2_规范作品文件.canon.json';   /* 存证卡验证步骤里引用包内文件名 */
       entry.author = maskId(_sessUser ? (_sessUser.phone || '') : '');
       chain.push(entry); saveChain(chain);
       const tsName = 'song-' + now.getTime() + '.ots';
       st.textContent = '指纹完成：' + fp.slice(0, 16) + '…  正在请求独立时间锚定……';
       const ots = await otsStamp(fp, s => { st.textContent = s; });
-      const canonName = 'song-' + now.getTime() + '.canon.json';
-      tryDownload(canonName, new Blob([canon], { type: 'application/json' }));
-      tryDownload('evidence-card-' + now.getTime() + '.html', new Blob([buildCertCard(entry, chain, !!ots, ots ? tsName : '')], { type: 'text/html' }));
-      if (ots) tryDownload(tsName, ots);
+      /* 打包成一个 ZIP：解压后 4 样文件都在，不再一个一个分散下载 */
+      st.textContent = '锚定完成，正在打包存证文件……（含简谱图片，约几秒）';
+      const enc = new TextEncoder();
+      const zipFiles = [];
+      zipFiles.push({ name: '0_请先读我.txt', u8: enc.encode(
+        '这份压缩包是这首作品的存证证据包，请整个留存好（建议网盘再备份一份）。\n'
+        + '生成时间：' + tLocal + '\n'
+        + (title ? '作品名称：' + title + '\n' : '')
+        + '作品指纹（SHA-256）：' + fp + '\n'
+        + '\n包内文件：\n'
+        + '  1_简谱图片(作品样本).png —— 著作权登记时作为作品样本直接上传\n'
+        + '  2_规范作品文件.canon.json —— 作品的规范化数据，它的 SHA-256 就是上面这个指纹\n'
+        + '  3_存证卡.html —— 双击用浏览器打开：含指纹、独立验证方法、创作说明模板（登记时照抄进「创作说明」栏）\n'
+        + (ots
+          ? '  4_独立时间戳证明.ots —— 比特币区块链独立时间锚定；几小时后可在 opentimestamps.org 上传第 2、4 两样完成验证\n'
+          : '  4_未锚定说明.txt —— 这次没连上公共日历；联网后重新点一次「存证」即可补上时间锚定\n')
+        + '\n著作权登记时：样本上传第 1 样，创作说明抄存证卡里的模板按实际改一改。\n') });
+      try{
+        const png = await jianpuPNGBlob(dataSnap, fp);
+        if (png) zipFiles.push({ name: '1_简谱图片(作品样本).png', u8: new Uint8Array(await png.arrayBuffer()) });
+      }catch(e){}
+      zipFiles.push({ name: '2_规范作品文件.canon.json', u8: enc.encode(canon) });
+      zipFiles.push({ name: '3_存证卡.html', u8: enc.encode(buildCertCard(entry, chain, !!ots, ots ? tsName : '')) });
+      if (ots) zipFiles.push({ name: '4_独立时间戳证明.ots', u8: new Uint8Array(await ots.arrayBuffer()) });
+      else zipFiles.push({ name: '4_未锚定说明.txt', u8: enc.encode('本次存证未完成区块链时间锚定（网络不通或日历不可达）。\n指纹与哈希链证据已经有效；联网后重新点一次「存证」，即可补上独立时间戳证明。\n') });
+      const zipName = '存证包_' + (title ? safeName(title) + '_' : '')
+        + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '.zip';
+      tryDownload(zipName, buildZip(zipFiles));
       let cloudMsg = '';
       try{
         const c = cloudReady();
@@ -2327,10 +2427,10 @@ function startStampFlow(){
           cloudMsg = error ? '<br>⚠ 云端登记未成功（' + esc(error.message || '未知原因') + '）——本地证据仍然有效，可稍后重新存证' : '<br>✅ 已同步云端存证库，与你的账号绑定';
         }
       }catch(e){ cloudMsg = '<br>⚠ 云端登记未成功——本地证据仍然有效'; }
-      st.innerHTML = '✅ 存证完成。已下载到浏览器「下载」文件夹：<br>①规范作品文件（' + canonName + '，它的 SHA-256 就是指纹）<br>②存证卡（含全部指纹与验证步骤）'
-        + (ots ? '<br>③独立时间戳证明（' + tsName + '，几小时后可在 opentimestamps.org 独立验证）'
-             : '<br>③<b>未锚定</b>（网络不通或日历不可达）——本地证据已生成，联网后重新点一次存证即可补锚定')
-        + cloudMsg;
+      st.innerHTML = '✅ 存证完成。已下载 <b>1 个存证压缩包</b>（' + esc(zipName) + '）到你浏览器的「下载」文件夹，<b>解压后 4 样文件都在里面</b>：<br>①简谱图片（作品样本）<br>②规范作品文件（它的 SHA-256 就是指纹）<br>③存证卡（含验证方法与创作说明模板）'
+        + (ots ? '<br>④独立时间戳证明（几小时后可在 opentimestamps.org 独立验证）'
+             : '<br>④未锚定说明——联网后重新点一次「存证」即可补时间戳')
+        + '<br>包内「0_请先读我.txt」有完整说明。' + cloudMsg;
       track('stamp', '完成', ots ? 'ots' : 'local');
     }catch(e){
       st.textContent = '存证失败：' + (e.message || e);
@@ -2550,46 +2650,47 @@ const JP_CSS = '.jpscore{font-family:"Songti SC","SimSun",serif;color:#2f2a22}'
   + '.jp-b2{background-image:linear-gradient(#2f2a22,#2f2a22);background-size:calc(100% - 18px) 1.4px;background-position:9px 41.5px;background-repeat:no-repeat}'
   + '.jp-dash{font-family:"Times New Roman",SimSun,serif;font-size:16px;color:#2f2a22;width:24px;text-align:center;line-height:19px;padding-top:17px;height:60px;flex:0 0 auto}'
   + '.jp-skip{font-size:11px;color:#a99;padding:0 6px;align-self:center;flex:0 0 auto}';
+async function jianpuPNGBlob(data, fp){
+  const inner = jianpuHTML(data);
+  if (inner.indexOf('还没有音符') >= 0) return null;
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-99999px;top:0;width:760px;';
+  holder.innerHTML = '<style>' + JP_CSS + '</style>'
+    + '<div style="background:#fbf9f2;padding:26px 30px 34px;border-radius:12px">'
+    + '<div class="jpscore">' + inner + '</div></div>';
+  document.body.appendChild(holder);
+  await new Promise(r => setTimeout(r, 80));
+  const cap = holder.children[1];
+  const w = Math.ceil(cap.offsetWidth), h = Math.ceil(cap.offsetHeight);
+  const ser = new XMLSerializer().serializeToString(cap);
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
+    + '<foreignObject width="100%" height="100%">' + ser + '</foreignObject></svg>';
+  const img = new Image();
+  await new Promise((res, rej) => {
+    img.onload = res; img.onerror = () => rej(new Error('图片渲染失败'));
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+  const scale = 2;
+  const cv = document.createElement('canvas');
+  cv.width = w * scale; cv.height = h * scale;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#fbf9f2'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.drawImage(img, 0, 0, w, h);
+  ctx.font = '11px sans-serif'; ctx.fillStyle = '#8a7d63';
+  ctx.fillText('画出原创歌曲 ' + APP_VER + ' · 作品指纹 SHA-256: ' + fp.slice(0, 32) + '…（完整指纹见存证卡）', 14, h - 10);
+  holder.remove();
+  return await new Promise(res => cv.toBlob(b => res(b), 'image/png'));
+}
 async function exportJianpuPNG(id){
   const d = loadDrafts().find(x => x.id === id);
   if (!d) return;
-  const inner = jianpuHTML(d.data);
-  if (inner.indexOf('还没有音符') >= 0){ flashTip('这一稿还没有音符，没什么可导出的'); return; }
   try{
-    const holder = document.createElement('div');
-    holder.style.cssText = 'position:fixed;left:-99999px;top:0;width:760px;';
-    holder.innerHTML = '<style>' + JP_CSS + '</style>'
-      + '<div style="background:#fbf9f2;padding:26px 30px 34px;border-radius:12px">'
-      + '<div class="jpscore">' + inner + '</div></div>';
-    document.body.appendChild(holder);
-    await new Promise(r => setTimeout(r, 80));
-    const cap = holder.children[1];
-    const w = Math.ceil(cap.offsetWidth), h = Math.ceil(cap.offsetHeight);
-    const ser = new XMLSerializer().serializeToString(cap);
-    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
-      + '<foreignObject width="100%" height="100%">' + ser + '</foreignObject></svg>';
-    const img = new Image();
-    await new Promise((res, rej) => {
-      img.onload = res; img.onerror = () => rej(new Error('图片渲染失败'));
-      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    });
-    const scale = 2;
-    const cv = document.createElement('canvas');
-    cv.width = w * scale; cv.height = h * scale;
-    const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#fbf9f2'; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.drawImage(img, 0, 0, w, h);
     const fp = await sha256Hex(snapSign(d.data));
-    ctx.font = '11px sans-serif'; ctx.fillStyle = '#8a7d63';
-    ctx.fillText('画出原创歌曲 ' + APP_VER + ' · 作品指纹 SHA-256: ' + fp.slice(0, 32) + '…（完整指纹见存证卡）', 14, h - 10);
-    holder.remove();
-    cv.toBlob(b => {
-      if (b){
-        tryDownload(safeName(d.name) + '.png', b);
-        track('export', 'png');
-        flashTip('✓ 已下载简谱图片「' + safeName(d.name) + '.png」——可直接用作著作权登记的作品样本');
-      } else flashTip('导出失败——请换 Chrome/Edge 浏览器重试');
-    }, 'image/png');
+    const b = await jianpuPNGBlob(d.data, fp);
+    if (!b){ flashTip('这一稿还没有音符，没什么可导出的'); return; }
+    tryDownload(safeName(d.name) + '.png', b);
+    track('export', 'png');
+    flashTip('✓ 已下载简谱图片「' + safeName(d.name) + '.png」——可直接用作著作权登记的作品样本');
   }catch(e){
     flashTip('导出失败：' + (e.message || e));
   }
