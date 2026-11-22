@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创歌曲 v1.18</title>
+<title>画出原创歌曲 v1.19</title>
 <meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创歌曲——作曲超简单，版权归你">
@@ -66,6 +66,25 @@ button.armed:hover{color:#fff}
 .toplink{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;padding:6px 8px;font-family:inherit}
 .toplink:hover{text-decoration:underline}
 #humRec.rec-on{background:#c0392b}
+.stampbtn{background:#b07d2b}
+/* ===== v1.19 入口欢迎卡 ===== */
+#welcome{display:none;padding:24px 14px 8px}
+#welcome .card{max-width:600px;margin:0 auto;border:1px solid var(--line2);border-radius:16px;
+  background:#fff;padding:26px 22px 22px;text-align:center;box-shadow:0 8px 24px rgba(34,32,28,.08)}
+#welcome .mk{font-size:12px;letter-spacing:3px;color:var(--muted)}
+#welcome .big{font-size:30px;font-weight:800;color:var(--ink);margin:10px 0 4px;letter-spacing:2px;line-height:1.4}
+#welcome .give{text-align:left;margin:16px auto 4px;max-width:480px;font-size:15.5px;line-height:2.1}
+#welcome .give b{color:var(--accent)}
+#welcome .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+#welcome .note{font-size:13.5px;color:var(--muted);margin:14px 0 0;line-height:1.9}
+body.welcome-show header,body.welcome-show #svHint,body.welcome-show .bar,
+body.welcome-show .wrap,body.welcome-show .dock,body.welcome-show .site-foot,body.welcome-show #rot{display:none}
+/* v1.19 使用方法分节 */
+.guide{font-size:15px;line-height:1.9}
+.guide h3.gsec{margin:18px 0 8px;padding:9px 14px;background:#f4f2fb;border-left:4px solid var(--accent);border-radius:6px;font-size:16.5px;color:var(--ink)}
+.guide h3.gsec.gold{background:#faf5ea;border-left-color:#b07d2b}
+.guide ul{margin:6px 0 10px;padding-left:22px}
+.guide li{margin:5px 0}
 /* 使用方法弹窗 */
 .guide h4{font-size:12px;margin:16px 0 6px;color:var(--accent);letter-spacing:.5px}
 .guide h4:first-child{margin-top:0}
@@ -265,10 +284,29 @@ var _hmt = _hmt || [];
   </div>
 </div>
 
+<div id="welcome">
+  <div class="card">
+    <div class="mk">DRAW YOUR SONG · 画出原创歌曲</div>
+    <div class="big">轻松给最爱的人<br>写一首你自己的歌</div>
+    <div class="give">
+      🎵 <b>画格子或哼唱</b>——把脑子里的旋律变成真的<br>
+      📖 <b>自动出简谱</b>——一字一音，照着就能唱<br>
+      ⬇ <b>文件全带走</b>——简谱图、乐谱、MIDI，都在你电脑上<br>
+      🛡 <b>一键存证</b>——指纹＋时间戳＋存证卡＋创作说明，<br>　　　著作权登记要的证据一次备齐
+    </div>
+    <div class="btns">
+      <button class="primary big stampbtn" id="wLogin">🛡 登录 / 注册——为存证绑定身份</button>
+      <button class="primary big" id="wTry">先试一试 →</button>
+    </div>
+    <div class="note">要把作品拿去著作权登记，<b>登录是必要条件</b>（手机验证码，一分钟）。<br>
+      只想先玩玩？点「先试一试」——随时点右上「登录」补上，作品不会丢；<br>登录后草稿自动云端随身带，换电脑也不丢。</div>
+  </div>
+</div>
+
 <div id="app">
 <header>
   <h1>画出原创歌曲</h1>
-  <span class="sub">v1.18 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.19 · 钢琴 / 弦乐 / 笛子三种音色可叠 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -299,9 +337,9 @@ var _hmt = _hmt || [];
     <button class="tbtn" id="tStrings">弦乐</button>
     <button class="tbtn" id="tFlute">笛子</button>
   </div>
-  <button id="btnHelp" class="primary big" style="margin-left:auto" title="第一次来一定点这里，一分钟就会用">使用方法</button>
-  <button id="btnStamp" class="toplink" title="存证：作品指纹（SHA-256）+ 独立时间戳 + 存证卡——给作品带上可独立验证、可绑定身份的时间证据，著作权登记可用">🛡 存证</button>
-  <button id="btnLogin" class="toplink" title="登录 / 注册：把存证记录与你的身份绑定，著作权登记时才认。手机验证码，一分钟">登录</button>
+  <button id="btnStamp" class="primary big stampbtn" title="最重要：作品指纹 + 独立时间戳 + 存证卡 + 创作说明——著作权登记的证据一次备齐" style="margin-left:auto">🛡 存证</button>
+  <button id="btnLogin" class="primary big" title="登录 / 注册：把存证记录与你的身份绑定，著作权登记时才认；登录后草稿自动云端随身带。手机验证码，一分钟">登录</button>
+  <button id="btnHelp" class="primary big" title="第一次来一定点这里，一分钟就会用">使用方法</button>
 </div>
 
 <div class="wrap">
@@ -351,7 +389,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创歌曲 v1.18 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创歌曲 v1.19 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1078,6 +1116,7 @@ function loadDrafts(){
 function saveDrafts(list){
   try { localStorage.setItem('hycyg_drafts', JSON.stringify(list)); }
   catch(e){ STORAGE_OK = false; throw e; }
+  if (_sessUser) cloudPushDrafts();
 }
 
 function snapSign(d){
@@ -1215,7 +1254,7 @@ $('btnDraft').onclick = () => {
       try {
         const list = loadDrafts();
         const item = { id: Date.now(), name: name,
-          time: new Date().toLocaleString('zh-CN'), data: dataSnapshot() };
+          time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot() };
         list.unshift(item);
         saveDrafts(list);
         renderDrafts();
@@ -1236,7 +1275,7 @@ $('btnNew').onclick = function(){
     try {
       const list = loadDrafts();
       const name = '自动保存 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
-      const item = { id: Date.now(), name: name, time: new Date().toLocaleString('zh-CN'), data: dataSnapshot() };
+      const item = { id: Date.now(), name: name, time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot() };
       list.unshift(item); saveDrafts(list); renderDrafts();
       flashTip('✓ 已自动存为「' + name + '」');
     } catch(e) { ok = false; }
@@ -1681,7 +1720,7 @@ function doImport(txt, msgEl){
     const sig = snapSign(d.data);
     if (list.some(x => snapSign(x.data) === sig)) { skipped++; return; }
     const useId = (d.id && !list.some(x => x.id === d.id)) ? d.id : Date.now() + Math.floor(Math.random()*9999);
-    list.unshift({ id: useId, name: d.name || '导入的草稿', time: d.time || '', data: d.data });
+    list.unshift({ id: useId, name: d.name || '导入的草稿', time: d.time || '', pts: Date.now(), data: d.data });
     added++;
   });
   if (added){
@@ -1781,62 +1820,45 @@ TKEYS.forEach(k => {
 /* ---------- 使用方法（原来堆在左侧的说明，全部收进这里） ---------- */
 function guideHTML(){
   return `<div class="guide">
-  <h4>这是什么</h4>
-  <p>把脑子里那段旋律<b>画</b>出来，贴上词，当场听，满意了就带走一份「每个字都绑在音上」的乐谱。
-     不用识五线谱，不用会乐器，不用装任何软件。</p>
-
-  <h4>一、画旋律</h4>
+  <h3 class="gsec gold">🎁 先说你能得到什么</h3>
   <ul>
-    <li>横轴＝时间（<b>每格 1/16 音符</b>）；纵轴＝音高，共三个八度。行首写着 1 2 3 4 5 6 7 就是简谱的七个音。</li>
-    <li>行首的记号：<b>无点＝中音</b>，<b>逗号（1,）＝低八度</b>，<b>撇号（1'）＝高八度</b>；每个从「1」开始的淡紫行＝一个八度。</li>
-    <li><b>画音</b>：按住拖动，划过去就有一条旋律。在已有的音上再点一下＝擦掉。</li>
-    <li><b>断音笔</b>：同一个音要唱两个字（比如「面」和「具」都在咪上，前面那个是附点）→ 点亮断音笔，
-        在长音的<b>后半截</b>点一下，出现白缝就是切开了。也可以按住 <b>Alt</b> 直接点。</li>
-    <li><b>右键音符</b> → 升半音 ♯ / 降半音 ♭ / 还原 ♮。</li>
-    <li>画到最右端会自动加长 4 小节，不够长就继续往右画。</li>
+    <li><b>一首你自己的歌</b>——旋律＋歌词一体的简谱，照着就能唱。</li>
+    <li><b>全套文件带走</b>：简谱图片（可直接打印 / 交登记材料）、带词乐谱 .musicxml、MIDI。</li>
+    <li><b>著作权证据包</b>：作品指纹＋独立时间戳＋存证卡＋创作说明模板，登记材料一次备齐。</li>
+    <li><b>版权完全归你</b>，本工具不主张任何权利。</li>
   </ul>
 
-  <h4>二、贴词</h4>
+  <h3 class="gsec gold">🛡 存证——最重要的一步</h3>
   <ul>
-    <li>左边框里<b>整段粘贴</b>，标点、空格自动忽略。</li>
-    <li>字按时间顺序落到音符上，<b>一个音一个字</b>。画布上每格上方会直接显示它唱的那个字。</li>
-    <li>字比音多，框下面会红字提醒——补旋律，或用断音笔把长音切开。<b>以画布为准</b>，多出来的字不会硬塞。</li>
+    <li>画完点右上<b>金色「🛡 存证」按钮</b>。第一次会让你<b>手机验证码登录</b>——这是必须的：登录后存证记录与账号绑定，著作权登记时才认「这是谁的」。</li>
+    <li>存证完成，自动下载 <b>4 样文件</b>到你电脑的「下载」文件夹：<b>简谱图片 PNG、规范作品文件、存证卡（含验证器）、时间戳证明</b>。</li>
+    <li>存证卡里附<b>创作说明模板</b>——照着抄进登记表「创作说明」栏，按实际改一改就行。</li>
+    <li>这些文件都在<b>你自己电脑上</b>，留存好；登记时直接上传/打印提交。</li>
   </ul>
 
-  <h4>三、听（重点）</h4>
+  <h3 class="gsec">✍️ 两种方式作曲</h3>
   <ul>
-    <li><b>▶ 播放</b>＝开始，正在放的时候按钮变成 <b>■ 停止</b>，再按一下就停。只有一个键。</li>
-    <li>音色可以<b>多选，最多三个同时响</b>：
-      <ul>
-        <li><b>钢琴</b>——颗粒清楚，核对每个音准不准最可靠。</li>
-        <li><b>弦乐</b>——弓弦连绵不断。如果觉得钢琴听着「一个一个的」，加上弦乐就顺了。</li>
-        <li><b>笛子</b>——清亮透气，高音区比钢琴好听。</li>
-      </ul>
-    </li>
-    <li>建议先开「钢琴 + 弦乐」整体听顺不顺，再单独开钢琴逐个音核对。</li>
-    <li><b>节拍器</b>在画布下方，跟着咔嗒声画更容易卡准拍子。</li>
+    <li><b>画格子</b>：行首 1–7 就是简谱的七个音；<b>按住拖动</b>划过即成旋律，再点一下＝擦掉。断音笔切开长音（一个音唱两个字），右键升/降半音 ♯♭。</li>
+    <li><b>🎙 哼唱</b>：按一下录音，哼完再按一下，自动落格子。哼的时候<b>一次只哼一个音、音与音稍断开</b>，识别最准。落完逐音修。</li>
+    <li>左边框<b>整段贴歌词</b>，字自动落到音符上，一格一字；字比音多会红字提醒。</li>
   </ul>
 
-  <h4>四、存草稿 / 带走</h4>
+  <h3 class="gsec">▶ 听与修</h3>
   <ul>
-    <li>听顺了就按 <b>💾 保存草稿</b>。稿子留在页面下方的草稿区，存在你自己的浏览器里，不会自己消失。</li>
-    <li><b>防丢习惯</b>：清浏览器缓存、换电脑、换浏览器都会让草稿不在——画完就点 <b>⇩ 备份全部</b>，把那段文字存进<b>你自己电脑</b>的记事本或文档里保管，或另存成 .json 文件。</li>
-    <li><b>点草稿的名字</b>＝把它放回画布，并展开简谱——简谱的数字正对着它唱的那个字，一眼看出词曲对不对。放回之前画布上的内容会自动存一份「⟲ 自动备份」。</li>
-    <li><b>⬇ 乐谱</b>＝<b>.musicxml</b>，带词的乐谱。用免费的 MuseScore 打开就是五线谱＋歌词，可以改配器、出伴奏、再导 MIDI。这是能把词曲一起带走的方式。</li>
-    <li><b>MIDI</b>＝<b>.mid</b>，只带音不带词。iPhone 自带的库乐队、FL、Cubase、Logic 都能开，换乐器、加鼓、配和弦、改速度一键完成。</li>
-    <li><b>删除</b>＝这一稿不要了，会先问一次再删。</li>
+    <li><b>▶ 播放</b>只有一个键：正在放时再按＝停止。</li>
+    <li>音色可<b>多选（最多三个）</b>：钢琴对音准、弦乐连绵、笛子清亮。建议「钢琴＋弦乐」先听整体。</li>
+    <li>画错点 <b>撤销</b>；<b>✚ 新建</b>＝自动存好当前稿、清空画布开新页。</li>
   </ul>
 
-  <h4>五、换电脑 / 换网址 / 备份</h4>
-  <p>草稿存在你自己的浏览器里，<b>按网址分开存</b>——本机文件、线上链接是互不相通的仓库，换地址就要搬一次家。
-     有内容时关闭或刷新页面会弹提醒；但最稳妥的办法是<b>离开前点「⇩ 备份全部」</b>，把文字存到你自己的电脑里。
-     搬去别处：到新的那边点 <b>⇧ 导入备份</b>，粘贴备份文字，或点「选备份文件…」选中之前存的 .json。</p>
-  <p><b>临时试用</b>：走之前记得备份到自己电脑。<b>长期使用</b>：目前请以「⇩ 备份全部」为准；云端存档（登录后草稿随身带）在开发计划中。</p>
+  <h3 class="gsec">💾 草稿不会丢</h3>
+  <ul>
+    <li><b>已登录</b>：草稿<b>自动云端随身带</b>——换电脑、清缓存，登录即找回。</li>
+    <li><b>没登录</b>：草稿存在本浏览器。防丢习惯：离开前点「⇩ 备份全部」存到自己电脑；换地方用「⇧ 导入备份」搬过去。</li>
+  </ul>
 
-  <h4>六、版权与隐私：作品是你的</h4>
-  <p><b>你画出来的旋律、贴上去的词，著作权归你自己</b>，本工具不主张任何权利。
-     本工具<b>不上传你的任何内容</b>——草稿、歌词、画的曲，全部只存在你自己的浏览器里，关掉网页也还在。
-     页面使用匿名访问统计，只统计打开次数和按钮点击次数，不涉及你创作的内容。</p>
+  <h3 class="gsec">🔒 隐私</h3>
+  <p>作品内容（音符、歌词）全程<b>不出你的电脑</b>——存证只提交指纹（32 字节哈希，不含作品本身）。
+     页面只用匿名访问统计（打开次数、按钮点击），不涉及你创作的内容。</p>
   </div>`;
 }
 $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
@@ -1911,7 +1933,7 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
 
 $('lnkFeedback').onclick = () => track('feedback','点击');
 
-/* v1.18 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
+/* v1.19 手机入口（清理定稿）：竖屏手机首次访问显示海报卡，点「开始作曲」直接进页面。
    v1.12/v1.13 的全屏锁定、视口切换、整页缩放实验全部移除——安卓 webview 转屏后视口不更新，多次实测错乱 */
 const rotEl = $('rot');
 function isPortrait(){ return window.innerHeight > window.innerWidth * 1.05; }
@@ -1932,7 +1954,7 @@ window.addEventListener('resize', rotUpdate);
 window.addEventListener('orientationchange', () => { setTimeout(rotUpdate, 250); setTimeout(rotUpdate, 900); });
 setTimeout(rotUpdate, 600);
 
-/* ================= v1.18 哼唱输入 + 作品存证 ================= */
+/* ================= v1.19 哼唱输入 + 作品存证 ================= */
 
 /* ---- 哼唱：录音 → 音高检测 → 落草稿 ---- */
 let humState = { recording:false, recorder:null, chunks:[], ctx:null, stream:null };
@@ -2127,7 +2149,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.18';
+const APP_VER = 'v1.19';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2167,7 +2189,7 @@ function buildCertCard(entry, chain, anchored, otsName){
   + '<li><b>本作品指纹：</b><code>' + esc(entry.fp) + '</code></li>'
   + '<li><b>生成时间（本地）：</b>' + esc(entry.t) + '</li>'
   + '<li><b>独立时间锚定：</b>' + (anchored ? '已提交 OpenTimestamps（证明文件 ' + esc(otsName) + '，数小时内可经比特币区块链独立验证）' : '未完成（离线或日历不可达）——指纹与哈希链仍然有效，可稍后重新存证补锚定') + '</li>'
-  + '<li><b>作者账号：</b>未登录（本地生成）——本卡证明「作品在此时已存在」，作者身份请结合账号/实名/版权登记使用</li>'
+  + '<li><b>作者账号：</b>' + (entry.author ? '已登录 ' + esc(entry.author) + '（云端存证库有对应登记记录，可申请核对）' : '未登录（本地生成）——本卡证明「作品在此时已存在」，作者身份请结合账号/实名/版权登记使用') + '</li>'
   + '<li><b>调性/速度：</b>' + esc(entry.meta) + '</li>'
   + '</ul>'
   + '<h3>验证方法（不需要经过本软件，任何人都可独立完成）</h3>'
@@ -2176,6 +2198,14 @@ function buildCertCard(entry, chain, anchored, otsName){
   + '<li>方法三：在下方选择规范作品文件，本页本地重算并比对（不需联网）。</li></ol>'
   + '<p><input type="file" id="f"><button id="v" style="margin-left:8px">本地重算比对</button></p><div id="r"></div>'
   + '<h3>哈希链（创作/存证历史）</h3><table><tr><th>#</th><th>指纹</th><th>时间</th><th>接续上一条</th></tr>' + rows + '</table>'
+  + '<h3>创作说明（著作权登记表「创作说明」栏可直接使用）</h3>'
+  + '<div style="border:1px solid #bbb;background:#faf8f2;padding:10px 14px;font-size:14px">'
+  + (entry.title ? '《' + esc(entry.title) + '》' : '本作品')
+  + '为本人独立创作的音乐作品，完成于 ' + esc(entry.t) + '（北京时间，与随附时间戳证明一致）。'
+  + '旋律由本人在「画出原创歌曲」网页工具中亲手绘制（或哼唱后逐音修改）定稿，歌词为本人创作；'
+  + '词曲一体对齐关系固化于随附规范作品文件中（SHA-256 指纹 ' + esc(entry.fp.slice(0, 16)) + '…）。'
+  + '本人持有完整创作过程证据，作品未许可他人使用。</div>'
+  + '<p style="color:#666;font-size:12px">以上为模板，请按实际情况核对修改后填入登记表；创作方式（绘制/哼唱）请如实选择表述。</p>'
   + '<p style="color:#666;font-size:12px">诚实说明：本卡证明「该作品内容在 T 时刻已存在且未被篡改」，不直接证明作者身份；用于著作权登记时，请连同身份证明与登记申请一并提交。法律依据：最高人民法院《关于互联网法院审理案件若干问题的规定》第十一条。</p>'
   + '<script>document.getElementById("v").onclick=function(){var f=document.getElementById("f").files[0];if(!f){document.getElementById("r").textContent="请先选择文件";return}var rd=new FileReader();rd.onload=async function(){var txt=rd.result;var hashHex;try{var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt));hashHex=[...new Uint8Array(d)].map(function(b){return b.toString(16).padStart(2,"0")}).join("")}catch(e){document.getElementById("r").textContent="本浏览器不支持本地计算";return}document.getElementById("r").textContent="所选文件 SHA-256 = "+hashHex+"\\n"+(hashHex==="' + esc(entry.fp) + '"?"✅ 与指纹一致——文件自本存证卡生成以来未被改动":"❌ 与指纹不一致——若这是另一版本，请对应哈希链中的对应条目")};rd.readAsText(f)}<\/script></body></html>';
 }
@@ -2217,6 +2247,8 @@ function startStampFlow(){
       const entry = { fp, prev, t: tLocal, utc: now.toISOString(),
         meta: (title ? title + ' · ' : '') + NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + '小节',
         ver: APP_VER };
+      entry.title = title;
+      entry.author = maskId(_sessUser ? (_sessUser.phone || '') : '');
       chain.push(entry); saveChain(chain);
       const tsName = 'song-' + now.getTime() + '.ots';
       st.textContent = '指纹完成：' + fp.slice(0, 16) + '…  正在请求独立时间锚定……';
@@ -2247,7 +2279,7 @@ function startStampFlow(){
   };
 }
 
-/* ================= v1.18 登录（手机验证码）+ 简谱图片导出 ================= */
+/* ================= v1.19 登录（手机验证码）+ 简谱图片导出 ================= */
 const WB_CFG = {
   endpoint: 'https://draw-your-song.app.workbuddy.host',
   oauthRelayBaseUrl: 'https://www.workbuddy.cn/v2/as/genie-baas/oauth',
@@ -2346,9 +2378,11 @@ function openLoginModal(reason, afterLogin){
     _pendingOtp = null;
     _sessUser = completed.data.user;
     refreshLoginBtn();
+    hideWelcome();
     $('overlay').classList.remove('show');
-    flashTip('✅ 已登录 ' + maskId(_sessUser.phone || '') + '——存证将与你的账号绑定');
+    flashTip('✅ 已登录 ' + maskId(_sessUser.phone || '') + '——存证将与你的账号绑定，草稿开始云端随身带');
     track('auth', 'login-ok');
+    cloudPullDrafts();
     const cb = _afterLogin; _afterLogin = null;
     if (cb) cb();
   };
@@ -2364,7 +2398,82 @@ $('btnLogin').onclick = async () => {
   }
   openLoginModal('登录后，你的存证记录会与账号绑定——"这个作品在何时存在、归属哪个账号"才站得住，著作权登记时才有身份证据。作品内容本身仍然不出你的电脑。', null);
 };
-window.addEventListener('load', async () => { await getSessionSafe(); refreshLoginBtn(); });
+window.addEventListener('load', async () => {
+  await getSessionSafe(); refreshLoginBtn();
+  if (_sessUser){ hideWelcome(); cloudPullDrafts(); }
+  else {
+    const mobilePortrait = window.matchMedia('(pointer:coarse)').matches
+      && (window.matchMedia('(orientation:portrait)').matches || isPortrait());
+    if (!mobilePortrait && !sessionStorage.getItem('hycyg_wlcmok')) showWelcome();
+  }
+});
+
+/* ===== v1.19 入口欢迎卡：先说能得到什么；登录为存证必要条件 ===== */
+function showWelcome(){
+  const el = document.getElementById('welcome');
+  if (!el) return;
+  el.style.display = 'block'; document.body.classList.add('welcome-show'); window.scrollTo(0, 0);
+}
+function hideWelcome(){
+  const el = document.getElementById('welcome');
+  if (el) el.style.display = 'none';
+  document.body.classList.remove('welcome-show');
+  try { sessionStorage.setItem('hycyg_wlcmok', '1'); } catch(e){}
+}
+$('wLogin').onclick = () => {
+  hideWelcome(); track('welcome', 'login');
+  openLoginModal('要把作品拿去<b>著作权登记</b>，登录是必要条件——存证记录与账号绑定后，"作品在何时存在、归属哪个账号"才站得住。作品内容本身仍然不出你的电脑。', null);
+};
+$('wTry').onclick = () => { hideWelcome(); track('welcome', 'try'); };
+
+/* ===== v1.19 云端草稿箱：登录后草稿随身同步，换设备/清缓存不丢 ===== */
+let _cloudSyncWarnAt = 0;
+function cloudSyncWarn(msg){
+  if (Date.now() - _cloudSyncWarnAt < 60000) return;
+  _cloudSyncWarnAt = Date.now();
+  flashTip('⚠ ' + msg + '——草稿仍保存在本地浏览器，作品不受影响');
+}
+async function cloudPushDrafts(){
+  if (!_sessUser || !cloudReady()) return;
+  try{
+    const c = cloudReady();
+    const list = loadDrafts();
+    await c.database.from('draft_store').delete().neq('id', 0);
+    if (list.length){
+      const rows = list.map(d => ({ id: d.id, name: d.name || '', time: d.time || '',
+        pts: d.pts || Date.now(), data: d.data }));
+      const { error } = await c.database.from('draft_store').insert(rows);
+      if (error) throw error;
+    }
+  }catch(e){ cloudSyncWarn('云端草稿同步未成功'); }
+}
+async function cloudPullDrafts(){
+  if (!_sessUser || !cloudReady()) return;
+  try{
+    const c = cloudReady();
+    const { data, error } = await c.database.from('draft_store').select('*').order('id', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) return;
+    const list = loadDrafts();
+    let added = 0, updated = 0;
+    data.forEach(r => {
+      const i = list.findIndex(x => x.id === r.id);
+      const cloudPts = r.pts || new Date(r.updated_at).getTime() || 0;
+      if (i < 0){
+        list.unshift({ id: r.id, name: r.name || '云端草稿', time: r.time || '', pts: cloudPts, data: r.data });
+        added++;
+      } else if ((list[i].pts || 0) < cloudPts){
+        list[i] = { id: r.id, name: r.name || list[i].name, time: r.time || list[i].time, pts: cloudPts, data: r.data };
+        updated++;
+      }
+    });
+    if (added || updated){
+      try { localStorage.setItem('hycyg_drafts', JSON.stringify(list)); } catch(e){ return; }
+      renderDrafts();
+      flashTip('☁ 已从云端取回草稿：新增 ' + added + '、更新 ' + updated + '——你的作品随身带');
+    }
+  }catch(e){ cloudSyncWarn('云端草稿取回未成功'); }
+}
 
 /* ---- 简谱图片导出（著作权登记的作品样本直接可用） ---- */
 const JP_CSS = '.jpscore{font-family:"Songti SC","SimSun",serif;color:#2f2a22}'
