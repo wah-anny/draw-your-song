@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创乐曲 v1.36</title>
+<title>画出原创乐曲 v1.37</title>
 <meta name="description" content="轻松创作乐曲并配上著作权申报文件。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创乐曲——轻松创作乐曲并配上著作权申报文件">
@@ -88,7 +88,7 @@ button.armed:hover{color:#fff}
 .wrow .tag{font-size:12px;padding:3px 11px;border-radius:999px;background:#f0e7d3;color:#8a611d;white-space:nowrap;flex:0 0 auto}
 .wrow.gold{border-color:#d9bd85;background:#fff9ec}
 .wrow.gold .tt{color:#8a611d}
-.wcta{display:flex;gap:14px;align-items:center;margin:22px 0 6px;flex-wrap:wrap}
+.wcta{display:flex;gap:14px;align-items:center;margin:22px 0 6px;flex-wrap:wrap;justify-content:center}
 .wcta .ask{font-size:14.5px;color:#5a4d33;font-weight:600}
 /* v1.35 扉页：英文换到汉字下方、上下空档均分、标语去白底、停掉动画 */
 #welcome{position:relative;background:url('扉页bg.jpg') center/cover no-repeat}
@@ -103,7 +103,8 @@ button.armed:hover{color:#fff}
 #welcome .whero .big em{font-style:normal;color:#b07d2b}
 #welcome .wrows{margin-top:auto}
 .wrow .tag.core{background:linear-gradient(135deg,#e0893a,#c2410c);color:#fff;font-weight:700;box-shadow:0 1px 6px rgba(194,65,12,.45);font-size:12.5px}
-#welcome .wmotto{margin:auto -70px 0;width:calc(100% + 140px);white-space:nowrap;text-align:center;font-size:clamp(20px,2.5vw,36px);font-weight:700;letter-spacing:.5em;text-indent:.5em;color:#3a3225;text-shadow:0 1px 3px rgba(255,250,235,.95),0 0 16px rgba(255,250,235,.85),0 0 4px rgba(255,253,248,.9)}
+#welcome{overflow-x:hidden}
+#welcome .wmotto{margin:auto auto 0;width:min(calc(100% + 140px),calc(100vw - 20px));white-space:nowrap;text-align:center;font-family:'STXingkai','华文行楷','KaiTi','楷体','FangSong',serif;font-size:clamp(22px,2.7vw,40px);font-weight:700;letter-spacing:.45em;text-indent:.45em;color:#3a3225;text-shadow:0 1px 3px rgba(255,250,235,.95),0 0 16px rgba(255,250,235,.85),0 0 4px rgba(255,253,248,.9)}
 #welcome .wfoot{margin-top:12px;background:rgba(255,253,248,.88);border-radius:12px;color:#5c4f36;padding:12px 18px}
 #welcome .wcta .ask{background:rgba(255,253,248,.85);border-radius:999px;padding:8px 16px}
 @media (max-width:900px){
@@ -377,14 +378,14 @@ var _hmt = _hmt || [];
       <span>免费使用</span><span>代码开源（MIT）</span><span>作品数据不出你的电脑</span><span>登录仅需手机验证码，一分钟</span><span>登录后草稿云端随身带</span><span>© 2026 充电器</span>
     </div>
   </div>
-  <!-- 背景音乐：巴赫《音乐的奉献》BWV 1079 三重奏鸣曲 Largo，1930年代巴黎录音（Ensemble Pro Musica），公有领域（Wikimedia Commons / Public Domain Project，文件 Disques_pro_musica-pm107-7001.ogg） -->
-  <audio id="bgmAudio" loop preload="auto" src="bgm_ricercar.ogg"></audio>
+  <!-- 背景音乐：巴赫《音乐的奉献》BWV 1079 三重奏鸣曲 Largo，1930年代巴黎录音（Ensemble Pro Musica），公有领域（Wikimedia Commons / Public Domain Project，文件 Disques_pro_musica-pm107-7001.ogg；已降噪+提量+压缩为 mp3） -->
+  <audio id="bgmAudio" loop preload="auto" src="bgm_final.mp3"></audio>
 </div>
 
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.36 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.37 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -470,7 +471,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.36 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.37 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -2352,7 +2353,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.36';
+const APP_VER = 'v1.37';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2714,30 +2715,33 @@ function hideWelcome(){
   if (el) el.style.display = 'none';
   document.body.classList.remove('welcome-show');
   try { sessionStorage.setItem('hycyg_wlcmok', '1'); } catch(e){}
+  bgmStopNow();
 }
 $('wLogin').onclick = () => {
-  hideWelcome(); track('welcome', 'login');
+  bgmStopNow(); hideWelcome(); track('welcome', 'login');
   openLoginModal('要把作品拿去著作权登记，登录是必要条件——登录后存证才有归属，登记时才认得上。作品内容本身仍然不出你的电脑。', null);
 };
-$('wTry').onclick = () => { hideWelcome(); track('welcome', 'try'); };
+$('wTry').onclick = () => { bgmStopNow(); hideWelcome(); track('welcome', 'try'); };
 
-/* ===== v1.36 扉页背景音乐：打开页面即起（静音起播后自动解除静音；被拦截则首次点击补启），进工具后淡出 ===== */
+/* ===== v1.37 扉页背景音乐：三级起播策略（直接有声→静音起播1秒后解除→任意点击出声）；进扉页门卫；进工具立即停 ===== */
 const _bgm = $('bgmAudio');
-let _bgmStarted = false;
-function bgmStartUnmuted(){
-  if (_bgmStarted) return;
-  _bgmStarted = true;
+let _bgmLive = false;
+function _bgmOnWelcome(){
+  const w = document.getElementById('welcome');
+  return !!(w && document.body.classList.contains('welcome-show') && w.style.display !== 'none');
+}
+function bgmGo(){
+  if (_bgmLive || !_bgmOnWelcome()) return;
   _bgm.volume = 0.32; _bgm.muted = false;
-  _bgm.play().catch(()=>{});
+  _bgm.play().then(()=>{ _bgmLive = true; }).catch(()=>{});
 }
 _bgm.volume = 0.32; _bgm.muted = true;
 _bgm.play().then(()=>{
-  if (!_bgmStarted){ _bgmStarted = true; setTimeout(()=>{ _bgm.muted = false; }, 1000); }
+  setTimeout(()=>{ if (!_bgmLive && _bgmOnWelcome()){ _bgm.muted = false; _bgmLive = true; } }, 1000);
 }).catch(()=>{});
-document.getElementById('welcome').addEventListener('pointerdown', bgmStartUnmuted);
+document.addEventListener('pointerdown', bgmGo, {capture:true});
 function bgmStopNow(){
-  if (!_bgm.paused) _bgm.pause();
-  _bgm.muted = false; _bgm.volume = 0.32;
+  _bgm.pause(); _bgm.muted = false; _bgm.volume = 0.32;
 }
 
 /* ===== v1.21 云端草稿箱：登录后草稿随身同步，换设备/清缓存不丢 ===== */
