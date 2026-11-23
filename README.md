@@ -68,3 +68,7 @@ AI 一键生成的音乐，内容著作权至今没有定论——国内外都�
 ## License
 
 MIT
+
+### 扉页背景音乐署名（CC BY 3.0）
+
+巴赫《音乐的奉献》BWV 1079 三重奏鸣曲 1. Largo 片段，演奏：La Guirlande Early Music（Luis Martínez Pueyo / Lathika Vithanage / Teodoro Baù / Joan Boronat Sanz），来源 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:J._S._Bach_-_Triosonata_in_C_minor_from_the_%27Musical_Offering%27,_BWV_1079_Nr._8_(1._Largo).webm)，依 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) 授权使用（本仓库已截取并压缩）。
