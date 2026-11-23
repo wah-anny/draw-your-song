@@ -3,13 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创乐曲 v1.40</title>
-<meta name="description" content="轻松创作乐曲并配上著作权申报文件。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
+<title>画出原创乐曲 v1.41 · 网页作曲工具｜画旋律出简谱，一键存证配著作权登记材料</title>
+<meta name="description" content="轻松创作乐曲并配上著作权申报文件。网页作曲工具：画格子或哼唱写旋律、贴歌词自动出一字一音的带词简谱，浏览器实时合成钢琴/弦乐/笛子试听，导出 MusicXML/MIDI/简谱图片，一键存证（作品指纹 + 独立时间戳）。不需要识谱、不需要会乐器、不需要安装，打开网页就能用。免费开源、不上传数据。">
+<meta name="keywords" content="网页作曲,在线作曲,简谱生成,画旋律,哼唱成曲,原创歌曲,著作权登记,作品存证,MusicXML,MIDI导出,免费作曲软件,画出原创乐曲">
+<meta name="author" content="画出原创乐曲">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://wah-anny.github.io/draw-your-song/">
+<meta property="og:site_name" content="画出原创乐曲">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:type" content="website">
-<meta property="og:title" content="画出原创乐曲——轻松创作乐曲并配上著作权申报文件">
-<meta property="og:description" content="不替你生成，帮你把脑中的旋律画下来。画格子写旋律、贴歌词，浏览器实时合成试音，导出带词乐谱和 MIDI。免费开源，草稿只存在你自己的浏览器里。">
+<meta property="og:title" content="画出原创乐曲——轻松创作乐曲，并配上著作权申报文件">
+<meta property="og:description" content="画格子或哼唱写旋律，贴歌词自动出带词简谱，一键存证为著作权登记配材料。不需要识谱、不需要会乐器、不需要安装。免费开源，草稿只存在你自己的浏览器里。">
 <meta property="og:url" content="https://draw-your-song.app.workbuddy.host/?sharecode=X7VJNMU5NF">
 <meta property="og:image" content="https://draw-your-song.app.workbuddy.host/og-cover.png?sharecode=X7VJNMU5NF">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "画出原创乐曲",
+  "alternateName": "Draw Your Song",
+  "applicationCategory": "MultimediaApplication",
+  "applicationSubCategory": "音乐创作",
+  "operatingSystem": "任何带现代浏览器的设备（Windows / macOS / Linux / Android / iOS）",
+  "url": "https://wah-anny.github.io/draw-your-song/",
+  "description": "网页作曲工具：画格子或哼唱写旋律、贴歌词，自动生成一字一音的带词简谱，浏览器内实时合成钢琴/弦乐/笛子试听，导出 MusicXML、MIDI 和简谱图片，并可在本地一键存证（作品指纹 + 独立时间戳）为著作权登记配材料。",
+  "featureList": [
+    "画格子作曲",
+    "哼唱自动落格",
+    "自动生成带词简谱",
+    "浏览器内实时试听",
+    "导出 MusicXML / MIDI / 简谱图片",
+    "本地一键存证（SHA-256 作品指纹 + 时间戳）",
+    "单个 HTML 文件，零依赖，不上传数据"
+  ],
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CNY"},
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true,
+  "inLanguage": "zh-CN"
+}
+</script>
 <script defer src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234b45c6'/%3E%3Cpath d='M12 24V9l10-2v13' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='10' cy='24' r='3' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%23fff'/%3E%3C/svg%3E">
 <style>
@@ -387,7 +419,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.40 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.41 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -473,7 +505,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.40 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.41 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -2355,7 +2387,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.40';
+const APP_VER = 'v1.41';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2725,7 +2757,7 @@ $('wLogin').onclick = () => {
 };
 $('wTry').onclick = () => { bgmStopNow(); hideWelcome(); track('welcome', 'try'); };
 
-/* ===== v1.40 扉页背景音乐：静音起播→真正开始出声后0.5秒解除静音（事件驱动，不等固定定时器）；任意点击兜底；进扉页门卫；进工具立即停 ===== */
+/* ===== v1.41 扉页背景音乐：静音起播→真正开始出声后0.5秒解除静音（事件驱动，不等固定定时器）；任意点击兜底；进扉页门卫；进工具立即停 ===== */
 const _bgm = $('bgmAudio');
 let _bgmLive = false;
 function _bgmOnWelcome(){
