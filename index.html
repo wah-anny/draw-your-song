@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创乐曲 v1.30</title>
-<meta name="description" content="作曲超简单，版权归你。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
+<title>画出原创乐曲 v1.31</title>
+<meta name="description" content="轻松创作乐曲并配上著作权申报文件。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
-<meta property="og:title" content="画出原创乐曲——作曲超简单，版权归你">
+<meta property="og:title" content="画出原创乐曲——轻松创作乐曲并配上著作权申报文件">
 <meta property="og:description" content="不替你生成，帮你把脑中的旋律画下来。画格子写旋律、贴歌词，浏览器实时合成试音，导出带词乐谱和 MIDI。免费开源，草稿只存在你自己的浏览器里。">
 <meta property="og:url" content="https://draw-your-song.app.workbuddy.host/?sharecode=X7VJNMU5NF">
 <meta property="og:image" content="https://draw-your-song.app.workbuddy.host/og-cover.png?sharecode=X7VJNMU5NF">
@@ -93,6 +93,9 @@ button.armed:hover{color:#fff}
 .wbtn:hover{background:#9c6d22}
 .wbtn.ghost{background:#fffdf8;border:1.5px solid #cdbb92;color:#5a4d33;box-shadow:none}
 .wbtn.ghost:hover{background:#faf4e6}
+.wreg{margin-top:18px;padding:12px 16px;border:1px solid #e6dcc6;border-radius:12px;background:#fffdf7;font-size:14px;color:var(--ink,#5a4632);line-height:1.9}
+.wreg a{color:#b07d2b;font-weight:700;text-decoration:none;border-bottom:1px dashed #b07d2b}
+.wreg small{color:#a49877;font-size:12px}
 .wfoot{margin-top:auto;padding:16px 0 4px;border-top:1px solid #e6dcc6;display:flex;gap:16px;flex-wrap:wrap;color:#a49877;font-size:12.5px;line-height:1.7}
 @media (max-width:640px){
   .wcv{padding:26px 16px 12px}
@@ -290,7 +293,7 @@ var _hmt = _hmt || [];
 <div id="rot">
   <div class="card">
     <div class="mk">DRAW YOUR SONG</div>
-    <div class="big">作曲超简单<br>版权归你</div>
+    <div class="big">轻松创作乐曲<br>并配上著作权申报文件</div>
     <div class="sub">♪ 画格子写旋律 · 贴歌词 · 浏览器实时试音</div>
     <svg viewBox="0 0 320 150" aria-hidden="true">
       <rect x="1" y="1" width="318" height="148" rx="10" fill="#fbfaf7" stroke="#cfc8ba" stroke-width="2"/>
@@ -347,6 +350,7 @@ var _hmt = _hmt || [];
       <span class="ask">需要著作权认证文件？</span><button class="wbtn" id="wLogin">登录</button>
       <span class="ask">只想先试试？</span><button class="wbtn ghost" id="wTry">先试一试 →</button>
     </div>
+    <div class="wreg">📑 著作权登记官方渠道：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
     <div class="wfoot">
       <span>免费使用</span><span>代码开源（MIT）</span><span>作品数据不出你的电脑</span><span>登录仅需手机验证码，一分钟</span><span>登录后草稿云端随身带</span><span>© 2026 充电器</span>
     </div>
@@ -356,7 +360,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.30 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.31 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -441,7 +445,7 @@ var _hmt = _hmt || [];
 </section>
 
 <footer class="site-foot">
-  <span>画出原创乐曲 v1.30 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.31 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -2323,7 +2327,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.30';
+const APP_VER = 'v1.31';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
