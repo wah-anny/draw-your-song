@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创乐曲 v1.37</title>
+<title>画出原创乐曲 v1.38</title>
 <meta name="description" content="轻松创作乐曲并配上著作权申报文件。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创乐曲——轻松创作乐曲并配上著作权申报文件">
@@ -98,17 +98,19 @@ button.armed:hover{color:#fff}
 #welcome .wbrandt .cn{padding:5px 16px;display:inline-block}
 #welcome .wbrandt .en{background:rgba(255,253,248,.82);border-radius:8px;padding:3px 10px;display:inline-block;align-self:flex-start;margin-top:0}
 #welcome .whero{text-align:center}
-#welcome .whero .big{background:none;box-shadow:none;display:inline-block;text-shadow:0 2px 12px rgba(255,250,235,.9),0 1px 3px rgba(255,250,235,.95)}
+#welcome .whero .big{background:none;box-shadow:none;display:inline-block;font-family:'STXingkai','华文行楷','KaiTi','楷体','FangSong',serif;font-weight:700;text-shadow:0 2px 12px rgba(255,250,235,.9),0 1px 3px rgba(255,250,235,.95)}
 #welcome .whero .sub{background:rgba(255,253,248,.9);border-radius:12px;box-shadow:0 2px 10px rgba(90,70,30,.14);padding:10px 20px;display:inline-block}
 #welcome .whero .big em{font-style:normal;color:#b07d2b}
 #welcome .wrows{margin-top:auto}
 .wrow .tag.core{background:linear-gradient(135deg,#e0893a,#c2410c);color:#fff;font-weight:700;box-shadow:0 1px 6px rgba(194,65,12,.45);font-size:12.5px}
 #welcome{overflow-x:hidden}
-#welcome .wmotto{margin:auto auto 0;width:min(calc(100% + 140px),calc(100vw - 20px));white-space:nowrap;text-align:center;font-family:'STXingkai','华文行楷','KaiTi','楷体','FangSong',serif;font-size:clamp(22px,2.7vw,40px);font-weight:700;letter-spacing:.45em;text-indent:.45em;color:#3a3225;text-shadow:0 1px 3px rgba(255,250,235,.95),0 0 16px rgba(255,250,235,.85),0 0 4px rgba(255,253,248,.9)}
+#welcome .wmotto{margin:auto 0 0;position:relative;left:50%;transform:translateX(-50%);width:min(calc(100% + 140px),calc(100vw - 20px));white-space:nowrap;text-align:center;font-family:inherit;font-size:clamp(22px,2.7vw,40px);font-weight:700;letter-spacing:0;text-indent:0;color:#3a3225}
+#welcome .wmotto i{font-style:normal;display:inline-block;border:1px solid rgba(255,253,248,.95);border-radius:.16em;padding:.06em .14em;margin:0 .05em;background:rgba(255,253,248,.12);box-shadow:0 1px 5px rgba(120,95,45,.10)}
+#welcome .wmotto .gp{display:inline-block;width:.62em}
 #welcome .wfoot{margin-top:12px;background:rgba(255,253,248,.88);border-radius:12px;color:#5c4f36;padding:12px 18px}
 #welcome .wcta .ask{background:rgba(255,253,248,.85);border-radius:999px;padding:8px 16px}
 @media (max-width:900px){
-  #welcome .wmotto{white-space:normal;width:100%;margin:16px 0 0;font-size:15px;letter-spacing:.3em;text-indent:.3em}
+  #welcome .wmotto{white-space:normal;width:100%;margin:16px 0 0;position:static;transform:none;font-size:15px}
   #welcome .wbrand{position:static;margin:0 0 10px}
   #welcome .wrows{margin-top:24px}
   .wcv{padding-top:14px}
@@ -373,7 +375,7 @@ var _hmt = _hmt || [];
       <span class="ask">需要著作权认证文件？</span><button class="wbtn" id="wLogin">登录</button>
       <span class="ask">只想先试试？</span><button class="wbtn ghost" id="wTry">先试一试 →</button>
     </div>
-    <div class="wmotto">音律无碍　纵横天地　穿越古今　与万物共鸣</div>
+    <div class="wmotto"><i>音</i><i>律</i><i>无</i><i>碍</i><span class="gp"></span><i>纵</i><i>横</i><i>天</i><i>地</i><span class="gp"></span><i>穿</i><i>越</i><i>古</i><i>今</i><span class="gp"></span><i>与</i><i>万</i><i>物</i><i>共</i><i>鸣</i></div>
     <div class="wfoot">
       <span>免费使用</span><span>代码开源（MIT）</span><span>作品数据不出你的电脑</span><span>登录仅需手机验证码，一分钟</span><span>登录后草稿云端随身带</span><span>© 2026 充电器</span>
     </div>
@@ -385,7 +387,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.37 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.38 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -471,7 +473,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.37 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.38 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -2353,7 +2355,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.37';
+const APP_VER = 'v1.38';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2723,7 +2725,7 @@ $('wLogin').onclick = () => {
 };
 $('wTry').onclick = () => { bgmStopNow(); hideWelcome(); track('welcome', 'try'); };
 
-/* ===== v1.37 扉页背景音乐：三级起播策略（直接有声→静音起播1秒后解除→任意点击出声）；进扉页门卫；进工具立即停 ===== */
+/* ===== v1.38 扉页背景音乐：三级起播策略（直接有声→静音起播1秒后解除→任意点击出声）；进扉页门卫；进工具立即停 ===== */
 const _bgm = $('bgmAudio');
 let _bgmLive = false;
 function _bgmOnWelcome(){
@@ -2736,8 +2738,13 @@ function bgmGo(){
   _bgm.play().then(()=>{ _bgmLive = true; }).catch(()=>{});
 }
 _bgm.volume = 0.32; _bgm.muted = true;
+const _bgmT0 = Date.now();
 _bgm.play().then(()=>{
-  setTimeout(()=>{ if (!_bgmLive && _bgmOnWelcome()){ _bgm.muted = false; _bgmLive = true; } }, 1000);
+  const iv = setInterval(()=>{
+    if (_bgmLive){ clearInterval(iv); return; }
+    if (!_bgmOnWelcome()){ clearInterval(iv); _bgm.pause(); return; }
+    if (Date.now() - _bgmT0 >= 1000){ _bgm.muted = false; _bgmLive = true; clearInterval(iv); }
+  }, 200);
 }).catch(()=>{});
 document.addEventListener('pointerdown', bgmGo, {capture:true});
 function bgmStopNow(){
