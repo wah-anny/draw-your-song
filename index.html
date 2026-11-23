@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创乐曲 v1.39</title>
+<title>画出原创乐曲 v1.40</title>
 <meta name="description" content="轻松创作乐曲并配上著作权申报文件。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创乐曲——轻松创作乐曲并配上著作权申报文件">
@@ -387,7 +387,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.39 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.40 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -473,7 +473,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.39 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.40 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -1378,7 +1378,7 @@ function renderDrafts(){
         <span class="dmeta">${warn}${meta} · ${NOTE_NAMES[d.data.root]}${d.data.mode === 'major' ? '大' : '小'}调 · ${d.data.sig.join('/')} · ${d.data.bpm}BPM</span>
         <span class="sp"></span>
         <button class="mini dl" title="下载带词的乐谱 .musicxml（MuseScore/Sibelius/Dorico 都能开，词逐字绑在音符上）">⬇ 乐谱</button>
-        <button class="mini png" title="下载简谱图片 .png（自带指纹水印，可直接用作著作权登记的作品样本）">⬇ 图</button>
+        <button class="mini png" title="下载简谱图片 .png（自带指纹水印，可作著作权登记的作品样本）">⬇ 图</button>
         <button class="mini mid" title="下载 MIDI .mid（只带音，不带词；给库乐队/FL/Cubase 换乐器、加伴奏用）">MIDI</button>
         <button class="mini stampd" title="对这一稿存证：生成可独立验证的证据压缩包（简谱图片＋规范作品文件＋存证卡＋时间戳都在里面）">🛡 存证</button>
         <button class="mini del" title="删除这一稿（会先问一次）">删除</button>
@@ -2355,7 +2355,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.39';
+const APP_VER = 'v1.40';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2725,7 +2725,7 @@ $('wLogin').onclick = () => {
 };
 $('wTry').onclick = () => { bgmStopNow(); hideWelcome(); track('welcome', 'try'); };
 
-/* ===== v1.39 扉页背景音乐：静音起播→真正开始出声后0.5秒解除静音（事件驱动，不等固定定时器）；任意点击兜底；进扉页门卫；进工具立即停 ===== */
+/* ===== v1.40 扉页背景音乐：静音起播→真正开始出声后0.5秒解除静音（事件驱动，不等固定定时器）；任意点击兜底；进扉页门卫；进工具立即停 ===== */
 const _bgm = $('bgmAudio');
 let _bgmLive = false;
 function _bgmOnWelcome(){
@@ -2857,7 +2857,7 @@ async function exportJianpuPNG(id){
     if (!b){ flashTip('这一稿还没有音符，没什么可导出的'); return; }
     tryDownload(safeName(d.name) + '.png', b);
     track('export', 'png');
-    flashTip('✓ 已下载简谱图片「' + safeName(d.name) + '.png」——可直接用作著作权登记的作品样本');
+    flashTip('✓ 已下载简谱图片「' + safeName(d.name) + '.png」——可作著作权登记的作品样本');
   }catch(e){
     flashTip('导出失败：' + (e.message || e));
   }
