@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>画出原创乐曲 v1.32</title>
+<title>画出原创乐曲 v1.33</title>
 <meta name="description" content="轻松创作乐曲并配上著作权申报文件。单 HTML 文件的网页作曲工具：画格子写旋律、贴歌词，浏览器实时合成钢琴/弦乐/笛子，导出带词 MusicXML 和 MIDI。零依赖、不上传数据、MIT 开源。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="画出原创乐曲——轻松创作乐曲并配上著作权申报文件">
@@ -90,15 +90,26 @@ button.armed:hover{color:#fff}
 .wrow.gold .tt{color:#8a611d}
 .wcta{display:flex;gap:14px;align-items:center;margin:22px 0 6px;flex-wrap:wrap}
 .wcta .ask{font-size:14.5px;color:#5a4d33;font-weight:600}
-/* v1.32 扉页背景（用户拍板的沙滩纱帘版为蓝本，继续深化） */
-#welcome{background:url('扉页bg.jpg') center/cover no-repeat fixed}
-#welcome .wbrandt .cn,#welcome .whero .big,#welcome .whero .sub{background:rgba(255,253,248,.86);border-radius:12px;box-shadow:0 3px 14px rgba(90,70,30,.16)}
+/* v1.33 扉页：品牌左上、主标语居中无衬底、窗帘飘动动层、底部标语组贴底 */
+#welcome{position:relative;background:url('扉页bg.jpg') center/cover no-repeat}
+.wsway{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:url('扉页bg.jpg') center/cover no-repeat;
+  -webkit-mask-image:linear-gradient(to right,#000 0,#000 24%,transparent 40%);
+  mask-image:linear-gradient(to right,#000 0,#000 24%,transparent 40%);
+  transform-origin:top center;animation:curtainSway 7s ease-in-out infinite alternate}
+@keyframes curtainSway{from{transform:skewX(0deg) translateX(0)}to{transform:skewX(-.7deg) translateX(7px)}}
+#welcome .wcv{position:relative;z-index:1;padding-top:104px}
+#welcome .wbrand{position:absolute;top:20px;left:26px;z-index:2;border-bottom:none;padding-bottom:0}
 #welcome .wbrandt .cn{padding:5px 16px;display:inline-block}
-#welcome .whero .big{padding:18px 28px;display:inline-block;border-radius:18px}
+#welcome .wbrandt .en{background:rgba(255,253,248,.82);border-radius:8px;padding:3px 10px;display:inline-block;align-self:flex-start}
+#welcome .whero{text-align:center}
+#welcome .whero .big{background:none;box-shadow:none;display:inline-block;text-shadow:0 2px 12px rgba(255,250,235,.9),0 1px 3px rgba(255,250,235,.95)}
 #welcome .whero .sub{padding:10px 20px;display:inline-block}
 #welcome .whero .big em{font-style:normal;color:#b07d2b}
+.wrow .tag.core{background:linear-gradient(135deg,#e0893a,#c2410c);color:#fff;font-weight:700;box-shadow:0 1px 6px rgba(194,65,12,.45);font-size:12.5px}
+.wmotto{margin:26px -40px 0;width:calc(100% + 80px);text-align:center;font-size:clamp(20px,2.7vw,32px);font-weight:700;letter-spacing:.6em;text-indent:.6em;color:#3a3225;text-shadow:0 1px 2px rgba(255,250,235,.9);background:linear-gradient(to right,transparent,rgba(255,253,248,.88) 12%,rgba(255,253,248,.88) 88%,transparent);padding:12px 0}
+#welcome .wfoot{margin-top:0;background:rgba(255,253,248,.85);border-radius:12px;color:#6b5c40;padding:12px 18px}
 #welcome .wcta .ask{background:rgba(255,253,248,.85);border-radius:999px;padding:8px 16px}
-.wmotto{margin-top:26px;text-align:center;font-size:19px;font-weight:600;letter-spacing:.85em;text-indent:.85em;color:#3a3225;background:linear-gradient(to right,transparent,rgba(255,253,248,.85) 15%,rgba(255,253,248,.85) 85%,transparent);padding:10px 0}
 .wbtn{border:none;border-radius:11px;padding:12px 30px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;color:#fff;background:#b07d2b;box-shadow:0 3px 10px rgba(140,100,40,.22)}
 .wbtn:hover{background:#9c6d22}
 .wbtn.ghost{background:#fffdf8;border:1.5px solid #cdbb92;color:#5a4d33;box-shadow:none}
@@ -327,6 +338,7 @@ var _hmt = _hmt || [];
 </div>
 
 <div id="welcome">
+  <div class="wsway" aria-hidden="true"></div>
   <div class="wcv">
     <div class="wbrand">
       <svg class="wlogo" viewBox="0 0 48 48" aria-hidden="true">
@@ -346,20 +358,20 @@ var _hmt = _hmt || [];
       </div>
     </div>
     <div class="whero">
-      <div class="big">轻松创作乐曲，<br><em>并配上</em>著作权申报文件</div>
+      <div class="big">轻松创作乐曲<br><em>并配上</em>著作权申报文件</div>
       <div class="sub">免费网页工具，电脑浏览器打开即用。旋律你亲手放、歌词你亲手贴——作品完完整整是你的，证据也完完整整是你的。</div>
     </div>
     <div class="wrows">
       <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子 / 哼唱作曲</span><span class="ds">格子上点一点，或哼唱几句自动落格——旋律立刻能听，不用懂乐理、不用会乐器。</span><span class="tag">创作</span></div>
       <div class="wrow"><span class="ic">📖</span><span class="tt">自动出简谱</span><span class="ds">贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span><span class="tag">成谱</span></div>
-      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要用的证据文件，一键提供。</span><span class="tag">核心</span></div>
+      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要用的证据文件，一键提供。</span><span class="tag core">核心</span></div>
       <div class="wrow"><span class="ic">⬇</span><span class="tt">文件全带走</span><span class="ds">简谱图片、乐谱、MIDI 全部下载到你的电脑，打印、转发、交材料随你用。</span><span class="tag">交付</span></div>
     </div>
     <div class="wcta">
       <span class="ask">需要著作权认证文件？</span><button class="wbtn" id="wLogin">登录</button>
       <span class="ask">只想先试试？</span><button class="wbtn ghost" id="wTry">先试一试 →</button>
     </div>
-    <div class="wmotto">音律无碍，纵横天地，穿越古今，与万物共鸣</div>
+    <div class="wmotto">音律无碍　纵横天地　穿越古今　与万物共鸣</div>
     <div class="wfoot">
       <span>免费使用</span><span>代码开源（MIT）</span><span>作品数据不出你的电脑</span><span>登录仅需手机验证码，一分钟</span><span>登录后草稿云端随身带</span><span>© 2026 充电器</span>
     </div>
@@ -369,7 +381,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.32 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.33 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -455,7 +467,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.32 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.33 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a id="lnkFeedback" href="https://wj.qq.com/s2/28766995/0a8g/" target="_blank" rel="noopener">💬 用了之后卡在哪？3 道选择题，2 分钟</a>
   <span class="dot">·</span>
@@ -2337,7 +2349,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.32';
+const APP_VER = 'v1.33';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
