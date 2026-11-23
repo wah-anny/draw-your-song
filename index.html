@@ -416,7 +416,7 @@ var _hmt = _hmt || [];
       <button id="btnHum" class="primary" title="哼唱落格：用麦克风哼一段旋律，自动落到格子上成为草稿，你再逐音修改">🎙 哼唱</button>
       <label class="chk"><input id="metro" type="checkbox">节拍器</label>
       <button id="btnBreak" class="mini">断音笔</button>
-      <button id="btnDelCol" class="mini" title="删列笔：在格子上点一下或拖一竖条，整列删除，后面的音符整体左移补位——前后乐句就接上了，不会再留空拍休止">删列笔</button>
+      <button id="btnDelCol" class="mini" title="删列笔：点一下或从小节线拖到小节线，整列删除、后面的音左移补位——整小节地删小节线不乱，删半截会提醒错位几拍">删列笔</button>
       <button id="btnUndo" class="mini">撤销</button>
       <button id="btnClear" class="mini">清空</button>
       <button id="btnOctUp" class="mini octbtn" title="平时三个八度；想要更高的音就点一下，画布多出一行高八度，再点一下收回">＋高八度</button>
@@ -629,10 +629,17 @@ function endDrag(){
     drag = null;
     cellMap.forEach(el => el.classList.remove('delmark'));
     const n = delCols.size;
+    const start = Math.min(...delCols);
+    const cpm = colsPerMeasure();
+    /* 小节对齐检测：起点在小节线上 且 删除量是整小节倍数 → 音符左移后与强弱拍/小节线完全不错位 */
+    const whole = n % cpm === 0 && start % cpm === 0;
     deleteCols(delCols);
     delCols = new Set();
     rebuild(); saveLocal();
-    flashTip(n ? '已删 ' + n + ' 列，后面的音左移接上（撤销可找回）' : '未删任何列');
+    flashTip(n ? (whole
+      ? '已删 ' + n + ' 列（整小节倍数），小节线与乐句保持对齐，不会乱；撤销可找回'
+      : '⚠ 已删 ' + n + ' 列——删除量不是整小节的倍数，后面乐句与小节线错位 ' + (n % cpm) + ' 拍。要小节不乱，请从小节线拖到小节线整小节地删；撤销可找回')
+      : '未删任何列');
     return;
   }
   drag = null;
@@ -2001,7 +2008,7 @@ function guideHTML(){
   <h3 class="gsec">✍️ 怎么作曲——先看你要什么，再选顺手的方式</h3>
   <ul>
     <li><b>情况一：我想要“我的词配上我的曲”。</b>两种方式任选其一，殊途同归：
-      <br>· <b>画格子</b>：行首 1–7 就是简谱的七个音，<b>按住拖动</b>划过即成旋律，再点一下＝擦掉；断音笔切开长音（一个音唱两个字），右键升/降半音 ♯♭；<b>删列笔</b>整竖列删除、后面的音左移补位——前后乐句中间留了空拍不想当休止符？用它删掉空列就接上了；
+      <br>· <b>画格子</b>：行首 1–7 就是简谱的七个音，<b>按住拖动</b>划过即成旋律，再点一下＝擦掉；断音笔切开长音（一个音唱两个字），右键升/降半音 ♯♭；<b>删列笔</b>整竖列删除、后面的音左移补位——前后乐句中间留了空拍小节？<b>从小节线拖到小节线、整小节整小节地删</b>，删完小节线不会乱；删半截会提醒你错位几拍，撤销可找回；
       <br>· <b>🎙 哼唱</b>：按一下录音、哼完再按一下，旋律自动落到格子上——它帮你<b>记下大体的旋律走向</b>，落完你在格子上<b>逐音修整</b>。哼的时候一次只哼一个音、音与音稍断开，识别更准。
       <br>旋律就绪后，左边框<b>整段贴上歌词</b>：字会<b>自动逐字对齐</b>——第 1 个音对第 1 个字，往后依此类推；画布、简谱、导出的文件三处对齐关系完全一致。字比音多会提醒你。</li>
     <li><b>情况二：我只想先作出曲子，词以后再说。</b>歌词框<b>留空</b>就行，同样是两种方式：画格子，或哼唱后逐音修整——怎么好听怎么来。<b>之后任何时候</b>把词贴进歌词框，字照样自动对到音符上，不用重画。</li>
