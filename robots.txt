@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://wah-anny.github.io/draw-your-song/sitemap.xml
+Sitemap: https://drawyoursongs.com/sitemap.xml
