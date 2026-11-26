@@ -1490,6 +1490,62 @@ function processTxt(title, info){
   if (info.cut) L.push('- 本存证对应草稿保存时的那一稿，之后的修改未计入本记录。');
   return L.join('\r\n');
 }
+/* 独立的过程记录文件：双击用浏览器打开，可 Ctrl+P 存 PDF，也可直接复制其中段落填进登记表 */
+function processHTML(title, info){
+  const e = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const runs = mergeRuns(info.revs);
+  let narrative = '';
+  if (runs.length){
+    const pick = [];
+    const push = r => { if (r && pick.indexOf(r) < 0) pick.push(r); };
+    push(runs[0]);
+    runs.slice().sort((a, b) => b.count - a.count).slice(0, 3).forEach(push);
+    push(runs[runs.length - 1]);
+    pick.sort((a, b) => tms(a.from) - tms(b.from));
+    const lead = ['最初', '随后', '接着', '此后', '最后'];
+    const body = pick.map((r, i) => (lead[i] || '此后') + '（' + shortT(r.from) + '）' + String(r.d).replace(/ · /g, '，')
+      + (r.count > 1 ? '，如此连续 ' + r.count + ' 次' : '')).join('；');
+    narrative = '本作品于 ' + (info.start || '') + ' 在「画出原创乐曲」网页工具内开始创作，' + (info.end || '')
+      + ' 定稿，创作全程在该工具内完成。其间共修改 ' + info.total + ' 次，主要过程为：' + body
+      + '。以上过程由软件在创作过程中自动记录，时间与每一次改动均见本记录明细。';
+  }
+  return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>创作过程记录 · ' + e(title || '未命名') + '</title>'
+  + '<style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;max-width:780px;margin:28px auto;padding:0 18px;color:#222;line-height:1.75}'
+  + 'h1{font-size:21px;margin:0 0 4px}h2{font-size:15px;margin:24px 0 8px;padding-left:8px;border-left:3px solid #c2410c}'
+  + 'table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}td,th{border:1px solid #bbb;padding:4px 7px;text-align:left;vertical-align:top}'
+  + 'th{background:#f3efe4}.meta td:first-child{width:110px;color:#666;background:#faf8f2}'
+  + '.box{border:1px solid #c2410c;background:#fff9ec;padding:12px 15px;border-radius:6px;font-size:14.5px}'
+  + 'code{background:#f2f0e8;padding:1px 4px}.note{color:#666;font-size:12px}'
+  + '@media print{body{margin:0;max-width:none}h2{border-color:#333}.box{background:#fff}}</style></head><body>'
+  + '<h1>创作过程记录</h1>'
+  + '<p class="note">由「画出原创乐曲」' + e(APP_VER) + ' 在创作过程中自动追加生成，非事后补写；记录全程在用户自己的浏览器内完成。</p>'
+  + '<table class="meta">'
+  + '<tr><td>作品名称</td><td><b>' + e(title || '未命名') + '</b></td></tr>'
+  + '<tr><td>记录区间</td><td>' + e(info.start || '—') + ' 至 ' + e(info.end || '—') + '</td></tr>'
+  + '<tr><td>修改次数</td><td><b>' + info.total + '</b> 次（合并同类后 ' + runs.length + ' 个阶段）</td></tr>'
+  + (info.folded && info.folded.count ? '<tr><td>更早改动</td><td>另有 ' + info.folded.count + ' 次已折叠（' + e(info.folded.from) + ' 至 ' + e(info.folded.to) + '），未逐条列出</td></tr>' : '')
+  + '<tr><td>生成时间</td><td>' + e(nowStamp()) + '</td></tr>'
+  + '</table>'
+  + (narrative ? '<h2>可直接填入登记表的一段话</h2><div class="box">' + e(narrative) + '</div>'
+     + '<p class="note">登记表「修改情况（修改次数、每次修改的核心内容）」栏可直接用上面这段；需要逐条列时用下表。</p>' : '')
+  + '<h2>阶段（同一类改动连续出现时合并）</h2>'
+  + (runs.length
+    ? '<table><tr><th>#</th><th>时间</th><th>改动内容</th><th>次数</th></tr>'
+      + runs.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + e(rangeT(r)) + '</td><td>' + e(r.d) + '</td><td>' + r.count + '</td></tr>').join('')
+      + '</table>'
+    : '<p class="note">（无阶段记录）</p>')
+  + '<h2>逐条明细（每一次改动）</h2>'
+  + '<table><tr><th>#</th><th>时间</th><th>改动</th><th>此刻音符</th><th>此刻歌词</th></tr>'
+  + (info.revs || []).map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + e(r.t) + '</td><td>' + e(r.d) + '</td><td>' + (r.n != null ? r.n + ' 格' : '') + '</td><td>' + (r.l != null ? r.l + ' 字' : '') + '</td></tr>').join('')
+  + '</table>'
+  + '<h2>使用说明与边界</h2>'
+  + '<p class="note">'
+  + '① 画布内容每变化一次即记一条，记录的是「这一稿相对上一稿改了什么」，可与同批存证卡里的哈希链时间对照。<br>'
+  + '② 本记录证明「该作品在这些时刻由这些步骤逐步形成」，<b>不判定作品是否原创，也不做查重</b>；著作权登记时作为「创作过程/修改情况」的说明材料提交，具体要求以登记机构官网为准。<br>'
+  + '③ 若本作品在启用此功能之前已开始创作，则记录起点晚于实际起笔时间，此前过程未被记录。'
+  + (info.cut ? '<br>④ 本存证对应草稿保存时的那一稿，之后的修改未计入本记录。' : '')
+  + '</p></body></html>';
+}
 function processJSON(title, info){
   return JSON.stringify({
     '_说明': '画出原创乐曲 创作过程记录。revisions 为画布每次变化的自动追加条目：t=记录时间，d=本次相对上一稿的改动，n=此刻音符格数，l=此刻歌词字数。',
@@ -2651,7 +2707,7 @@ function buildCertCard(entry, chain, anchored, otsName, proc){
           '<li>' + esc(rangeT(r)) + '　' + esc(r.d)
           + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : '') + '</li>').join('')
       + (runs.length > shown.length ? '<li>……其余 ' + (runs.length - shown.length) + ' 个阶段见随包《5_创作过程记录.txt》</li>' : '') + '</ol>'
-      + '<p style="color:#666;font-size:12px">本记录逐条说明该作品如何一步步形成，不判定作品是否原创、也不做查重；完整明细（含每一次的时间与改动）见随包《5_创作过程记录.txt / .json》。' + (proc.cut ? '本存证对应草稿保存时的那一稿，之后的修改未计入。' : '') + '</p>'
+      + '<p style="color:#666;font-size:12px">本记录逐条说明该作品如何一步步形成，不判定作品是否原创、也不做查重；<b>完整过程另存为独立文件《5_创作过程记录.html》</b>（含可直接填表的一段话与逐条明细）。' + (proc.cut ? '本存证对应草稿保存时的那一稿，之后的修改未计入。' : '') + '</p>'
     : '<h3>创作过程记录</h3><p style="color:#666;font-size:13px">本稿没有过程记录（此功能自 v1.42 起记录；或该稿来自更早的版本）。从下一次起，画布每次改动都会被自动记录，存证时一并生成。</p>';
   return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>存证卡 ' + esc(entry.fp.slice(0, 12)) + '</title>'
   + '<style>body{font-family:system-ui,Microsoft YaHei,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222;line-height:1.7}h1{font-size:20px}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #bbb;padding:4px 6px;text-align:left}code{background:#f2f0e8;padding:1px 4px;word-break:break-all}button{padding:6px 14px}#r{font-weight:bold;margin:8px 0}</style></head><body>'
@@ -2758,7 +2814,7 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
   const proc = workRevsFor(d);
   const procRuns = proc.revs.length ? mergeRuns(proc.revs) : [];
   const procBrief = procRuns.length
-    ? '已自动记录 <b>' + proc.total + ' 次修改</b>（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + '）——将生成《创作过程记录》并写进存证卡，登记表「修改情况」栏可直接用：<br>'
+    ? '已自动记录 <b>' + proc.total + ' 次修改</b>（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + '）——存证后会<b>单独生成一份《创作过程记录》文件</b>（双击打开，里面有一段可直接填进登记表「修改情况」栏的话），存证卡里同时留摘要：<br>'
       + procRuns.slice(0, 3).map((r, i) => '<span style="color:#555">' + (i + 1) + '. ' + esc(rangeT(r)) + '　' + esc(r.d) + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : '') + '</span>').join('<br>')
       + (procRuns.length > 3 ? '<br><span style="color:#888">…共 ' + procRuns.length + ' 个阶段，全部列在存证卡与随包记录里</span>' : '')
     : '这一稿<b>没有过程记录</b>（此功能自 v1.42 起记录，或本稿来自更早版本）。从现在起画布每次改动都会自动记一条，下次存证就会带上。';
@@ -2818,7 +2874,8 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
           ? '  4_独立时间戳证明.ots —— 不用打开，验证时在 opentimestamps.org 上传第 2、4 两样即可；比特币区块链独立时间锚定\n'
           : '  4_未锚定说明.txt —— 记事本打开。这次没连上公共日历；联网后重新点一次「存证」即可补上时间锚定\n')
         + (proc.revs.length
-          ? '  5_创作过程记录.txt / .json —— 记事本打开。软件在创作过程中自动记下的过程：共 ' + proc.total + ' 次修改、每次改了什么（不是事后补写）。登记表「修改情况（修改次数、每次修改的核心内容）」栏照它填，存证卡里也有摘要\n'
+          ? '  5_创作过程记录.html —— 【主文件】双击用浏览器打开：上面有一段「可直接填入登记表的话」，下面是阶段表与每一次改动的明细，Ctrl+P 可存成 PDF 一起交\n'
+            + '  5_创作过程记录.txt / .json —— 同样内容的纯文本与数据备份，txt 用记事本打开即可，长期留存不怕格式失效\n'
           : '')
         + '\n提示：png 看图软件 / json 记事本 / html 浏览器，都不需要安装别的软件，Windows 自带就够。\n'
         + '\n歌词就在包里：印在「1_简谱图片」的音符正下方，也存在「2_规范作品文件」的「歌词_lyricsText」里。\n'
@@ -2833,6 +2890,7 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
       else zipFiles.push({ name: '4_未锚定说明.txt', u8: enc.encode('本次存证未完成区块链时间锚定（网络不通或日历不可达）。\n指纹与哈希链证据已经有效；联网后重新点一次「存证」，即可补上独立时间戳证明。\n') });
       /* v1.42：创作过程记录——登记表「修改情况（修改次数、每次修改的核心内容）」栏的直接来源 */
       if (proc.revs.length){
+        zipFiles.push({ name: '5_创作过程记录.html', u8: enc.encode(processHTML(title, proc)) });
         zipFiles.push({ name: '5_创作过程记录.txt', u8: enc.encode(processTxt(title, proc)) });
         zipFiles.push({ name: '5_创作过程记录.json', u8: enc.encode(processJSON(title, proc)) });
       }
@@ -2853,7 +2911,7 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
       st.innerHTML = '✅ 存证完成。已下载 <b>1 个存证压缩包</b>（' + esc(zipName) + '）到你浏览器的「下载」文件夹，<b>解压后文件都在里面</b>：<br>①简谱图片（作品样本）<br>②规范作品文件（它的 SHA-256 就是指纹）<br>③存证卡（含验证方法、创作说明模板、创作过程摘要）'
         + (ots ? '<br>④独立时间戳证明（几小时后可在 opentimestamps.org 独立验证）'
              : '<br>④未锚定说明——联网后重新点一次「存证」即可补时间戳')
-        + (proc.revs.length ? '<br>⑤创作过程记录（' + proc.total + ' 次修改的完整明细——登记表「修改情况」栏照它填）' : '')
+        + (proc.revs.length ? '<br>⑤<b>创作过程记录</b>（独立文件，' + proc.total + ' 次修改——双击「5_创作过程记录.html」，里面有一段可直接填进登记表的话）' : '')
         + '<br>包内「0_请先读我.txt」有完整说明。' + cloudMsg;
       track('stamp', '完成', ots ? 'ots' : 'local');
     }catch(e){
