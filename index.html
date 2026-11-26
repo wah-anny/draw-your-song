@@ -268,6 +268,8 @@ label.chk{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:1
 .dline .del.armed{background:#a33;border-color:#a33;color:#fff}
 .cur-tag{font-size:10px;color:#0f6e56;background:#e1f5ee;border-radius:4px;
   padding:1px 5px;white-space:nowrap}
+.revtag{font-size:10px;color:#8a611d;background:#fdf3dc;border:1px solid #e8d3a4;border-radius:4px;
+  padding:0 5px;white-space:nowrap;cursor:help}
 .dcraft .jp{display:none;background:#fbf9f2;border:1px solid var(--line);
   border-radius:8px;padding:10px 12px;margin:2px 0 10px;max-height:340px;overflow:auto}
 .dcraft.open .jp{display:block}
@@ -404,7 +406,7 @@ var _hmt = _hmt || [];
     <div class="wrows">
       <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子 / 哼唱·弹奏作曲</span><span class="ds">格子上点一点，或哼唱几句、弹一段乐器，声音自动落格——旋律立刻能听，不用懂乐理、不用会乐器。</span><span class="tag">创作</span></div>
       <div class="wrow"><span class="ic">📖</span><span class="tt">自动出简谱</span><span class="ds">贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span><span class="tag">成谱</span></div>
-      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要用的证据文件，一键提供。</span><span class="tag core">核心</span></div>
+      <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明＋创作过程记录——著作权登记要用的证据文件，一键提供。</span><span class="tag core">核心</span></div>
       <div class="wrow"><span class="ic">⬇</span><span class="tt">文件全带走</span><span class="ds">简谱图片、乐谱、MIDI 全部下载到你的电脑，打印、转发、交材料随你用。</span><span class="tag">交付</span></div>
     </div>
     <div class="wcta">
@@ -423,7 +425,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.41 · 画格子 / 哼唱 / 乐器弹奏多种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.42 · 画格子 / 哼唱 / 乐器弹奏多种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -509,7 +511,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.41 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.42 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a href="copyright-registration.html">📜 乐曲著作权登记要什么材料？（站内指南）</a>
   <span class="dot">·</span>
@@ -1297,6 +1299,207 @@ function saveLocal(){
   try {
     localStorage.setItem('hycyg_v05', JSON.stringify(dataSnapshot()));
   } catch(e){}
+  noteWorkRev(dataSnapshot());   /* v1.42：每次画布内容变化，自动记一条「改了什么」 */
+}
+
+/* ================= v1.42 创作过程记录（修改次数 + 每次修改的核心内容） =================
+   为什么要有：著作权登记《作品说明书》明确要求填「修改情况（修改次数、每次修改的核心内容）」。
+   这一项人几乎写不出来——没人记得改了几次、每次为什么改，最后只能写"经过多次修改"，等于没写。
+   这里在画布每次内容变化时自动追加一条：时间 + 本次相对上一稿改了什么（加/删几格、改几个字、调了什么）。
+   红线：只记录「作品在你手上如何一步步长成」，不判定是否原创、不做查重、不声称能证明作者身份。 */
+const WORK_KEY = 'hycyg_works', WORK_CUR = 'hycyg_work_cur', WORK_MAX = 6, REV_MAX = 600, REV_GAP = 6000;
+let _WORKS = null, _WID = null, _revTimer = null, _revFrom = 0;
+
+function nowStamp(d){
+  d = d || new Date();
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' '
+    + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+}
+function loadWorks(){
+  if (_WORKS) return _WORKS;
+  try { _WORKS = JSON.parse(localStorage.getItem(WORK_KEY) || '{}') || {}; } catch(e){ _WORKS = {}; }
+  if (!_WID){ try { _WID = localStorage.getItem(WORK_CUR) || null; } catch(e){ _WID = null; } }
+  return _WORKS;
+}
+function saveWorks(){
+  try {
+    localStorage.setItem(WORK_KEY, JSON.stringify(_WORKS || {}));
+    if (_WID) localStorage.setItem(WORK_CUR, _WID);
+  } catch(e){}
+}
+function newWorkId(){ return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function trimWorks(){
+  const ks = Object.keys(_WORKS || {});
+  if (ks.length <= WORK_MAX) return;
+  ks.sort((a, b) => String((_WORKS[a] || {}).start || '').localeCompare(String((_WORKS[b] || {}).start || '')));
+  ks.slice(0, ks.length - WORK_MAX).forEach(k => { delete _WORKS[k]; });
+}
+/* 取当前创作链；没有就新建（base=此刻画面 → 意味着「从此刻开始记录」，不假装记录了更早的过程） */
+function curWork(){
+  const w = loadWorks();
+  if (!_WID || !w[_WID]){
+    _WID = newWorkId();
+    w[_WID] = { start: nowStamp(), revs: [], base: dataSnapshot() };
+    trimWorks(); saveWorks();
+  }
+  return w[_WID];
+}
+function workRevCount(){ try { const w = loadWorks()[_WID]; return w && w.revs ? w.revs.length : 0; } catch(e){ return 0; } }
+function lyricLen(s){ return (s || '').replace(/\s+/g, '').length; }
+
+/* 一句话说明「这一稿相对上一稿改了什么」——这是整个功能的核心产物 */
+function diffNote(a, b){
+  if (!a) return '';
+  const parts = [];
+  const A = new Set(a.cells || []), B = new Set(b.cells || []);
+  let add = 0, del = 0;
+  B.forEach(x => { if (!A.has(x)) add++; });
+  A.forEach(x => { if (!B.has(x)) del++; });
+  if (add || del) parts.push((add ? '加 ' + add + ' 格' : '') + (add && del ? '、' : '') + (del ? '删 ' + del + ' 格' : ''));
+  const ab = new Set(a.breaks || []), bb = new Set(b.breaks || []);
+  let bc = 0;
+  bb.forEach(x => { if (!ab.has(x)) bc++; });
+  ab.forEach(x => { if (!bb.has(x)) bc++; });
+  if (bc) parts.push('断音改 ' + bc + ' 处');
+  if (JSON.stringify(a.accs || {}) !== JSON.stringify(b.accs || {})) parts.push('升降音调整');
+  const la = lyricLen(a.lyricsText), lb = lyricLen(b.lyricsText);
+  if ((a.lyricsText || '') !== (b.lyricsText || '')){
+    if (!la && lb) parts.push('录入歌词 ' + lb + ' 字');
+    else if (la && !lb) parts.push('清空歌词');
+    else if (la !== lb) parts.push('改词 ' + (lb > la ? '+' : '') + (lb - la) + ' 字（现 ' + lb + ' 字）');
+    else parts.push('改词（字数不变）');
+  }
+  if (a.root !== b.root || a.mode !== b.mode) parts.push('调性改为 ' + (NOTE_NAMES[b.root] || b.root) + (b.mode === 'major' ? '大调' : '小调'));
+  if (String(a.sig) !== String(b.sig)) parts.push('拍号改为 ' + (b.sig || []).join('/'));
+  if (a.bpm !== b.bpm) parts.push('速度 ' + a.bpm + '→' + b.bpm + ' BPM');
+  if (a.measures !== b.measures) parts.push('小节 ' + a.measures + '→' + b.measures);
+  if ((a.octUp || 0) !== (b.octUp || 0) || (a.octDown || 0) !== (b.octDown || 0)) parts.push('音域行调整');
+  return parts.join(' · ');
+}
+
+/* 节流：连续快速改动合成一条（2 秒窗口），避免一次点击记一条把记录刷成噪音 */
+function noteWorkRev(cur){
+  try{
+    if (typeof STORAGE_OK !== 'undefined' && !STORAGE_OK) return;
+    const w = curWork();
+    if (w.base && snapSign(w.base) === snapSign(cur)) return;
+    if (!_revFrom) _revFrom = Date.now();
+    if (_revTimer) return;
+    _revTimer = setTimeout(flushWorkRev, REV_GAP);
+  }catch(e){}
+}
+function flushWorkRev(){
+  _revTimer = null;
+  try{
+    const w = curWork();
+    const now = dataSnapshot();
+    if (w.base && snapSign(w.base) === snapSign(now)) { _revFrom = 0; return; }
+    const d = diffNote(w.base, now);
+    if (!d) { _revFrom = 0; return; }
+    const at = new Date(_revFrom || Date.now());
+    _revFrom = 0;
+    w.revs.push({ t: nowStamp(at), d: d, n: (now.cells || []).length, l: lyricLen(now.lyricsText) });
+    /* 超上限不静默丢弃：把最早的几条折进 folded，报告里如实说明「更早的 N 次已折叠」 */
+    if (w.revs.length > REV_MAX){
+      const drop = w.revs.length - REV_MAX;
+      const gone = w.revs.slice(0, drop);
+      const keep = w.revs.slice(drop);
+      w.folded = w.folded || { count: 0, from: gone[0] ? gone[0].t : '', to: gone[gone.length - 1] ? gone[gone.length - 1].t : '' };
+      w.folded.count += drop;
+      w.folded.to = (gone[gone.length - 1] && gone[gone.length - 1].t) || w.folded.to;
+      w.revs = keep;
+    }
+    w.base = now;
+    saveWorks();
+  }catch(e){}
+}
+/* 立刻结算待记的那一条（换稿/存证前调用，免得记录挂到别的稿上） */
+function flushWorkRevNow(){
+  if (_revTimer){ clearTimeout(_revTimer); _revTimer = null; }
+  flushWorkRev();
+}
+/* 载入某份草稿后，创作链接到那份草稿上（同一条链：继续追加；不同链：另起一条，起笔时间沿用草稿时间） */
+function adoptWorkFor(d){
+  if (!d) return;
+  const w = loadWorks();
+  const t = d.workId ? w[d.workId] : null;
+  if (t && t.revs){
+    _WID = d.workId;
+    const cnt = (typeof d.revIdx === 'number') ? Math.min(d.revIdx, t.revs.length) : t.revs.length;
+    t.base = d.data;
+    t.revs.push({ t: nowStamp(), d: '回到第 ' + cnt + ' 次记录的那一稿继续修改', n: (d.data.cells || []).length, l: lyricLen(d.data.lyricsText) });
+    if (t.revs.length > REV_MAX) t.revs = t.revs.slice(-REV_MAX);
+  } else {
+    _WID = newWorkId();
+    w[_WID] = { start: d.time || nowStamp(), revs: [], base: d.data };
+    trimWorks();
+  }
+  saveWorks();
+}
+/* 取某份草稿对应的过程记录（只取到该稿保存时为止，后面的改动不算进这份存证） */
+function workRevsFor(d){
+  const w = loadWorks();
+  const t = (d && d.workId) ? w[d.workId] : null;
+  if (!t || !t.revs || !t.revs.length) return { revs: [], start: '', end: '', total: 0, cut: false, folded: null };
+  const cut = (typeof d.revIdx === 'number' && d.revIdx < t.revs.length);
+  const revs = (cut ? t.revs.slice(0, d.revIdx) : t.revs).filter(r => r && r.d);
+  return { revs: revs, start: t.start || (revs[0] && revs[0].t) || '',
+    end: revs.length ? revs[revs.length - 1].t : '', total: revs.length, cut: cut, folded: t.folded || null };
+}
+/* 同类改动合并成阶段（显示用）：「加 1 格」连记 12 次 → 一个阶段；相隔超过 3 分钟不算同一段 */
+function tms(t){ const v = Date.parse(String(t || '').replace(' ', 'T')); return isNaN(v) ? 0 : v; }
+function mergeRuns(revs){
+  const out = [];
+  (revs || []).forEach(r => {
+    const last = out[out.length - 1];
+    if (last && last.d === r.d && Math.abs(tms(r.t) - tms(last.to)) <= 180000){ last.to = r.t; last.count++; }
+    else out.push({ d: r.d, from: r.t, to: r.t, count: 1 });
+  });
+  return out;
+}
+function shortT(t){ return String(t || '').slice(5, 16); }   /* MM-DD HH:MM */
+function rangeT(r){ const a = shortT(r.from), b = shortT(r.to); return (r.count > 1 && b !== a) ? a + ' — ' + b : a; }
+
+function processTxt(title, info){
+  const runs = mergeRuns(info.revs);
+  const L = [];
+  L.push('创作过程记录（由「画出原创乐曲」在创作过程中自动追加，非事后补写）');
+  L.push('');
+  L.push('作品：' + (title || '未命名'));
+  L.push('记录区间：' + (info.start || '—') + ' 至 ' + (info.end || '—'));
+  L.push('记录变更次数：' + info.total);
+  L.push('合并同类后阶段数：' + runs.length);
+  if (info.folded && info.folded.count) L.push('更早的 ' + info.folded.count + ' 次改动已折叠（' + (info.folded.from || '') + ' 至 ' + (info.folded.to || '') + '），未逐条列出');
+  L.push('');
+  L.push('── 阶段（同一类改动连续出现时合并）──');
+  runs.forEach((r, i) => {
+    L.push(' ' + (i + 1) + '. ' + rangeT(r) + '　' + r.d + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : ''));
+  });
+  L.push('');
+  L.push('── 逐条明细 ──');
+  info.revs.forEach((r, i) => {
+    L.push(' #' + (i + 1) + '　' + r.t + '　' + r.d + '　（此刻音符 ' + (r.n != null ? r.n : '?') + ' 格 · 歌词 ' + (r.l != null ? r.l : '?') + ' 字）');
+  });
+  L.push('');
+  L.push('说明：');
+  L.push('- 画布内容每变化一次即记一条，记录的是「这一稿相对上一稿改了什么」，可与哈希链时间对照。');
+  L.push('- 记录全程在你自己浏览器内生成和保存，不上传服务器。');
+  L.push('- 本记录证明「该作品在这些时刻由这些步骤逐步形成」，不判定作品是否原创，也不做查重。');
+  L.push('- 若本作品在启用此功能（v1.42）之前已经开始创作，则本记录起点晚于实际起笔时间，此前过程未被记录。');
+  if (info.cut) L.push('- 本存证对应草稿保存时的那一稿，之后的修改未计入本记录。');
+  return L.join('\r\n');
+}
+function processJSON(title, info){
+  return JSON.stringify({
+    '_说明': '画出原创乐曲 创作过程记录。revisions 为画布每次变化的自动追加条目：t=记录时间，d=本次相对上一稿的改动，n=此刻音符格数，l=此刻歌词字数。',
+    '作品': title || '',
+    '记录区间': { '起': info.start || '', '止': info.end || '' },
+    '记录变更次数': info.total,
+    '更早折叠的改动': (info.folded && info.folded.count) ? { '次数': info.folded.count, '区间': (info.folded.from || '') + ' 至 ' + (info.folded.to || '') } : null,
+    'revisions': (info.revs || []).map((r, i) => ({ '序号': i + 1, '时间': r.t, '改动': r.d, '音符格数': r.n, '歌词字数': r.l })),
+    '生成时间': nowStamp()
+  }, null, 2);
 }
 
 let STORAGE_OK = true;
@@ -1361,7 +1564,8 @@ function autoBackup(tag){
   list.unshift({ id: Date.now() + Math.floor(Math.random()*1000),
     name: '⟲ 自动备份' + (tag ? '·' + tag : '') + ' ' +
       new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
-    time: new Date().toLocaleString('zh-CN'), data: cur });
+    time: new Date().toLocaleString('zh-CN'), data: cur,
+    workId: _WID || null, revIdx: workRevCount() });
   /* v1.29：上限 40→100；草稿是防丢的最后一道闸，能不挤掉就不挤掉（每份仅几 KB，100 份远不到存储上限） */
   if (list.length > 100) list.length = 100;
   try { saveDrafts(list); } catch(e){ return false; }
@@ -1407,18 +1611,20 @@ function renderDrafts(){
     } catch(e){ cntOK = false; }
     const chars = cleanChars(d.data.lyricsText).length;
     const isCur = curSig && snapSign(d.data) === curSig;
+    const revN = (d.workId && typeof d.revIdx === 'number') ? d.revIdx : 0;
     const warn = (chars > n && cntOK) ? `<span class="wn">⚠ ${chars-n} 字无音</span> · ` : '';
     const meta = cntOK ? `${n} 音 · ${chars} 字` : `${d.data.cells ? d.data.cells.length : 0} 格 · ${chars} 字`;
     return `<div class="dcraft" data-id="${d.id}">
       <div class="dline">
         <b class="dname" title="点这里：放回画布并展开简谱">${esc(d.name)}</b>
         ${isCur ? '<span class="cur-tag">画布上</span>' : ''}
+        ${revN > 1 ? `<span class="revtag" title="这份草稿保存时，已自动记录 ${revN} 次修改——存证时随包生成《创作过程记录》，并写进存证卡的创作说明（登记表可直接用）">🔁 ${revN} 改</span>` : ''}
         <span class="dmeta">${warn}${meta} · ${NOTE_NAMES[d.data.root]}${d.data.mode === 'major' ? '大' : '小'}调 · ${d.data.sig.join('/')} · ${d.data.bpm}BPM</span>
         <span class="sp"></span>
         <button class="mini dl" title="下载带词的乐谱 .musicxml（MuseScore/Sibelius/Dorico 都能开，词逐字绑在音符上）">⬇ 乐谱</button>
         <button class="mini png" title="下载简谱图片 .png（自带指纹水印，可作著作权登记的作品样本）">⬇ 图</button>
         <button class="mini mid" title="下载 MIDI .mid（只带音，不带词；给库乐队/FL/Cubase 换乐器、加伴奏用）">MIDI</button>
-        <button class="mini stampd" title="对这一稿存证：生成可独立验证的证据压缩包（简谱图片＋规范作品文件＋存证卡＋时间戳都在里面）">🛡 存证</button>
+        <button class="mini stampd" title="对这一稿存证：生成可独立验证的证据压缩包（简谱图片＋规范作品文件＋存证卡＋创作过程记录＋时间戳都在里面）">🛡 存证</button>
         <button class="mini del" title="删除这一稿（会先问一次）">删除</button>
       </div>
       <div class="jp"></div>
@@ -1453,8 +1659,10 @@ function openDraft(id){
   const same = S.cells.size > 0 && snapSign(dataSnapshot()) === snapSign(d.data);
   let backed = false;
   if (!same){
+    flushWorkRevNow();
     backed = autoBackup('载入前');
     loadData(d.data);
+    adoptWorkFor(d);
     saveLocal();
   }
   renderDrafts();
@@ -1484,8 +1692,10 @@ $('btnDraft').onclick = () => {
     name => {
       try {
         const list = loadDrafts();
+        curWork();   /* 确保创作链存在，草稿记下它的编号与「记录到第几次」 */
         const item = { id: Date.now(), name: name,
-          time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot() };
+          time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot(),
+          workId: _WID, revIdx: workRevCount() };
         list.unshift(item);
         saveDrafts(list);
         renderDrafts();
@@ -1506,13 +1716,19 @@ $('btnNew').onclick = function(){
     try {
       const list = loadDrafts();
       const name = '自动保存 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
-      const item = { id: Date.now(), name: name, time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot() };
+      curWork();
+      const item = { id: Date.now(), name: name, time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot(),
+        workId: _WID, revIdx: workRevCount() };
       list.unshift(item); saveDrafts(list); renderDrafts();
       flashTip('✓ 已自动存为「' + name + '」');
     } catch(e) { ok = false; }
     if (!ok) { flashTip('⚠️ 自动保存失败——已停止新建，请手动「💾 保存草稿」后再清空'); return; }
     undoStack.push(snapshot());
     S.cells.clear(); S.breaks.clear(); S.accs = {};
+    /* 新的一页 = 新的一条创作链，从空画布起笔（先换链再存，免得把清空记成上一首的「删 N 格」） */
+    _WID = newWorkId();
+    loadWorks()[_WID] = { start: nowStamp(), revs: [], base: dataSnapshot() };
+    trimWorks(); saveWorks();
     updateRuns(); renderDecor(); updateStat(); saveLocal();
     track('canvas','新建');
   });
@@ -2393,7 +2609,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.41';
+const APP_VER = 'v1.42';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2422,9 +2638,21 @@ async function otsStamp(fpHex, statusCb){
   return null;
 }
 
-function buildCertCard(entry, chain, anchored, otsName){
+function buildCertCard(entry, chain, anchored, otsName, proc){
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const rows = chain.map((e, i) => '<tr><td>#' + (i + 1) + '</td><td style="font-family:monospace">' + esc(e.fp) + '</td><td>' + esc(e.t) + '</td><td>' + (i ? esc(e.prev.slice(0, 16)) + '…' : '（起点）') + '</td></tr>').join('');
+  const runs = proc && proc.revs && proc.revs.length ? mergeRuns(proc.revs) : [];
+  const shown = runs.slice(0, 12);
+  const procHtml = runs.length
+    ? '<h3>创作过程记录（登记表「创作过程 / 修改情况」栏可直接使用）</h3>'
+      + '<p>本作品自 <b>' + esc(proc.start) + '</b> 开始创作，至 <b>' + esc(proc.end) + '</b> 定稿，其间共记录 <b>' + proc.total + ' 次修改</b>'
+      + (runs.length !== proc.total ? '（同类合并后 ' + runs.length + ' 个阶段）' : '') + '。以下记录由软件在创作过程中自动追加，非事后补写：</p>'
+      + '<ol style="font-size:14px">' + shown.map(r =>
+          '<li>' + esc(rangeT(r)) + '　' + esc(r.d)
+          + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : '') + '</li>').join('')
+      + (runs.length > shown.length ? '<li>……其余 ' + (runs.length - shown.length) + ' 个阶段见随包《5_创作过程记录.txt》</li>' : '') + '</ol>'
+      + '<p style="color:#666;font-size:12px">本记录逐条说明该作品如何一步步形成，不判定作品是否原创、也不做查重；完整明细（含每一次的时间与改动）见随包《5_创作过程记录.txt / .json》。' + (proc.cut ? '本存证对应草稿保存时的那一稿，之后的修改未计入。' : '') + '</p>'
+    : '<h3>创作过程记录</h3><p style="color:#666;font-size:13px">本稿没有过程记录（此功能自 v1.42 起记录；或该稿来自更早的版本）。从下一次起，画布每次改动都会被自动记录，存证时一并生成。</p>';
   return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>存证卡 ' + esc(entry.fp.slice(0, 12)) + '</title>'
   + '<style>body{font-family:system-ui,Microsoft YaHei,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222;line-height:1.7}h1{font-size:20px}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #bbb;padding:4px 6px;text-align:left}code{background:#f2f0e8;padding:1px 4px;word-break:break-all}button{padding:6px 14px}#r{font-weight:bold;margin:8px 0}</style></head><body>'
   + '<h1>画出原创乐曲 · 作品存证卡</h1>'
@@ -2442,11 +2670,13 @@ function buildCertCard(entry, chain, anchored, otsName){
   + '<li>方法三：在下方选择规范作品文件，本页本地重算并比对（不需联网）。</li></ol>'
   + '<p><input type="file" id="f"><button id="v" style="margin-left:8px">本地重算比对</button></p><div id="r"></div>'
   + '<h3>哈希链（创作/存证历史）</h3><table><tr><th>#</th><th>指纹</th><th>时间</th><th>接续上一条</th></tr>' + rows + '</table>'
+  + procHtml
   + '<h3>创作说明（著作权登记表「创作说明」栏可直接使用）</h3>'
   + '<div style="border:1px solid #bbb;background:#faf8f2;padding:10px 14px;font-size:14px">'
   + (entry.title ? '《' + esc(entry.title) + '》' : '本作品')
   + '为本人独立创作的音乐作品，完成于 ' + esc(entry.t) + '（北京时间，与随附时间戳证明一致）。'
   + '旋律由本人在「画出原创乐曲」网页工具中亲手绘制（或哼唱/乐器弹奏后逐音修改）定稿，歌词为本人创作；'
+  + (proc && proc.total ? '创作期间共修改 ' + proc.total + ' 次（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + '），修改情况见本卡「创作过程记录」。' : '')
   + '词曲一体对齐关系固化于随附规范作品文件中（SHA-256 指纹 ' + esc(entry.fp.slice(0, 16)) + '…）。'
   + '本人持有完整创作过程证据，作品未许可他人使用。</div>'
   + '<p style="color:#666;font-size:12px">以上为模板，请按实际情况核对修改后填入登记表；创作方式（绘制/哼唱/乐器弹奏）请如实选择表述。</p>'
@@ -2516,6 +2746,7 @@ function buildZip(files){   /* files: [{name, u8:Uint8Array}] */
 
 async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定的这一稿存证（入口只在草稿行） */
   if (!d || !d.data) return;
+  flushWorkRevNow();               /* 把还没结算的那一次改动先记上，别漏 */
   track('stamp', '打开');
   const user = await getSessionSafe();
   if (!user){
@@ -2524,6 +2755,13 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
   }
   const draftRef = d;
   const dataSnap = d.data;
+  const proc = workRevsFor(d);
+  const procRuns = proc.revs.length ? mergeRuns(proc.revs) : [];
+  const procBrief = procRuns.length
+    ? '已自动记录 <b>' + proc.total + ' 次修改</b>（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + '）——将生成《创作过程记录》并写进存证卡，登记表「修改情况」栏可直接用：<br>'
+      + procRuns.slice(0, 3).map((r, i) => '<span style="color:#555">' + (i + 1) + '. ' + esc(rangeT(r)) + '　' + esc(r.d) + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : '') + '</span>').join('<br>')
+      + (procRuns.length > 3 ? '<br><span style="color:#888">…共 ' + procRuns.length + ' 个阶段，全部列在存证卡与随包记录里</span>' : '')
+    : '这一稿<b>没有过程记录</b>（此功能自 v1.42 起记录，或本稿来自更早版本）。从现在起画布每次改动都会自动记一条，下次存证就会带上。';
   const canon = canonJSON(dataSnap);
   const nCells = new Set(dataSnap.cells).size;
   const lyCount = (dataSnap.lyricsText || '').replace(/\s/g, '').length;
@@ -2535,7 +2773,8 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
       <p style="background:#fff9ec;border:1px solid #d9bd85;border-radius:8px;padding:9px 12px;margin:0 0 10px">
         <b>这次存证的对象：</b>${esc(whatDesc)}。<br>
         存证对象是<b>草稿箱里确定的这一稿</b>：指纹只对这一稿计算——存完之后你在画布上怎么改、草稿删不删，都不影响这份存证。</p>
-      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网）；完成后<b>打包成 1 个存证压缩包</b>下载——解压后简谱图片、规范作品文件、存证卡、时间戳证明都在里面；存证记录同步云端存证库，与你的登录账号绑定。</p>
+      <p>将本地计算作品指纹（SHA-256，内容不出你的电脑），尝试向 <b>OpenTimestamps</b> 免费公共日历提交锚定（仅指纹出网）；完成后<b>打包成 1 个存证压缩包</b>下载——解压后简谱图片、规范作品文件、存证卡${proc.revs.length ? '、创作过程记录' : ''}、时间戳证明都在里面；存证记录同步云端存证库，与你的登录账号绑定。</p>
+      <p style="background:#fdf8ee;border:1px solid #e5d6b8;border-radius:8px;padding:9px 12px;font-size:13px;line-height:1.8;margin:8px 0"><b>创作过程：</b>${procBrief}</p>
       <p style="margin:10px 0 4px">作品名称（用于存证卡与云端登记，建议填写）：</p>
       <input id="stampTitle" type="text" maxlength="40" value="${esc(draftRef.name)}" placeholder="例如：给妈妈的歌" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px">
       <div style="margin:10px 0"><button class="primary" id="stampGo">开始存证</button> <button class="mini" id="stampClose">取消</button></div>
@@ -2578,17 +2817,25 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
         + (ots
           ? '  4_独立时间戳证明.ots —— 不用打开，验证时在 opentimestamps.org 上传第 2、4 两样即可；比特币区块链独立时间锚定\n'
           : '  4_未锚定说明.txt —— 记事本打开。这次没连上公共日历；联网后重新点一次「存证」即可补上时间锚定\n')
+        + (proc.revs.length
+          ? '  5_创作过程记录.txt / .json —— 记事本打开。软件在创作过程中自动记下的过程：共 ' + proc.total + ' 次修改、每次改了什么（不是事后补写）。登记表「修改情况（修改次数、每次修改的核心内容）」栏照它填，存证卡里也有摘要\n'
+          : '')
         + '\n提示：png 看图软件 / json 记事本 / html 浏览器，都不需要安装别的软件，Windows 自带就够。\n'
         + '\n歌词就在包里：印在「1_简谱图片」的音符正下方，也存在「2_规范作品文件」的「歌词_lyricsText」里。\n'
-        + '\n著作权登记时：样本上传第 1 样，创作说明抄存证卡里的模板按实际改一改。\n') });
+        + '\n著作权登记时：样本上传第 1 样；创作说明抄存证卡里的模板按实际改一改；「修改情况」一栏照第 5 样填。\n') });
       try{
         const png = await jianpuPNGBlob(dataSnap, fp);
         if (png) zipFiles.push({ name: '1_简谱图片(作品样本).png', u8: new Uint8Array(await png.arrayBuffer()) });
       }catch(e){}
       zipFiles.push({ name: '2_规范作品文件.canon.json', u8: enc.encode(canon) });
-      zipFiles.push({ name: '3_存证卡.html', u8: enc.encode(buildCertCard(entry, chain, !!ots, ots ? tsName : '')) });
+      zipFiles.push({ name: '3_存证卡.html', u8: enc.encode(buildCertCard(entry, chain, !!ots, ots ? tsName : '', proc)) });
       if (ots) zipFiles.push({ name: '4_独立时间戳证明.ots', u8: new Uint8Array(await ots.arrayBuffer()) });
       else zipFiles.push({ name: '4_未锚定说明.txt', u8: enc.encode('本次存证未完成区块链时间锚定（网络不通或日历不可达）。\n指纹与哈希链证据已经有效；联网后重新点一次「存证」，即可补上独立时间戳证明。\n') });
+      /* v1.42：创作过程记录——登记表「修改情况（修改次数、每次修改的核心内容）」栏的直接来源 */
+      if (proc.revs.length){
+        zipFiles.push({ name: '5_创作过程记录.txt', u8: enc.encode(processTxt(title, proc)) });
+        zipFiles.push({ name: '5_创作过程记录.json', u8: enc.encode(processJSON(title, proc)) });
+      }
       const zipName = '存证包_' + safeName(title || draftRef.name || '未命名') + '_'
         + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '.zip';
       tryDownload(zipName, buildZip(zipFiles));
@@ -2603,9 +2850,10 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
           cloudMsg = error ? '<br>⚠ 云端登记未成功（' + esc(error.message || '未知原因') + '）——本地证据仍然有效，可稍后重新存证' : '<br>✅ 已同步云端存证库，与你的账号绑定';
         }
       }catch(e){ cloudMsg = '<br>⚠ 云端登记未成功——本地证据仍然有效'; }
-      st.innerHTML = '✅ 存证完成。已下载 <b>1 个存证压缩包</b>（' + esc(zipName) + '）到你浏览器的「下载」文件夹，<b>解压后 4 样文件都在里面</b>：<br>①简谱图片（作品样本）<br>②规范作品文件（它的 SHA-256 就是指纹）<br>③存证卡（含验证方法与创作说明模板）'
+      st.innerHTML = '✅ 存证完成。已下载 <b>1 个存证压缩包</b>（' + esc(zipName) + '）到你浏览器的「下载」文件夹，<b>解压后文件都在里面</b>：<br>①简谱图片（作品样本）<br>②规范作品文件（它的 SHA-256 就是指纹）<br>③存证卡（含验证方法、创作说明模板、创作过程摘要）'
         + (ots ? '<br>④独立时间戳证明（几小时后可在 opentimestamps.org 独立验证）'
              : '<br>④未锚定说明——联网后重新点一次「存证」即可补时间戳')
+        + (proc.revs.length ? '<br>⑤创作过程记录（' + proc.total + ' 次修改的完整明细——登记表「修改情况」栏照它填）' : '')
         + '<br>包内「0_请先读我.txt」有完整说明。' + cloudMsg;
       track('stamp', '完成', ots ? 'ots' : 'local');
     }catch(e){
@@ -2827,7 +3075,13 @@ async function cloudPullDrafts(){
         list.unshift({ id: r.id, name: r.name || '云端草稿', time: r.time || '', pts: cloudPts, data: r.data });
         added++;
       } else if ((list[i].pts || 0) < cloudPts){
+        const keepWork = list[i].workId;   /* v1.42：保住创作链编号，别让云端覆盖把过程记录弄丢 */
         list[i] = { id: r.id, name: r.name || list[i].name, time: r.time || list[i].time, pts: cloudPts, data: r.data };
+        if (keepWork){
+          list[i].workId = keepWork;
+          const wr = loadWorks()[keepWork];
+          list[i].revIdx = wr ? wr.revs.length : undefined;
+        }
         updated++;
       }
     });
