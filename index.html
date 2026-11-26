@@ -123,6 +123,7 @@ button.armed:hover{color:#fff}
 .wrow .tag{font-size:12px;padding:3px 11px;border-radius:999px;background:#f0e7d3;color:#8a611d;white-space:nowrap;flex:0 0 auto}
 .wrow.gold{border-color:#d9bd85;background:#fff9ec}
 .wrow.gold .tt{color:#8a611d}
+.wrow.gold .ds{color:#c2410c;font-weight:500}
 .wcta{display:flex;gap:14px;align-items:center;margin:22px 0 6px;flex-wrap:wrap;justify-content:center}
 .wcta .ask{font-size:14.5px;color:#5a4d33;font-weight:600}
 /* v1.35 扉页：英文换到汉字下方、上下空档均分、标语去白底、停掉动画 */
@@ -401,7 +402,7 @@ var _hmt = _hmt || [];
       <div class="sub">免费网页工具，电脑浏览器打开即用。旋律你亲手放、歌词你亲手贴——作品完完整整是你的，证据也完完整整是你的。</div>
     </div>
     <div class="wrows">
-      <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子 / 哼唱作曲</span><span class="ds">格子上点一点，或哼唱几句自动落格——旋律立刻能听，不用懂乐理、不用会乐器。</span><span class="tag">创作</span></div>
+      <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子 / 哼唱·弹奏作曲</span><span class="ds">格子上点一点，或哼唱几句、弹一段乐器，声音自动落格——旋律立刻能听，不用懂乐理、不用会乐器。</span><span class="tag">创作</span></div>
       <div class="wrow"><span class="ic">📖</span><span class="tt">自动出简谱</span><span class="ds">贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span><span class="tag">成谱</span></div>
       <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明——著作权登记要用的证据文件，一键提供。</span><span class="tag core">核心</span></div>
       <div class="wrow"><span class="ic">⬇</span><span class="tt">文件全带走</span><span class="ds">简谱图片、乐谱、MIDI 全部下载到你的电脑，打印、转发、交材料随你用。</span><span class="tag">交付</span></div>
@@ -422,7 +423,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.41 · 画格子 / 哼唱两种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
+  <span class="sub">v1.41 · 画格子 / 哼唱 / 乐器弹奏多种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -479,7 +480,7 @@ var _hmt = _hmt || [];
     <div class="transport">
       <button id="btnDraft" class="primary">💾 保存草稿</button>
       <button id="btnNew" class="primary" title="把当前画面自动存入草稿箱，然后清空画布——快速开始新的一页">✚ 新建</button>
-      <button id="btnHum" class="primary" title="哼唱落格：用麦克风哼一段旋律，自动落到格子上成为草稿，你再逐音修改">🎙 哼唱</button>
+      <button id="btnHum" class="primary" title="哼唱 / 乐器弹奏落格：对着麦克风哼一段旋律或弹奏乐器，声音自动落到格子上成为草稿，你再逐音修改">🎙 哼唱 / 乐器弹奏</button>
       <label class="chk"><input id="metro" type="checkbox">节拍器</label>
       <button id="btnBreak" class="mini">断音笔</button>
       <button id="btnDelCol" class="mini" title="删列笔：点一下或从小节线拖到小节线，整列删除、后面的音左移补位——整小节地删小节线不乱，删半截会提醒错位几拍">删列笔</button>
@@ -2076,7 +2077,7 @@ function guideHTML(){
   <ul>
     <li><b>情况一：我想要“我的词配上我的曲”。</b>两种方式任选其一，殊途同归：
       <br>· <b>画格子</b>：行首 1–7 就是简谱的七个音，<b>按住拖动</b>划过即成旋律，再点一下＝擦掉；断音笔切开长音（一个音唱两个字），右键升/降半音 ♯♭；<b>删列笔</b>整竖列删除、后面的音左移补位——前后乐句中间留了空拍小节？<b>从小节线拖到小节线、整小节整小节地删</b>，删完小节线不会乱；删半截会提醒你错位几拍，撤销可找回；
-      <br>· <b>🎙 哼唱</b>：按一下录音、哼完再按一下，旋律自动落到格子上——它帮你<b>记下大体的旋律走向</b>，落完你在格子上<b>逐音修整</b>。哼的时候一次只哼一个音、音与音稍断开，识别更准。
+      <br>· <b>🎙 哼唱 / 乐器弹奏</b>：按一下录音，哼几声或对着麦克风弹一段乐器，再按一下——声音自动落到格子上。<b>无论哼唱还是乐器弹奏，它都能收录并帮你记下大体的旋律走向</b>，落完你在格子上<b>逐音修整</b>。哼的时候一次只哼一个音、音与音稍断开；弹奏时同样放慢、音与音稍分开，识别更准。
       <br>旋律就绪后，左边框<b>整段贴上歌词</b>：字会<b>自动逐字对齐</b>——第 1 个音对第 1 个字，往后依此类推；画布、简谱、导出的文件三处对齐关系完全一致。字比音多会提醒你。</li>
     <li><b>情况二：我只想先作出曲子，词以后再说。</b>歌词框<b>留空</b>就行，同样是两种方式：画格子，或哼唱后逐音修整——怎么好听怎么来。<b>之后任何时候</b>把词贴进歌词框，字照样自动对到音符上，不用重画。</li>
   </ul>
@@ -2185,7 +2186,7 @@ $('btnHum').onclick = () => {
   track('hum','打开');
   const repChecked = S.cells.size ? '' : 'checked';
   const appChecked = S.cells.size ? 'checked' : '';
-  openExport('🎙 哼唱落格——哼几句，音符自动落到格子上，你再逐音修', `
+  openExport('🎙 哼唱 / 乐器弹奏落格——哼几句或弹一段，声音自动落到格子上，你再逐音修', `
     <div style="max-width:560px;line-height:1.8;font-size:14px">
       <p><b>怎么哼：</b>安静房间，离麦克风近一点，用「啦/啊」稳稳地哼<b>单音旋律</b>（一次一个音，别哼和弦）。<b>每个音哼清楚、音与音之间稍微断开</b>，识别会准很多。哼完软件会自动对速度、落格子，落格后按 ▶ 试听逐个修。</p>
       <p style="color:var(--muted)">音频只在你电脑里分析，不上传任何服务器。</p>
@@ -2443,10 +2444,10 @@ function buildCertCard(entry, chain, anchored, otsName){
   + '<div style="border:1px solid #bbb;background:#faf8f2;padding:10px 14px;font-size:14px">'
   + (entry.title ? '《' + esc(entry.title) + '》' : '本作品')
   + '为本人独立创作的音乐作品，完成于 ' + esc(entry.t) + '（北京时间，与随附时间戳证明一致）。'
-  + '旋律由本人在「画出原创乐曲」网页工具中亲手绘制（或哼唱后逐音修改）定稿，歌词为本人创作；'
+  + '旋律由本人在「画出原创乐曲」网页工具中亲手绘制（或哼唱/乐器弹奏后逐音修改）定稿，歌词为本人创作；'
   + '词曲一体对齐关系固化于随附规范作品文件中（SHA-256 指纹 ' + esc(entry.fp.slice(0, 16)) + '…）。'
   + '本人持有完整创作过程证据，作品未许可他人使用。</div>'
-  + '<p style="color:#666;font-size:12px">以上为模板，请按实际情况核对修改后填入登记表；创作方式（绘制/哼唱）请如实选择表述。</p>'
+  + '<p style="color:#666;font-size:12px">以上为模板，请按实际情况核对修改后填入登记表；创作方式（绘制/哼唱/乐器弹奏）请如实选择表述。</p>'
   + '<p style="color:#666;font-size:12px">诚实说明：本卡证明「该作品内容在 T 时刻已存在且未被篡改」，不直接证明作者身份；用于著作权登记时，请连同身份证明与登记申请一并提交。法律依据：最高人民法院《关于互联网法院审理案件若干问题的规定》第十一条。</p>'
   + '<script>document.getElementById("v").onclick=function(){var f=document.getElementById("f").files[0];if(!f){document.getElementById("r").textContent="请先选择文件";return}var rd=new FileReader();rd.onload=async function(){var txt=rd.result;var hashHex;try{var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt));hashHex=[...new Uint8Array(d)].map(function(b){return b.toString(16).padStart(2,"0")}).join("")}catch(e){document.getElementById("r").textContent="本浏览器不支持本地计算";return}document.getElementById("r").textContent="所选文件 SHA-256 = "+hashHex+"\\n"+(hashHex==="' + esc(entry.fp) + '"?"✅ 与指纹一致——文件自本存证卡生成以来未被改动":"❌ 与指纹不一致——若这是另一版本，请对应哈希链中的对应条目")};rd.readAsText(f)}<\/script></body></html>';
 }
