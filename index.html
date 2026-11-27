@@ -425,7 +425,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.45 · 为保证你的存证有效，请一定先仔细研读「使用方法」</span>
+  <span class="sub">v1.46 · 为保证你的存证有效，请一定先仔细研读「使用方法」</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -522,7 +522,7 @@ var _hmt = _hmt || [];
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.45 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.46 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a href="copyright-registration.html">📜 乐曲著作权登记要什么材料？（站内指南）</a>
   <span class="dot">·</span>
@@ -2773,7 +2773,7 @@ async function bkPickFolder(){
   _bkHandle = h; _bkPerm = 'granted'; _bkErr = '';
   try { await idbSet('bkFolder', h); } catch(e){}
   await bkWriteLatest(true);
-  flashTip('✓ 自动备份已开启——以后每次保存自动写进「' + esc(h.name || '所选文件夹') + '」里的 项目名/最新.json');
+  flashTip('✓ 自动存档已开启——以后每次保存自动写进「' + esc(h.name || '所选文件夹') + '」里的 项目名/最新.json，再不用点任何东西');
 }
 async function bkEnsurePerm(){
   if (!_bkHandle) return false;
@@ -2834,13 +2834,13 @@ function renderBkCard(){
     return;
   }
   if (!_bkHandle){
-    el.innerHTML = '<button class="mini" id="btnBkFolder" title="选一个你电脑上的文件夹，之后每次保存自动写入 项目名/最新.json——浏览器被清空也能从硬盘找回">💾 开启自动备份</button><span style="color:var(--muted)">还没开——选一次文件夹，之后全自动</span>';
+    el.innerHTML = '<button class="mini" id="btnBkFolder" title="点一次，选一个你电脑上的文件夹作为作品档案夹——之后每次保存自动写进 项目名/最新.json，浏览器被清空也能从硬盘找回，再不用点任何东西">🗄 自动存档</button><span style="color:var(--muted)">点一次就永远自动——选一个文件夹存你的作品档案</span>';
     const b = $('btnBkFolder');
     if (b) b.onclick = bkPickFolder;
     return;
   }
   if (_bkPerm !== 'granted'){
-    el.innerHTML = '<button class="mini" id="btnBkFolder">💾 恢复自动备份连接</button><span style="color:var(--muted)">浏览器重启后点一下重新授权</span>';
+    el.innerHTML = '<button class="mini" id="btnBkFolder">🗄 自动存档 · 重连</button><span style="color:var(--muted)">浏览器重启后点一下就接上</span>';
     const b = $('btnBkFolder');
     if (b) b.onclick = async () => { if (!await bkEnsurePerm()) bkPickFolder(); };
     return;
@@ -2851,8 +2851,27 @@ function renderBkCard(){
     + (_bkErr ? ' · <span style="color:#8b2f2f" title="' + esc(_bkErr) + '">上次写入失败</span>' : '');
 }
 
-function hardConfirmDelete(id, name, btn){
-  armConfirm(btn, '确认删?', () => {
+/* v1.46 登录后存档引导：登录的人多半是想要存档的——主动把「自动存档」送到面前（只弹一次/次登录，不拦任务） */
+function bkActive(){ return _bkHandle && _bkPerm === 'granted'; }
+function openArchiveGuide(){
+  if (bkActive()) return;                                   /* 已经在自动存档，不打扰 */
+  if (!bkSupported()) return;                               /* 不支持的环境顶栏已是降级说明 */
+  openExport('登录成功 ✓ 最后一步：给作品建个档案', `
+    <div style="max-width:560px;line-height:1.9;font-size:14.5px">
+      <p style="margin:0 0 6px">登录好了。接着点下面这个键，给作品在<b>你自己的电脑硬盘</b>上建一个档案夹：</p>
+      <div style="margin:10px 0"><button class="primary big" id="agGo" style="cursor:pointer">🗄 自动存档</button></div>
+      <p style="margin:6px 0 0;color:var(--muted)">点「自动存档」后浏览器会请你选一个文件夹（选个你记得住的，比如「我的音乐档案」）——<b>就点这一次，以后再也不用管</b>。</p>
+      <ul style="margin:10px 0 0;padding-left:20px">
+        <li>之后你<b>每存一稿、每存一次证，都自动写进这个文件夹</b>，按作品分好（作品名/最新.json）。</li>
+        <li>浏览器哪天被清空了，作品档案还在你硬盘上——<b>硬盘才是保险箱，浏览器只是工作台</b>。</li>
+        <li>作品内容始终不出你的电脑，我们不上传、也看不到。</li>
+      </ul>
+    </div>`);
+  const g = document.getElementById('agGo');
+  if (g) g.onclick = () => { $('overlay').classList.remove('show'); bkPickFolder(); };
+}
+
+function hardConfirmDelete(id, name, btn){  armConfirm(btn, '确认删?', () => {
     saveDrafts(loadDrafts().filter(x => x.id !== id));
     flashTip('已删除草稿「' + name + '」');
     renderDrafts();
@@ -2996,7 +3015,7 @@ function guideHTML(){
   <ul>
     <li><b>首选：备份文件夹的 最新.json</b>——开了「💾 自动备份」的，每个作品文件夹里都有 <b>项目名/最新.json</b>（永远是最新的）和 <b>历史/</b>（每次存证的记录）。把它拷到新电脑 → 打开本页 → 点「⇧ 导入备份」选它 → <b>草稿、立项、定稿标记、改动记录一起回来</b>（自动识别，重复的跳过）。</li>
     <li><b>没开自动备份的</b>：把之前「⇩ 备份全部」导出的 .json 拷过去，同样「⇧ 导入备份」选它。</li>
-    <li><b>浏览器清空了 / 换了个浏览器</b>：同上，点「⇧ 导入备份」。如果一次都没备份过，那台机器上的草稿就找不回来了——这是浏览器存储的硬限制，我们不藏这个风险，所以请现在就点顶栏的「💾 开启自动备份」。</li>
+    <li><b>浏览器清空了 / 换了个浏览器</b>：同上，点「⇧ 导入备份」。如果一次都没备份过，那台机器上的草稿就找不回来了——这是浏览器存储的硬限制，我们不藏这个风险，所以请现在就点顶栏的「🗄 自动存档」（点一次就永远自动，之后再也不用管）。</li>
     <li><b>手上只有当初的存证包</b>：解压 → 用「⇧ 导入备份」选里面的 <b>5_创作过程记录.json</b>，草稿和改动记录一起回来。</li>
     <li>不走云端：你的作品内容从不进我们的服务器（云端只有指纹台账），换电脑靠备份文件搬过去。</li>
   </ul>
@@ -3302,7 +3321,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.45';
+const APP_VER = 'v1.46';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -3692,6 +3711,7 @@ function openLoginModal(reason, afterLogin){
     cloudPullDrafts();
     const cb = _afterLogin; _afterLogin = null;
     if (cb) cb();
+    else openArchiveGuide();   /* 无后续任务的普通登录 → 送存档引导；带任务的（如正在存证）不插队 */
   };
 }
 $('btnLogin').onclick = async () => {
