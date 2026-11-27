@@ -404,7 +404,7 @@ var _hmt = _hmt || [];
       <div class="sub">免费网页工具，电脑浏览器打开即用。旋律你亲手放、歌词你亲手贴——作品完完整整是你的，证据也完完整整是你的。</div>
     </div>
     <div class="wrows">
-      <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子 · 哼唱 · 乐器弹奏</span><span class="ds">格子上点一点，或哼唱几句、弹一段乐器，声音自动落格——旋律立刻能听，不用懂乐理、不用会乐器。</span><span class="tag">创作</span></div>
+      <div class="wrow"><span class="ic">🎵</span><span class="tt">画格子 · 哼唱 · 乐器弹奏</span><span class="ds">格子上点一点，或哼唱几句、弹一段乐器，声音自动落格——旋律立刻能听，不用懂乐理、不用会乐器；作品以「立项」归档，草稿、定稿、每一步改动都记在作品名下。</span><span class="tag">创作</span></div>
       <div class="wrow"><span class="ic">📖</span><span class="tt">自动出简谱</span><span class="ds">贴上歌词，自动生成一字一音的带词简谱，照着就能唱。</span><span class="tag">成谱</span></div>
       <div class="wrow gold"><span class="ic">🛡</span><span class="tt">一键存证</span><span class="ds">作品指纹＋独立时间戳＋存证卡＋创作说明＋创作过程记录——著作权登记要用的证据文件，一键提供。</span><span class="tag core">核心</span></div>
       <div class="wrow"><span class="ic">⬇</span><span class="tt">文件全带走</span><span class="ds">简谱图片、乐谱、MIDI 全部下载到你的电脑，打印、转发、交材料随你用。</span><span class="tag">交付</span></div>
@@ -425,7 +425,7 @@ var _hmt = _hmt || [];
 <div id="app">
 <header>
   <h1>画出原创乐曲</h1>
-  <span class="sub">v1.43 · 画格子 / 哼唱 / 乐器弹奏多种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 存证含创作过程记录</span>
+  <span class="sub">v1.44 · 立项归档 · 画格子 / 哼唱 / 乐器弹奏多种方式作曲 · 可带歌词 · 草稿常驻页面下方 · 导出带词乐谱 / MIDI · 存证含创作过程记录</span>
 </header>
 
 <div id="svHint" style="display:none;margin:0 auto 10px;max-width:1180px;padding:10px 14px;border-radius:10px;font-size:13.5px;line-height:1.7"></div>
@@ -458,6 +458,17 @@ var _hmt = _hmt || [];
   </div>
   <button id="btnLogin" class="primary big" title="登录 / 注册：存证需要登录才有归属，著作权登记时才认得上。登录只用来查你的存证台账（哪首、什么时候、指纹多少），不存你的作品内容。手机验证码，一分钟">登录</button>
   <button id="btnHelp" class="primary big" title="第一次来一定点这里，一分钟就会用">使用方法</button>
+</div>
+
+<!-- v1.44 立项制：一个作品一个立项；草稿、定稿、改动记录都挂在立项下 -->
+<div class="bar" id="projBar" style="margin-top:-6px">
+  <div class="field" style="flex:1;min-width:230px"><label>作品</label>
+    <select id="projSel" style="max-width:260px" title="当前作品（立项）：草稿箱只显示这个项目的稿；改动记录也记在这个项目名下"></select>
+    <button class="mini" id="btnProjNew" title="新建立项＝开一个新作品：配好名字、清空画布、从零记录">＋新建立项</button>
+    <button class="mini" id="btnProjMgr" title="所有项目的管理：改名 / 结项 / 搁置 / 重开 / 回收站">管理</button>
+  </div>
+  <span id="quotaBadge" style="font-size:12.5px;padding:4px 10px;border-radius:999px;background:#f3efe4;color:inherit;white-space:nowrap" title="进行中项目最多 5 个；进行中项目的草稿总量最多 50 份（结项/搁置后不占）。45 份起提醒，50 份要结项或删旧稿才能再存"></span>
+  <span id="bkCard" style="font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:330px"></span>
 </div>
 
 <div class="wrap">
@@ -501,17 +512,17 @@ var _hmt = _hmt || [];
     <h2>我的草稿</h2>
     <span class="cnt" id="dockCount"></span>
     <span class="sp"></span>
-    <button class="mini" id="btnBackup" title="把全部草稿和当前画面存成一个备份文件（换浏览器、换网址、换电脑都能搬过去）">⇩ 备份全部</button>
-    <button class="mini" id="btnRestore" title="从备份文件把草稿导进来">⇧ 导入备份</button>
+    <button class="mini" id="btnBackup" title="把全部草稿、立项与改动记录存成一个备份文件（换浏览器、换网址、换电脑都能搬过去）">⇩ 备份全部</button>
+    <button class="mini" id="btnRestore" title="从备份文件把草稿、立项与改动记录导进来（自动识别，重复的跳过）">⇧ 导入备份</button>
     <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
   </div>
-  <div class="hint" style="margin:0 0 6px">点名字＝放回画布＋展开简谱（数字正对着它唱的那个字）；⬇ 乐谱＝带词的 .musicxml；MIDI＝只带音；🛡 存证＝对这一稿生成著作权证据压缩包（点哪份存哪份）</div>
+  <div class="hint" style="margin:0 0 6px">只显示当前作品（立项）的稿，换作品用顶栏「作品」下拉。点名字＝放回画布＋展开简谱（数字正对着它唱的那个字）；★＝定稿（可换可取消）；⬇ 乐谱＝带词的 .musicxml；MIDI＝只带音；🛡 存证＝对这一稿生成著作权证据压缩包，改动记录取<b>项目全程</b>（不是只到这一稿为止）</div>
   <div id="draftList"></div>
 </section>
 
 <footer class="site-foot">
   <div class="wreg" style="margin:0 0 10px">📑 著作权登记官方渠道（登录后办证用得上）：<a href="https://www.ccopyright.com.cn" target="_blank" rel="noopener noreferrer">中国版权保护中心（全国统一办理）</a>　·　<a href="https://www.ncac.gov.cn/xxfb/bqshfw/bqdj/djjg/202410/t20241018_870052.html" target="_blank" rel="noopener noreferrer">全国各省登记机关与办理机构名录（国家版权局）</a><br><small>以上为官方网站外部链接，仅供参考；办理条件、材料与费用以官方网站说明为准。</small></div>
-  <span>画出原创乐曲 v1.43 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
+  <span>画出原创乐曲 v1.44 · MIT 开源 · 你的曲和词只存在你自己的浏览器里，谁都不上传</span>
   <span class="dot">·</span>
   <a href="copyright-registration.html">📜 乐曲著作权登记要什么材料？（站内指南）</a>
   <span class="dot">·</span>
@@ -1300,6 +1311,7 @@ function saveLocal(){
     localStorage.setItem('hycyg_v05', JSON.stringify(dataSnapshot()));
   } catch(e){}
   noteWorkRev(dataSnapshot());   /* v1.42：每次画布内容变化，自动记一条「改了什么」 */
+  bkSchedule();                  /* v1.44：开了自动备份文件夹就节流写盘（15 秒合一次） */
 }
 
 /* ================= v1.42 创作过程记录（修改次数 + 每次修改的核心内容） =================
@@ -1307,8 +1319,150 @@ function saveLocal(){
    这一项人几乎写不出来——没人记得改了几次、每次为什么改，最后只能写"经过多次修改"，等于没写。
    这里在画布每次内容变化时自动追加一条：时间 + 本次相对上一稿改了什么（加/删几格、改几个字、调了什么）。
    红线：只记录「作品在你手上如何一步步长成」，不判定是否原创、不做查重、不声称能证明作者身份。 */
-const WORK_KEY = 'hycyg_works', WORK_CUR = 'hycyg_work_cur', WORK_MAX = 6, REV_MAX = 600, REV_GAP = 6000;
-let _WORKS = null, _WID = null, _revTimer = null, _revFrom = 0;
+const WORK_KEY = 'hycyg_works', WORK_CUR = 'hycyg_work_cur', REV_MAX = 600, REV_GAP = 6000;
+let _WORKS = null, _WID = null, _revTimer = null, _revFrom = 0, _worksLoaded = false;
+
+/* ================= v1.44 立项制（作品档案） =================
+   一个立项＝一个作品（容器）；草稿是容器里的罐子；改动记录挂在容器上，不挂在罐子上。
+   所以选第 5 份当定稿，第 6–10 份的痕迹照样在——存证取「项目全程记录」。 */
+const PROJ_KEY = 'hycyg_projects', PROJ_CUR = 'hycyg_proj_cur';
+const PROJ_MAX = 5, DRAFT_MAX = 50, DRAFT_WARN = 45, WORKS_KEEP = 30;
+let _PROJS = null, _PID = null, _migrated = false;
+
+function loadProjs(){
+  if (_PROJS) return _PROJS;
+  try { _PROJS = JSON.parse(localStorage.getItem(PROJ_KEY) || 'null') || null; } catch(e){ _PROJS = null; }
+  try { _PID = localStorage.getItem(PROJ_CUR) || null; } catch(e){ _PID = null; }
+  if (!_PROJS){ _PROJS = []; migrateToProjects(); }
+  if (_PID && !(_PROJS || []).some(p => p.id === _PID)) _PID = null;
+  return _PROJS;
+}
+function saveProjs(){
+  try {
+    localStorage.setItem(PROJ_KEY, JSON.stringify(_PROJS || []));
+    if (_PID) localStorage.setItem(PROJ_CUR, _PID);
+  } catch(e){}
+}
+function projById(id){ return (loadProjs() || []).find(p => p.id === id) || null; }
+function curProj(){ return _PID ? projById(_PID) : null; }
+function activeProjs(){ return loadProjs().filter(p => p.status === 'active'); }
+function makeProj(name){
+  const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    name: name || '未命名作品', type: '曲', status: 'active',
+    created: nowStamp(), workIds: [newWorkId()], finalDraftId: null };
+  loadProjs().unshift(p);
+  return p;
+}
+/* 旧数据迁移：v1.44 之前没有立项概念——已有草稿全部归入一个「未命名作品」立项，记录原样保留 */
+function migrateToProjects(){
+  if (_migrated) return;
+  _migrated = true;
+  let drafts = [];
+  try { drafts = JSON.parse(localStorage.getItem('hycyg_drafts') || '[]') || []; } catch(e){}
+  if (!drafts.length) return;
+  const p = makeProj('未命名作品（v1.44 前自动归入）');
+  p.created = (drafts[drafts.length - 1] && drafts[drafts.length - 1].time) || p.created;
+  const wids = [];
+  drafts.forEach(d => { d.projectId = p.id; if (d.workId && wids.indexOf(d.workId) < 0) wids.push(d.workId); });
+  if (wids.length) p.workIds = wids;
+  _PID = p.id;
+  saveProjs();
+  try { localStorage.setItem('hycyg_drafts', JSON.stringify(drafts)); } catch(e){}
+}
+/* 当前立项（没有就建一个叫「未命名作品」的）；画布上已有的创作链收进这个立项 */
+function ensureCurrentProj(){
+  let p = curProj();
+  if (!p){
+    const act = activeProjs();
+    p = act.length ? act[0] : makeProj('未命名作品');
+    _PID = p.id;
+  }
+  if (!p.workIds || !p.workIds.length) p.workIds = [];
+  const w = loadWorks();
+  if (_WID && w[_WID] && p.workIds.indexOf(_WID) < 0) p.workIds.push(_WID);
+  if (!p.workIds.length){ p.workIds = [newWorkId()]; _WID = p.workIds[0]; }
+  else if (p.workIds.indexOf(_WID || '') < 0) _WID = p.workIds[p.workIds.length - 1];
+  saveProjs();
+  return p;
+}
+/* 配额：进行中项目 ≤5；进行中项目的草稿总量 ≤50（跨项目合计，单项不限）；结项/搁置不占 */
+function quotaInfo(){
+  const act = activeProjs();
+  const ids = {}; act.forEach(p => { ids[p.id] = 1; });
+  const ds = loadDrafts().filter(d => ids[d.projectId]);
+  return { projects: act.length, drafts: ds.length };
+}
+function quotaFull(){ const q = quotaInfo(); return q.drafts >= DRAFT_MAX; }
+function updateQuotaBadge(){
+  const el = $('quotaBadge');
+  if (!el) return;
+  const q = quotaInfo();
+  el.textContent = '进行中 ' + q.projects + '/' + PROJ_MAX + ' 项 · 草稿 ' + q.drafts + '/' + DRAFT_MAX + ' 份';
+  const hot = q.drafts >= DRAFT_MAX, warm = q.drafts >= DRAFT_WARN || q.projects >= PROJ_MAX;
+  el.style.background = hot ? '#8b2f2f' : warm ? '#b45309' : '#f3efe4';
+  el.style.color = (hot || warm) ? '#fff' : 'inherit';
+}
+function quotaBlockModal(){
+  openExport('🧺 草稿位满了（' + DRAFT_MAX + ' 份）', `
+    <div style="line-height:1.9;max-width:520px">
+      <p>进行中项目的草稿总量到了 <b>${DRAFT_MAX} 份</b>上限。两条出路：</p>
+      <p>① <b>结项一个旧作品</b>——先对定稿点「🛡 存证」拿到证据包，再在「管理」里把它结项；结项后它的草稿不再占位（改动记录完整保留，可重开续写）。</p>
+      <p>② <b>删掉不要的旧草稿</b>——草稿箱里每行都有「删除」。</p>
+      <div class="row" style="margin-top:12px">
+        <button class="mini primary" id="qbMgr">打开项目管理</button>
+        <button class="mini" id="qbClose">知道了</button>
+      </div>
+    </div>`);
+  $('qbMgr').onclick = () => { $('overlay').classList.remove('show'); openProjMgr(); };
+  $('qbClose').onclick = () => $('overlay').classList.remove('show');
+}
+function draftT(d){ const v = d.pts || Date.parse(String(d.time || '').replace(/\//g, '-')); return isNaN(v) ? 0 : v; }
+function projDrafts(pid){ return loadDrafts().filter(d => d.projectId === pid); }
+/* 第 N 稿：按保存时间先后在项目内编号 */
+function draftRank(p, d){
+  const ds = projDrafts(p.id).slice().sort((a, b) => draftT(a) - draftT(b));
+  const i = ds.findIndex(x => x.id === d.id);
+  return i >= 0 ? i + 1 : ds.length;
+}
+
+/* ---- 明细存 IndexedDB（localStorage 只有 5MB 且超了会静默写失败；明细全记不限流，必须搬家） ---- */
+const IDB_NAME = 'hycyg_works_db', IDB_STORE = 'kv';
+let _idb = null, _worksBackend = 'ls';
+function idbOpen(){
+  return new Promise(res => {
+    if (_idb) return res(_idb);
+    if (!window.indexedDB) return res(null);
+    let rq;
+    try { rq = indexedDB.open(IDB_NAME, 1); } catch(e){ return res(null); }
+    rq.onupgradeneeded = () => { try { rq.result.createObjectStore(IDB_STORE); } catch(e){} };
+    rq.onsuccess = () => { _idb = rq.result; res(_idb); };
+    rq.onerror = () => res(null);
+    rq.onblocked = () => res(null);
+    setTimeout(() => { if (!_idb) res(null); }, 3000);
+  });
+}
+function idbGet(key){
+  return idbOpen().then(db => new Promise(res => {
+    if (!db) return res(null);
+    try {
+      const rq = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
+      rq.onsuccess = () => res(rq.result == null ? null : rq.result);
+      rq.onerror = () => res(null);
+    } catch(e){ res(null); }
+  }));
+}
+function idbSet(key, val){
+  return idbOpen().then(db => new Promise(res => {
+    if (!db) return res(false);
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(val, key);
+      tx.oncomplete = () => res(true);
+      tx.onerror = () => res(false);
+      tx.onabort = () => res(false);
+    } catch(e){ res(false); }
+  }));
+}
 
 function nowStamp(d){
   d = d || new Date();
@@ -1317,29 +1471,57 @@ function nowStamp(d){
     + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
 }
 function loadWorks(){
-  if (_WORKS) return _WORKS;
+  if (_worksLoaded) return _WORKS || {};
+  /* 先同步读 localStorage 旧数据兜底；IndexedDB 读到后合并过来（迁移一次，之后明细全走 IDB） */
   try { _WORKS = JSON.parse(localStorage.getItem(WORK_KEY) || '{}') || {}; } catch(e){ _WORKS = {}; }
   if (!_WID){ try { _WID = localStorage.getItem(WORK_CUR) || null; } catch(e){ _WID = null; } }
-  return _WORKS;
+  _worksLoaded = true;
+  idbGet('works').then(v => {
+    if (v && v.data && Object.keys(v.data).length){
+      const merged = v.data;
+      /* 合并：IDB 为主；本地内存里更新（修订更多）的链以本地为准，绝不让搬家里丢一条记录 */
+      Object.keys(_WORKS || {}).forEach(k => {
+        const a = merged[k], b = _WORKS[k];
+        if (!a) merged[k] = b;
+        else if (b && (b.revs || []).length > (a.revs || []).length) merged[k] = b;
+      });
+      _WORKS = merged;
+      _worksBackend = 'idb';
+      try { localStorage.removeItem(WORK_KEY); } catch(e){}   /* 迁移完成，明细不再占 localStorage */
+    } else if (_WORKS && Object.keys(_WORKS).length){
+      /* 首次迁移：localStorage 明细 → IndexedDB */
+      idbSet('works', { data: _WORKS, migratedAt: nowStamp() }).then(ok => {
+        if (ok){ _worksBackend = 'idb'; try { localStorage.removeItem(WORK_KEY); } catch(e){} }
+      });
+    } else {
+      _worksBackend = 'idb';
+    }
+  });
+  return _WORKS || {};
 }
 function saveWorks(){
-  try {
-    localStorage.setItem(WORK_KEY, JSON.stringify(_WORKS || {}));
-    if (_WID) localStorage.setItem(WORK_CUR, _WID);
-  } catch(e){}
+  try { if (_WID) localStorage.setItem(WORK_CUR, _WID); } catch(e){}
+  if (_worksBackend === 'idb'){ idbSet('works', { data: _WORKS || {}, savedAt: nowStamp() }); return; }
+  try { localStorage.setItem(WORK_KEY, JSON.stringify(_WORKS || {})); } catch(e){}
+  idbSet('works', { data: _WORKS || {}, savedAt: nowStamp() });   /* 双写：IDB 就绪前先落 localStorage 不丢 */
 }
 function newWorkId(){ return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+/* 清理不被任何立项引用的旧链（立项自己的链永不清理——记录是证据本体） */
 function trimWorks(){
-  const ks = Object.keys(_WORKS || {});
-  if (ks.length <= WORK_MAX) return;
-  ks.sort((a, b) => String((_WORKS[a] || {}).start || '').localeCompare(String((_WORKS[b] || {}).start || '')));
-  ks.slice(0, ks.length - WORK_MAX).forEach(k => { delete _WORKS[k]; });
+  const w = _WORKS || {};
+  const ks = Object.keys(w);
+  if (ks.length <= WORKS_KEEP) return;
+  const referenced = {};
+  loadProjs().forEach(p => (p.workIds || []).forEach(id => { referenced[id] = 1; }));
+  const free = ks.filter(k => !referenced[k])
+    .sort((a, b) => String((w[a] || {}).start || '').localeCompare(String((w[b] || {}).start || '')));
+  free.slice(0, ks.length - WORKS_KEEP).forEach(k => { delete w[k]; });
 }
 /* 取当前创作链；没有就新建（base=此刻画面 → 意味着「从此刻开始记录」，不假装记录了更早的过程） */
 function curWork(){
   const w = loadWorks();
-  if (!_WID || !w[_WID]){
-    _WID = newWorkId();
+  ensureCurrentProj();
+  if (!w[_WID]){
     w[_WID] = { start: nowStamp(), revs: [], base: dataSnapshot() };
     trimWorks(); saveWorks();
   }
@@ -1437,15 +1619,38 @@ function adoptWorkFor(d){
   }
   saveWorks();
 }
-/* 取某份草稿对应的过程记录（只取到该稿保存时为止，后面的改动不算进这份存证） */
-function workRevsFor(d){
+/* v1.44 核心：存证取「项目全程记录」——第 6~10 稿的痕迹不再丢（记录挂在项目上，不挂在稿上）。
+   若项目标了定稿：定稿及之前的记录为正文，定稿之后的改动单列为「定稿后试改（不影响定稿文本）」。 */
+function workRevsForProject(p){
   const w = loadWorks();
-  const t = (d && d.workId) ? w[d.workId] : null;
-  if (!t || !t.revs || !t.revs.length) return { revs: [], start: '', end: '', total: 0, cut: false, folded: null };
-  const cut = (typeof d.revIdx === 'number' && d.revIdx < t.revs.length);
-  const revs = (cut ? t.revs.slice(0, d.revIdx) : t.revs).filter(r => r && r.d);
-  return { revs: revs, start: t.start || (revs[0] && revs[0].t) || '',
-    end: revs.length ? revs[revs.length - 1].t : '', total: revs.length, cut: cut, folded: t.folded || null };
+  let revs = [], folded = null;
+  ((p && p.workIds) || []).forEach(id => {
+    const t = w[id];
+    if (!t || !t.revs) return;
+    t.revs.forEach(r => { if (r && r.d) revs.push(r); });
+    if (t.folded && t.folded.count){
+      folded = folded || { count: 0, from: t.folded.from || '', to: '' };
+      folded.count += t.folded.count;
+      if (!folded.from) folded.from = t.folded.from;
+      folded.to = t.folded.to || folded.to;
+    }
+  });
+  revs.sort((a, b) => String(a.t).localeCompare(String(b.t)));
+  const fin = (p && p.finalDraftId) ? loadDrafts().find(x => x.id === p.finalDraftId) : null;
+  const ft = fin ? draftT(fin) : 0;
+  let main = revs, after = [];
+  if (fin && ft){
+    const cutAt = nowStamp(new Date(ft));
+    main = revs.filter(r => String(r.t) <= cutAt);
+    after = revs.filter(r => String(r.t) > cutAt);
+  }
+  return { revs: main, after: after,
+    start: main.length ? main[0].t : (revs[0] && revs[0].t) || '',
+    end: (after.length ? after[after.length - 1].t : main.length ? main[main.length - 1].t : ''),
+    total: revs.length, mainTotal: main.length, afterTotal: after.length,
+    folded: folded,
+    projName: (p && p.name) || '',
+    finalName: fin ? fin.name : '', finalStamp: fin && ft ? nowStamp(new Date(ft)) : '' };
 }
 /* 同类改动合并成阶段（显示用）：「加 1 格」连记 12 次 → 一个阶段；相隔超过 3 分钟不算同一段 */
 function tms(t){ const v = Date.parse(String(t || '').replace(' ', 'T')); return isNaN(v) ? 0 : v; }
@@ -1463,22 +1668,32 @@ function rangeT(r){ const a = shortT(r.from), b = shortT(r.to); return (r.count 
 
 function processTxt(title, info){
   const runs = mergeRuns(info.revs);
+  const afterRuns = mergeRuns(info.after || []);
   const L = [];
   L.push('创作过程记录（由「画出原创乐曲」在创作过程中自动追加，非事后补写）');
   L.push('');
   L.push('作品：' + (title || '未命名'));
+  if (info.projName) L.push('所属立项：' + info.projName + '（记录挂在这个作品名下，涵盖该项目全部草稿的改动）');
   L.push('记录区间：' + (info.start || '—') + ' 至 ' + (info.end || '—'));
-  L.push('记录变更次数：' + info.total);
-  L.push('合并同类后阶段数：' + runs.length);
+  L.push('记录变更次数：' + info.total
+    + (info.mainTotal != null ? '（其中定稿前 ' + info.mainTotal + ' 次' + (info.afterTotal ? '，定稿后试改 ' + info.afterTotal + ' 次' : '') + '）' : ''));
+  if (info.finalName) L.push('定稿：' + info.finalName + '（' + (info.finalStamp || '') + ' 标为定稿；本次存证的文本以随包规范作品文件为准）');
   if (info.folded && info.folded.count) L.push('更早的 ' + info.folded.count + ' 次改动已折叠（' + (info.folded.from || '') + ' 至 ' + (info.folded.to || '') + '），未逐条列出');
   L.push('');
   L.push('── 阶段（同一类改动连续出现时合并）──');
   runs.forEach((r, i) => {
     L.push(' ' + (i + 1) + '. ' + rangeT(r) + '　' + r.d + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : ''));
   });
+  if (afterRuns.length){
+    L.push('');
+    L.push('── 定稿后试改（不影响定稿文本）──');
+    afterRuns.forEach((r, i) => {
+      L.push(' ' + (i + 1) + '. ' + rangeT(r) + '　' + r.d + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : ''));
+    });
+  }
   L.push('');
   L.push('── 逐条明细 ──');
-  info.revs.forEach((r, i) => {
+  (info.revs || []).concat(info.after || []).forEach((r, i) => {
     L.push(' #' + (i + 1) + '　' + r.t + '　' + r.d + '　（此刻音符 ' + (r.n != null ? r.n : '?') + ' 格 · 歌词 ' + (r.l != null ? r.l : '?') + ' 字）');
   });
   L.push('');
@@ -1487,13 +1702,14 @@ function processTxt(title, info){
   L.push('- 记录全程在你自己浏览器内生成和保存，不上传服务器。');
   L.push('- 本记录证明「该作品在这些时刻由这些步骤逐步形成」，不判定作品是否原创，也不做查重。');
   L.push('- 若本作品在启用此功能（v1.42）之前已经开始创作，则本记录起点晚于实际起笔时间，此前过程未被记录。');
-  if (info.cut) L.push('- 本存证对应草稿保存时的那一稿，之后的修改未计入本记录。');
+  L.push('- 记录属于立项（作品）而非某一稿：项目内全部草稿（含定稿之后的其他尝试）的改动都已完整计入。');
   return L.join('\r\n');
 }
 /* 独立的过程记录文件：双击用浏览器打开，可 Ctrl+P 存 PDF，也可直接复制其中段落填进登记表 */
 function processHTML(title, info){
   const e = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const runs = mergeRuns(info.revs);
+  const afterRuns = mergeRuns(info.after || []);
   let narrative = '';
   if (runs.length){
     const pick = [];
@@ -1505,10 +1721,19 @@ function processHTML(title, info){
     const lead = ['最初', '随后', '接着', '此后', '最后'];
     const body = pick.map((r, i) => (lead[i] || '此后') + '（' + shortT(r.from) + '）' + String(r.d).replace(/ · /g, '，')
       + (r.count > 1 ? '，如此连续 ' + r.count + ' 次' : '')).join('；');
-    narrative = '本作品于 ' + (info.start || '') + ' 在「画出原创乐曲」网页工具内开始创作，' + (info.end || '')
-      + ' 定稿，创作全程在该工具内完成。其间共修改 ' + info.total + ' 次，主要过程为：' + body
+    narrative = '本作品于 ' + (info.start || '') + ' 在「画出原创乐曲」网页工具内开始创作，'
+      + (info.finalStamp ? info.finalStamp + ' 将「' + info.finalName + '」定为定稿' : (info.end || '') + ' 定稿')
+      + '，创作全程在该工具内完成。其间共修改 ' + (info.mainTotal != null ? info.mainTotal : info.total) + ' 次，主要过程为：' + body
+      + (info.afterTotal ? '。定稿之后另有 ' + info.afterTotal + ' 次试改（不影响定稿文本，明细见下节）' : '')
       + '。以上过程由软件在创作过程中自动记录，时间与每一次改动均见本记录明细。';
   }
+  const afterHtml = afterRuns.length
+    ? '<h2>定稿后试改（不影响定稿文本）</h2>'
+      + '<table><tr><th>#</th><th>时间</th><th>改动内容</th><th>次数</th></tr>'
+      + afterRuns.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + e(rangeT(r)) + '</td><td>' + e(r.d) + '</td><td>' + r.count + '</td></tr>').join('')
+      + '</table>'
+      + '<p class="note">定稿是项目内被你标了 ★ 的那一稿；定稿之后又动了别处＝试改，改动照样如实记录——这部分恰恰说明创作在持续，不影响定稿文本本身。</p>'
+    : '';
   return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>创作过程记录 · ' + e(title || '未命名') + '</title>'
   + '<style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;max-width:780px;margin:28px auto;padding:0 18px;color:#222;line-height:1.75}'
   + 'h1{font-size:21px;margin:0 0 4px}h2{font-size:15px;margin:24px 0 8px;padding-left:8px;border-left:3px solid #c2410c}'
@@ -1521,8 +1746,12 @@ function processHTML(title, info){
   + '<p class="note">由「画出原创乐曲」' + e(APP_VER) + ' 在创作过程中自动追加生成，非事后补写；记录全程在用户自己的浏览器内完成。</p>'
   + '<table class="meta">'
   + '<tr><td>作品名称</td><td><b>' + e(title || '未命名') + '</b></td></tr>'
+  + (info.projName ? '<tr><td>所属立项</td><td>' + e(info.projName) + '（记录挂在项目上，涵盖该项目全部草稿的改动）</td></tr>' : '')
   + '<tr><td>记录区间</td><td>' + e(info.start || '—') + ' 至 ' + e(info.end || '—') + '</td></tr>'
-  + '<tr><td>修改次数</td><td><b>' + info.total + '</b> 次（合并同类后 ' + runs.length + ' 个阶段）</td></tr>'
+  + '<tr><td>修改次数</td><td><b>' + info.total + '</b> 次'
+    + (info.mainTotal != null ? '（定稿前 ' + info.mainTotal + ' 次' + (info.afterTotal ? '，定稿后试改 ' + info.afterTotal + ' 次' : '') + '）' : '')
+    + '（合并同类后 ' + (runs.length + afterRuns.length) + ' 个阶段）</td></tr>'
+  + (info.finalName ? '<tr><td>定稿</td><td>' + e(info.finalName) + '（' + e(info.finalStamp || '') + ' 标为定稿）</td></tr>' : '')
   + (info.folded && info.folded.count ? '<tr><td>更早改动</td><td>另有 ' + info.folded.count + ' 次已折叠（' + e(info.folded.from) + ' 至 ' + e(info.folded.to) + '），未逐条列出</td></tr>' : '')
   + '<tr><td>生成时间</td><td>' + e(nowStamp()) + '</td></tr>'
   + '</table>'
@@ -1534,26 +1763,32 @@ function processHTML(title, info){
       + runs.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + e(rangeT(r)) + '</td><td>' + e(r.d) + '</td><td>' + r.count + '</td></tr>').join('')
       + '</table>'
     : '<p class="note">（无阶段记录）</p>')
+  + afterHtml
   + '<h2>逐条明细（每一次改动）</h2>'
   + '<table><tr><th>#</th><th>时间</th><th>改动</th><th>此刻音符</th><th>此刻歌词</th></tr>'
-  + (info.revs || []).map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + e(r.t) + '</td><td>' + e(r.d) + '</td><td>' + (r.n != null ? r.n + ' 格' : '') + '</td><td>' + (r.l != null ? r.l + ' 字' : '') + '</td></tr>').join('')
+  + (info.revs || []).concat(info.after || []).map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + e(r.t) + '</td><td>' + e(r.d) + '</td><td>' + (r.n != null ? r.n + ' 格' : '') + '</td><td>' + (r.l != null ? r.l + ' 字' : '') + '</td></tr>').join('')
   + '</table>'
   + '<h2>使用说明与边界</h2>'
   + '<p class="note">'
   + '① 画布内容每变化一次即记一条，记录的是「这一稿相对上一稿改了什么」，可与同批存证卡里的哈希链时间对照。<br>'
   + '② 本记录证明「该作品在这些时刻由这些步骤逐步形成」，<b>不判定作品是否原创，也不做查重</b>；著作权登记时作为「创作过程/修改情况」的说明材料提交，具体要求以登记机构官网为准。<br>'
-  + '③ 若本作品在启用此功能之前已开始创作，则记录起点晚于实际起笔时间，此前过程未被记录。'
-  + (info.cut ? '<br>④ 本存证对应草稿保存时的那一稿，之后的修改未计入本记录。' : '')
+  + '③ 若本作品在启用此功能之前已开始创作，则记录起点晚于实际起笔时间，此前过程未被记录。<br>'
+  + '④ 记录属于立项（作品）而非某一稿：项目内全部草稿（含定稿之后的其他尝试）的改动都已完整计入，不再有"选了某稿之后痕迹消失"的问题。'
   + '</p></body></html>';
 }
 function processJSON(title, info){
   return JSON.stringify({
-    '_说明': '画出原创乐曲 创作过程记录。revisions 为画布每次变化的自动追加条目：t=记录时间，d=本次相对上一稿的改动，n=此刻音符格数，l=此刻歌词字数。',
+    '_说明': '画出原创乐曲 创作过程记录。revisions 为画布每次变化的自动追加条目：t=记录时间，d=本次相对上一稿的改动，n=此刻音符格数，l=此刻歌词字数。记录属于立项（作品），涵盖该项目全部草稿的改动。',
     '作品': title || '',
+    '所属立项': info.projName || '',
+    '定稿': info.finalName ? { '草稿名': info.finalName, '标定时间': info.finalStamp || '' } : null,
     '记录区间': { '起': info.start || '', '止': info.end || '' },
     '记录变更次数': info.total,
+    '定稿前次数': info.mainTotal != null ? info.mainTotal : info.total,
+    '定稿后试改次数': info.afterTotal || 0,
     '更早折叠的改动': (info.folded && info.folded.count) ? { '次数': info.folded.count, '区间': (info.folded.from || '') + ' 至 ' + (info.folded.to || '') } : null,
     'revisions': (info.revs || []).map((r, i) => ({ '序号': i + 1, '时间': r.t, '改动': r.d, '音符格数': r.n, '歌词字数': r.l })),
+    '定稿后试改': (info.after || []).map((r, i) => ({ '序号': i + 1, '时间': r.t, '改动': r.d, '音符格数': r.n, '歌词字数': r.l })),
     '生成时间': nowStamp()
   }, null, 2);
 }
@@ -1613,18 +1848,21 @@ function canonJSON(d){
 /* 载入别的草稿前，先把画布上现有内容存一份，绝不静默丢稿（同内容不重复存） */
 function autoBackup(tag){
   if (!S.cells.size) return false;
+  if (quotaFull()) return false;   /* v1.44：草稿位满时不自动塞，出路（结项/删旧稿）由用户决定 */
   const cur = dataSnapshot();
   const sig = snapSign(cur);
   const list = loadDrafts();
   if (list.some(x => snapSign(x.data) === sig)) return false;
+  const p = ensureCurrentProj();
   list.unshift({ id: Date.now() + Math.floor(Math.random()*1000),
     name: '⟲ 自动备份' + (tag ? '·' + tag : '') + ' ' +
       new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
-    time: new Date().toLocaleString('zh-CN'), data: cur,
-    workId: _WID || null, revIdx: workRevCount() });
-  /* v1.29：上限 40→100；草稿是防丢的最后一道闸，能不挤掉就不挤掉（每份仅几 KB，100 份远不到存储上限） */
+    time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: cur,
+    projectId: p.id, workId: _WID || null, revIdx: workRevCount() });
+  /* 总量保险丝不变（含结项/搁置项目的稿在内最多 100 份）；进行中的稿另受 50 份配额约束 */
   if (list.length > 100) list.length = 100;
   try { saveDrafts(list); } catch(e){ return false; }
+  updateQuotaBadge();
   return true;
 }
 
@@ -1649,16 +1887,19 @@ function askName(title, def, cb){
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') $('nameOk').click(); });
 }
 
-/* ================= 草稿区（常驻，不弹窗） ================= */
+/* ================= 草稿区（常驻，不弹窗）——只显示当前立项的稿 ================= */
 function renderDrafts(){
-  const list = loadDrafts();
+  const p = ensureCurrentProj();
+  const list = projDrafts(p.id);
   const curSig = S.cells.size ? snapSign(dataSnapshot()) : null;
-  $('dockCount').textContent = list.length ? '（' + list.length + ' 份）' : '';
+  $('dockCount').textContent = p.name + ' · ' + list.length + ' 稿';
   const box = $('draftList');
   if (!list.length){
-    box.innerHTML = '<div class="empty">还没有草稿——上面画好旋律、按 ▶ 听顺了，就按「💾 保存草稿」。</div>';
+    box.innerHTML = '<div class="empty">「' + esc(p.name) + '」还没有草稿——上面画好旋律、按 ▶ 听顺了，就按「💾 保存草稿」。要开新作品用顶栏「＋新建立项」。</div>';
     return;
   }
+  const order = list.slice().sort((a, b) => draftT(a) - draftT(b));
+  const rank = {}; order.forEach((d, i) => { rank[d.id] = i + 1; });
   box.innerHTML = list.map(d => {
     let n = 0, cntOK = true;
     try {
@@ -1672,16 +1913,19 @@ function renderDrafts(){
     const meta = cntOK ? `${n} 音 · ${chars} 字` : `${d.data.cells ? d.data.cells.length : 0} 格 · ${chars} 字`;
     return `<div class="dcraft" data-id="${d.id}">
       <div class="dline">
+        <span class="revtag" title="这是「${esc(p.name)}」的第 ${rank[d.id]} 稿（按保存时间编号）">第${rank[d.id]}稿</span>
+        ${d.final ? '<span class="cur-tag" style="background:#b45309">★ 定稿</span>' : ''}
         <b class="dname" title="点这里：放回画布并展开简谱">${esc(d.name)}</b>
         ${isCur ? '<span class="cur-tag">画布上</span>' : ''}
-        ${revN > 1 ? `<span class="revtag" title="这份草稿保存时，已自动记录 ${revN} 次修改——存证时随包生成《创作过程记录》，并写进存证卡的创作说明（登记表可直接用）">🔁 ${revN} 改</span>` : ''}
+        ${revN > 1 ? `<span class="revtag" title="这份草稿保存时，本项目已自动记录 ${revN} 次修改——存证时随包生成《创作过程记录》（取项目全程），并写进存证卡的创作说明（登记表可直接用）">🔁 ${revN} 改</span>` : ''}
         <span class="dmeta">${warn}${meta} · ${NOTE_NAMES[d.data.root]}${d.data.mode === 'major' ? '大' : '小'}调 · ${d.data.sig.join('/')} · ${d.data.bpm}BPM</span>
         <span class="sp"></span>
+        <button class="mini fin" title="${d.final ? '取消定稿标记（定稿可以换、可以取消）' : '把这一稿标为本作品的定稿——存证包里会写明定稿是哪份、定稿后又试改了什么'}">★ 定稿</button>
         <button class="mini dl" title="下载带词的乐谱 .musicxml（MuseScore/Sibelius/Dorico 都能开，词逐字绑在音符上）">⬇ 乐谱</button>
         <button class="mini png" title="下载简谱图片 .png（自带指纹水印，可作著作权登记的作品样本）">⬇ 图</button>
         <button class="mini mid" title="下载 MIDI .mid（只带音，不带词；给库乐队/FL/Cubase 换乐器、加伴奏用）">MIDI</button>
-        <button class="mini stampd" title="对这一稿存证：生成可独立验证的证据压缩包（简谱图片＋规范作品文件＋存证卡＋创作过程记录＋时间戳都在里面）">🛡 存证</button>
-        <button class="mini del" title="删除这一稿（会先问一次）">删除</button>
+        <button class="mini stampd" title="对这一稿存证：生成可独立验证的证据压缩包（简谱图片＋规范作品文件＋存证卡＋创作过程记录（项目全程）＋时间戳都在里面）">🛡 存证</button>
+        <button class="mini del" title="删除这一稿（会先问一次；改动记录不删）">删除</button>
       </div>
       <div class="jp"></div>
     </div>`;
@@ -1694,12 +1938,15 @@ function renderDrafts(){
 
     el.querySelector('.del').onclick = function(){
       armConfirm(this, '确认删?', () => {
+        const p2 = curProj();
         saveDrafts(loadDrafts().filter(x => x.id !== id));
+        if (p2 && p2.finalDraftId === id){ p2.finalDraftId = null; saveProjs(); }
         flashTip('已删除草稿「' + d.name + '」');
-        renderDrafts();
+        renderDrafts(); renderProjSel();
       });
     };
 
+    el.querySelector('.fin').onclick = () => toggleFinal(d);
     el.querySelector('.dname').onclick = () => openDraft(id);
     el.querySelector('.dl').onclick = () => downloadDraft(id);
     el.querySelector('.png').onclick = () => exportJianpuPNG(id);
@@ -1708,10 +1955,30 @@ function renderDrafts(){
   });
 }
 
+/* ★ 定稿：项目内同一时间只有一份，可换、可取消（存证包按它写「定稿」与「定稿后试改」） */
+function toggleFinal(d){
+  const p = ensureCurrentProj();
+  const all = loadDrafts();
+  if (p.finalDraftId === d.id){
+    d.final = false; p.finalDraftId = null;
+    flashTip('已取消定稿标记');
+  } else {
+    all.forEach(x => { if (x.projectId === p.id) x.final = false; });
+    d.final = true; p.finalDraftId = d.id;
+    flashTip('★ 已把「' + d.name + '」标为「' + p.name + '」的定稿——存证任何一稿时，包里都会写明定稿是哪份、定稿后又试改了什么');
+  }
+  try { saveDrafts(all); } catch(e){}
+  saveProjs(); renderDrafts();
+}
+
 /* 点草稿名字：放回画布 + 展开简谱（简谱数字正对它唱的那个字） */
 function openDraft(id){
   const d = loadDrafts().find(x => x.id === id);
   if (!d) return;
+  /* v1.44：草稿属于哪个立项就回到哪个立项（正常不会发生，导入/旧数据兜底） */
+  if (d.projectId && d.projectId !== _PID){
+    _PID = d.projectId; saveProjs(); renderProjSel();
+  }
   const same = S.cells.size > 0 && snapSign(dataSnapshot()) === snapSign(d.data);
   let backed = false;
   if (!same){
@@ -1743,21 +2010,26 @@ function expandOnly(id, d){
 $('btnDraft').onclick = () => {
   if (!S.cells.size) { flashTip('还没有音符，先画一段再存草稿'); return; }
   if (!STORAGE_OK) { flashTip('⚠️ 此环境禁用了本地存储，保存不会生效——请把本文件用系统浏览器打开后操作'); return; }
+  if (quotaFull()) { quotaBlockModal(); return; }
   askName('💾 保存草稿',
     '草稿 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}),
     name => {
       try {
+        const p = ensureCurrentProj();
         const list = loadDrafts();
         curWork();   /* 确保创作链存在，草稿记下它的编号与「记录到第几次」 */
         const item = { id: Date.now(), name: name,
           time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot(),
-          workId: _WID, revIdx: workRevCount() };
+          projectId: p.id, workId: _WID, revIdx: workRevCount() };
         list.unshift(item);
         saveDrafts(list);
-        renderDrafts();
+        renderDrafts(); renderProjSel();
         expandOnly(item.id, item);
         track('draft','保存', list.length);
-        flashTip('✓ 草稿「' + name + '」已保存（共 ' + list.length + ' 份）');
+        const q = quotaInfo();
+        flashTip('✓ 「' + p.name + '」第 ' + draftRank(p, item) + ' 稿「' + name + '」已保存（进行中草稿 ' + q.drafts + '/' + DRAFT_MAX + '）');
+        bkSchedule();
+        bkFallbackDownload();   /* 不支持自动备份文件夹的浏览器：每次手动保存后自动下载一份 .json */
       } catch(e) {
         flashTip('⚠️ 保存失败：环境禁用了本地存储——请用系统浏览器打开本文件再操作');
       }
@@ -1767,24 +2039,25 @@ $('btnDraft').onclick = () => {
 $('btnNew').onclick = function(){
   if (!S.cells.size) { flashTip('已经是新的一页，直接开画'); return; }
   if (!STORAGE_OK) { flashTip('⚠️ 此环境禁用了本地存储——新建前请先「⇩ 备份全部」或「💾 保存草稿」'); return; }
+  if (quotaFull()) { quotaBlockModal(); return; }
   armConfirm(this, '⚠ 再点一次：当前画面自动存草稿 → 清空开新页', () => {
     let ok = true;
     try {
+      const p = ensureCurrentProj();
       const list = loadDrafts();
       const name = '自动保存 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
       curWork();
       const item = { id: Date.now(), name: name, time: new Date().toLocaleString('zh-CN'), pts: Date.now(), data: dataSnapshot(),
-        workId: _WID, revIdx: workRevCount() };
-      list.unshift(item); saveDrafts(list); renderDrafts();
+        projectId: p.id, workId: _WID, revIdx: workRevCount() };
+      list.unshift(item); saveDrafts(list); renderDrafts(); renderProjSel();
       flashTip('✓ 已自动存为「' + name + '」');
+      bkSchedule();
+      bkFallbackDownload();
     } catch(e) { ok = false; }
     if (!ok) { flashTip('⚠️ 自动保存失败——已停止新建，请手动「💾 保存草稿」后再清空'); return; }
     undoStack.push(snapshot());
     S.cells.clear(); S.breaks.clear(); S.accs = {};
-    /* 新的一页 = 新的一条创作链，从空画布起笔（先换链再存，免得把清空记成上一首的「删 N 格」） */
-    _WID = newWorkId();
-    loadWorks()[_WID] = { start: nowStamp(), revs: [], base: dataSnapshot() };
-    trimWorks(); saveWorks();
+    /* v1.44：同一立项内开新页——记录不断、不重置；这次「清空」本身作为一条改动如实入记录 */
     updateRuns(); renderDecor(); updateStat(); saveLocal();
     track('canvas','新建');
   });
@@ -2153,9 +2426,20 @@ function ymd(){
   return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate());
 }
 
+/* v1.44 备份格式 version 2：草稿 + 立项 + 改动明细 + 定稿标记，一包全带走；
+   version 1（旧备份）也认——草稿自动归入当前立项 */
 function payloadOf(){
-  return { app: '画出原创乐曲', version: 1, exportedAt: new Date().toISOString(),
-           current: dataSnapshot(), drafts: loadDrafts() };
+  return { app: '画出原创乐曲', version: 2, exportedAt: new Date().toISOString(),
+           current: dataSnapshot(), drafts: loadDrafts(),
+           projects: loadProjs(), works: JSON.parse(JSON.stringify(_WORKS || {})) };
+}
+
+function projectPayload(p){
+  const w = loadWorks();
+  return { app: '画出原创乐曲', version: 2, type: 'project', exportedAt: new Date().toISOString(),
+    project: JSON.parse(JSON.stringify(p)), drafts: projDrafts(p.id),
+    works: (p.workIds || []).reduce((o, id) => { if (w[id]) o[id] = w[id]; return o; }, {}),
+    current: dataSnapshot() };
 }
 
 function openTransfer(mode){
@@ -2164,10 +2448,10 @@ function openTransfer(mode){
   openExport(isOut ? '⇩ 备份全部草稿' : '⇧ 导入草稿', `
     <div class="hint" style="margin:0 0 8px;line-height:1.75">
       ${isOut
-        ? `下面这段文字就是你的全部草稿（<b>${n} 份</b>＋当前画布）。点「复制这段文字」，<br>
+        ? `下面这段文字就是你的全部作品数据（<b>${n} 份草稿</b>＋全部立项＋改动记录＋当前画布）。点「复制这段文字」，<br>
            再到另一个网址点「⇧ 导入备份」把它粘进去就搬过去了。<br>
            <span style="color:#a33">注意：本机文件和线上网页是两个互不相通的仓库，a 里的草稿不会自动出现在 b 里。</span>`
-        : '把之前复制的那段文字粘到下面，点「导入」。也可以点「选备份文件…」直接选中之前另存的 .json 备份文件。重复的会自动跳过。'}
+        : '把之前复制的那段文字粘到下面，点「导入」。也可以点「选备份文件…」直接选中之前另存的 .json 备份文件（含自动备份文件夹里的 最新.json）。重复的自动跳过，立项与改动记录自动读回。'}
     </div>
     <textarea id="trBox" ${isOut ? 'readonly' : ''}
       placeholder="${isOut ? '' : '在这里粘贴备份文字（Ctrl+V）……'}"
@@ -2213,25 +2497,62 @@ function doImport(txt, msgEl){
   const say = s => { if (msgEl) msgEl.textContent = s; else flashTip(s); };
   let obj = null;
   try { obj = JSON.parse(String(txt).trim()); } catch(e){ say('⚠ 这段文字读不出来，可能没复制完整'); return; }
+  /* v1.44：立项与改动明细先落位（自动读回——备份文件夹的 最新.json 也走这条路） */
+  let addedProjects = 0, addedWorks = 0;
+  if (obj && obj.project && obj.project.id){
+    const ps = loadProjs();
+    if (!ps.some(x => x.id === obj.project.id)){ ps.push(obj.project); addedProjects++; }
+    saveProjs();
+  }
+  if (obj && Array.isArray(obj.projects)){
+    const ps = loadProjs();
+    obj.projects.forEach(p => {
+      if (!p || !p.id) return;
+      if (!ps.some(x => x.id === p.id)){ ps.push(p); addedProjects++; }
+      else { /* 同名立项存在：保留本地，不覆盖（防半截数据写坏） */ }
+    });
+    saveProjs();
+  }
+  if (obj && obj.works && typeof obj.works === 'object'){
+    const w = loadWorks();
+    Object.keys(obj.works).forEach(k => {
+      if (!w[k]){ w[k] = obj.works[k]; addedWorks++; }
+      else if (obj.works[k] && (obj.works[k].revs || []).length > (w[k].revs || []).length){ w[k] = obj.works[k]; addedWorks++; }
+    });
+    saveWorks();
+  }
   let incoming = obj && obj.drafts ? obj.drafts : (Array.isArray(obj) ? obj : []);
   if (!incoming.length && obj && obj.cells){ incoming = [{ name: obj.name || '导入的草稿', data: obj }]; }
-  if (!incoming.length){ say('⚠ 里面没有找到草稿'); return; }
+  if (!incoming.length && !addedProjects && !addedWorks){ say('⚠ 里面没有找到草稿'); return; }
   const list = loadDrafts();
   let added = 0, skipped = 0;
+  const homePid = (obj && obj.project && obj.project.id) ? obj.project.id : _PID;
   incoming.forEach(d => {
     if (!d || !d.data || !d.data.cells) { skipped++; return; }
     const sig = snapSign(d.data);
     if (list.some(x => snapSign(x.data) === sig)) { skipped++; return; }
     const useId = (d.id && !list.some(x => x.id === d.id)) ? d.id : Date.now() + Math.floor(Math.random()*9999);
-    list.unshift({ id: useId, name: d.name || '导入的草稿', time: d.time || '', pts: Date.now(), data: d.data });
+    /* 归属：带 projectId 就照它来（对应立项已在上一步落位）；旧备份没带 → 归当前立项 */
+    const pid = d.projectId || homePid;
+    list.unshift({ id: useId, name: d.name || '导入的草稿', time: d.time || '', pts: d.pts || Date.now(), data: d.data,
+      projectId: pid, workId: d.workId || null, revIdx: typeof d.revIdx === 'number' ? d.revIdx : 0, final: !!d.final });
+    const p = projById(pid);
+    if (p){
+      if (p.workIds.indexOf(d.workId || '') < 0 && d.workId) p.workIds.push(d.workId);
+      if (d.final) p.finalDraftId = useId;
+    }
     added++;
   });
+  saveProjs();
   if (added){
     try { saveDrafts(list); }
     catch(e){ say('⚠ 保存失败：这个环境禁用了本地存储'); return; }
   }
-  renderDrafts();
-  say('✓ 导入 ' + added + ' 份' + (skipped ? '，跳过 ' + skipped + ' 份（重复或无音符）' : '') + '——关掉这个框就能看到');
+  renderDrafts(); renderProjSel();
+  say('✓ 导入 ' + added + ' 份草稿'
+    + (addedProjects ? '、' + addedProjects + ' 个立项' : '')
+    + (addedWorks ? '、' + addedWorks + ' 条改动记录' : '')
+    + (skipped ? '，跳过 ' + skipped + ' 份（重复或无音符）' : '') + '——关掉这个框就能看到');
   if (msgEl) setTimeout(() => { $('overlay').classList.remove('show'); }, 1100);
 }
 
@@ -2246,6 +2567,287 @@ $('fileRestore').onchange = e => {
   }
   e.target.value = '';
 };
+
+/* ================= v1.44 立项：选择器 / 管理 / 结项 / 回收站 ================= */
+function renderProjSel(){
+  const sel = $('projSel');
+  if (!sel) return;
+  const ps = loadProjs().filter(p => p.status !== 'trashed');
+  const order = ps.slice().sort((a, b) =>
+    (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1) || String(b.created).localeCompare(String(a.created)));
+  const label = p => {
+    const n = projDrafts(p.id).length;
+    const st = p.status === 'active' ? '' : p.status === 'paused' ? '（搁置）' : '（已结项）';
+    const fin = p.finalDraftId ? ' ★' : '';
+    return p.name + ' · ' + n + ' 稿' + fin + st;
+  };
+  sel.innerHTML = order.map(p =>
+    '<option value="' + esc(p.id) + '"' + (p.id === _PID ? ' selected' : '') + '>' + esc(label(p)) + '</option>').join('');
+  updateQuotaBadge();
+}
+
+$('projSel').onchange = () => switchProj($('projSel').value);
+function switchProj(pid){
+  if (!pid || pid === _PID){ renderProjSel(); return; }
+  const p = projById(pid);
+  if (!p){ renderProjSel(); return; }
+  flushWorkRevNow();
+  if (S.cells.size){
+    /* 先把当前画面存进旧立项（同内容不重复存），再切——画布内容不串项目 */
+    autoBackup('切换前');
+  }
+  if (S.cells.size){
+    undoStack.push(snapshot());
+    S.cells.clear(); S.breaks.clear(); S.accs = {};
+    const w = loadWorks();
+    if (_WID && w[_WID]){ w[_WID].base = dataSnapshot(); saveWorks(); }   /* 旧链 base 归零，画布已存稿，无内容丢失 */
+  }
+  _PID = pid;
+  const p2 = ensureCurrentProj();
+  saveProjs();
+  const w2 = loadWorks();
+  if (_WID && w2[_WID]){ w2[_WID].base = dataSnapshot(); saveWorks(); }
+  updateRuns(); renderDecor(); updateStat(); saveLocal();
+  renderProjSel(); renderDrafts();
+  flashTip('已切换到「' + p2.name + '」——草稿箱只显示这个作品的稿');
+}
+
+$('btnProjNew').onclick = () => {
+  const q = quotaInfo();
+  if (q.projects >= PROJ_MAX){
+    openExport('🏷 进行中项目已满（' + PROJ_MAX + ' 个）', `
+      <div style="line-height:1.9;max-width:500px">
+        <p>同时进行中的作品最多 <b>${PROJ_MAX}</b> 个。先把一个旧作品<b>结项</b>（做完、存好证）或<b>搁置</b>（先放一放），再开新的。</p>
+        <div class="row" style="margin-top:12px">
+          <button class="mini primary" id="pnMgr">打开项目管理</button>
+          <button class="mini" id="pnClose">知道了</button>
+        </div>
+      </div>`);
+    $('pnMgr').onclick = () => { $('overlay').classList.remove('show'); openProjMgr(); };
+    $('pnClose').onclick = () => $('overlay').classList.remove('show');
+    return;
+  }
+  askName('🎵 新建立项——一个作品一个立项，草稿、定稿、改动记录都挂在它名下',
+    '作品 ' + new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}),
+    name => {
+      flushWorkRevNow();
+      if (S.cells.size) autoBackup('立项前');
+      if (S.cells.size){ undoStack.push(snapshot()); S.cells.clear(); S.breaks.clear(); S.accs = {}; }
+      const p = makeProj(name);
+      _PID = p.id;
+      saveProjs();
+      _WID = p.workIds[0];
+      const w = loadWorks();
+      if (!w[_WID]) w[_WID] = { start: nowStamp(), revs: [], base: dataSnapshot() };
+      else w[_WID].base = dataSnapshot();
+      saveWorks();
+      updateRuns(); renderDecor(); updateStat(); saveLocal();
+      renderProjSel(); renderDrafts();
+      flashTip('✓ 已立项「' + name + '」——从这一笔起，每一步改动都记在这个作品名下');
+    });
+};
+
+$('btnProjMgr').onclick = () => openProjMgr();
+
+function openProjMgr(){
+  const ps = loadProjs();
+  const stBadge = s => s === 'active' ? '<span style="color:#15803d">进行中</span>'
+    : s === 'paused' ? '<span style="color:#b45309">搁置</span>'
+    : s === 'done' ? '<span style="color:#666">已结项</span>'
+    : '<span style="color:#8b2f2f">回收站</span>';
+  const finMark = p => p.finalDraftId ? '<span style="color:#b45309">★已标定稿</span>' : '';
+  const row = p => {
+    const n = projDrafts(p.id).length;
+    const acts = [];
+    if (p.status !== 'trashed'){
+      acts.push('<button class="mini pick" data-id="' + p.id + '">打开</button>');
+      acts.push('<button class="mini rn" data-id="' + p.id + '">改名</button>');
+      if (p.status === 'active'){
+        acts.push('<button class="mini done" data-id="' + p.id + '">结项</button>');
+        acts.push('<button class="mini pz" data-id="' + p.id + '">搁置</button>');
+      } else {
+        acts.push('<button class="mini re" data-id="' + p.id + '">重开</button>');
+      }
+      acts.push('<button class="mini del" data-id="' + p.id + '" title="连人带稿移入回收站（记录保留，30 天内意思上可随时恢复——本版不设自动清空）">移入回收站</button>');
+    } else {
+      acts.push('<button class="mini re" data-id="' + p.id + '">恢复</button>');
+    }
+    return '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px dashed var(--line)">'
+      + '<b>' + esc(p.name) + '</b>' + finMark(p) + ' <span style="color:var(--muted);font-size:12.5px">' + n + ' 稿 · ' + esc((p.created || '').slice(0, 10)) + ' 起 · ' + stBadge(p.status) + '</span>'
+      + '<span class="sp" style="flex:1"></span>' + acts.join(' ') + '</div>';
+  };
+  const main = ps.filter(p => p.status !== 'trashed');
+  const trash = ps.filter(p => p.status === 'trashed');
+  openExport('🗂 项目管理——' + main.length + ' 个作品' + (trash.length ? '（回收站 ' + trash.length + '）' : ''), `
+    <div style="max-width:640px;max-height:60vh;overflow:auto;line-height:1.6">
+      <p class="hint" style="margin:0 0 8px">结项 = 作品告一段落：它的草稿不再占「50 份」配额（记录完整保留，可重开续写）。
+        搁置 = 先放一放，同样不占进行中名额。移入回收站不删任何数据。</p>
+      ${main.map(row).join('') || '<p class="hint">还没有项目。</p>'}
+      ${trash.length ? '<h3 style="font-size:14px;margin:14px 0 4px">🗑 回收站</h3>' + trash.map(row).join('') : ''}
+      <div class="row" style="margin-top:12px"><button class="mini" id="pmClose">关闭</button></div>
+    </div>`);
+  $('pmClose').onclick = () => $('overlay').classList.remove('show');
+  const find = id => projById(id);
+  const rerender = () => { $('overlay').classList.remove('show'); openProjMgr(); renderProjSel(); renderDrafts(); };
+  document.querySelectorAll('#exbody .pick').forEach(b => b.onclick = () => { $('overlay').classList.remove('show'); switchProj(b.dataset.id); });
+  document.querySelectorAll('#exbody .rn').forEach(b => b.onclick = () => {
+    const p = find(b.dataset.id); if (!p) return;
+    $('overlay').classList.remove('show');
+    askName('✏️ 改名（改动记录、草稿归属不变）', p.name, n => { p.name = n; saveProjs(); renderProjSel(); renderDrafts(); });
+  });
+  document.querySelectorAll('#exbody .done').forEach(b => b.onclick = () => { const p = find(b.dataset.id); if (p) openFinishProj(p); });
+  document.querySelectorAll('#exbody .pz').forEach(b => b.onclick = () => {
+    const p = find(b.dataset.id); if (!p) return;
+    p.status = 'paused'; saveProjs(); rerender();
+    flashTip('「' + p.name + '」已搁置——不占进行中名额，随时重开');
+  });
+  document.querySelectorAll('#exbody .re').forEach(b => b.onclick = () => {
+    const p = find(b.dataset.id); if (!p) return;
+    if (p.status !== 'trashed' && quotaInfo().projects >= PROJ_MAX && p.status !== 'paused'){
+      flashTip('进行中已满 ' + PROJ_MAX + ' 个——先结项/搁置一个再重开'); return;
+    }
+    if (p.status === 'trashed' && quotaInfo().projects >= PROJ_MAX){
+      flashTip('进行中已满 ' + PROJ_MAX + ' 个——先结项/搁置一个再恢复'); return;
+    }
+    p.status = 'active'; saveProjs(); rerender();
+    flashTip('「' + p.name + '」已重开为进行中');
+  });
+  document.querySelectorAll('#exbody .del').forEach(b => b.onclick = () => {
+    const p = find(b.dataset.id); if (!p) return;
+    armConfirm(b, '⚠ 连同草稿移入回收站?', () => {
+      p.status = 'trashed'; p.trashedAt = nowStamp(); saveProjs();
+      if (_PID === p.id) _PID = null;
+      rerender();
+      flashTip('「' + p.name + '」已移入回收站（数据未删，可恢复）');
+    });
+  });
+}
+
+/* 结项弹窗：先确认证据包在手，再结（8.7：包里应有 8 个文件，请先打开数一眼） */
+function openFinishProj(p){
+  const n = projDrafts(p.id).length;
+  openExport('🏁 结项「' + esc(p.name) + '」', `
+    <div style="line-height:1.9;max-width:520px">
+      <p>结项后：这个作品的 <b>${n} 份草稿</b>不再占「50 份」配额，项目进入「已结项」名单；改动记录完整保留，随时可重开续写。</p>
+      <p style="background:#fff9ec;border:1px solid #d9bd85;border-radius:8px;padding:9px 12px">
+        <b>结项前请先保存好至少一样：</b><br>
+        ① 对定稿点过「🛡 存证」——<b>证据包解压后应有 8 个文件，请打开数一眼</b>；<br>
+        ② 或「⇩ 备份全部」导出的 .json 已放到你的备份文件夹。</p>
+      <label style="display:block;margin:10px 0"><input type="checkbox" id="finOk"> 我确认已保存（证据包/备份文件在我手上）</label>
+      <div class="row"><button class="mini primary" id="finGo">确认结项</button><button class="mini" id="finCancel">取消</button></div>
+    </div>`);
+  $('finGo').onclick = () => {
+    if (!$('finOk').checked){ flashTip('请先勾选「我确认已保存」——结项不删数据，但别把唯一一份留在浏览器里'); return; }
+    p.status = 'done'; p.finishedAt = nowStamp(); saveProjs();
+    $('overlay').classList.remove('show');
+    renderProjSel(); renderDrafts(); updateQuotaBadge();
+    flashTip('✓ 「' + p.name + '」已结项——草稿不再占配额，记录完整保留');
+  };
+  $('finCancel').onclick = () => $('overlay').classList.remove('show');
+}
+
+/* ================= v1.44 自动备份文件夹（File System Access API） =================
+   选一次文件夹，之后每次保存自动写「项目名/最新.json」，存证另存「历史/时间戳.json」。
+   浏览器被清空也能从硬盘找回——这是「我们没弄丢你东西」唯一的物理依据。
+   Safari/Firefox/手机不支持：降级为每次手动保存后自动下载一份 .json。 */
+let _bkHandle = null, _bkPerm = 'prompt', _bkLast = '', _bkErr = '', _bkTimer = null, _bkBusy = false;
+function bkSupported(){ return typeof window.showDirectoryPicker === 'function'; }
+async function bkRestoreHandle(){
+  if (!bkSupported()) return;
+  try {
+    const h = await idbGet('bkFolder');
+    if (h){
+      _bkHandle = h;
+      try { _bkPerm = await h.queryPermission({ mode: 'readwrite' }); } catch(e){ _bkPerm = 'prompt'; }
+    }
+  } catch(e){}
+  renderBkCard();
+}
+async function bkPickFolder(){
+  if (!bkSupported()){ flashTip('这个浏览器不支持自动备份文件夹（需要电脑版 Edge/Chrome）——离开前点「⇩ 备份全部」最稳'); return; }
+  let h;
+  try { h = await window.showDirectoryPicker({ id: 'hycyg-bk', mode: 'readwrite' }); }
+  catch(e){ return; }   /* 用户取消 */
+  _bkHandle = h; _bkPerm = 'granted'; _bkErr = '';
+  try { await idbSet('bkFolder', h); } catch(e){}
+  await bkWriteLatest(true);
+  flashTip('✓ 自动备份已开启——以后每次保存自动写进「' + esc(h.name || '所选文件夹') + '」里的 项目名/最新.json');
+}
+async function bkEnsurePerm(){
+  if (!_bkHandle) return false;
+  if (_bkPerm === 'granted') return true;
+  try { _bkPerm = await _bkHandle.requestPermission({ mode: 'readwrite' }); } catch(e){ return false; }
+  renderBkCard();
+  return _bkPerm === 'granted';
+}
+async function bkWriteLatest(){
+  if (!_bkHandle || _bkBusy) return;
+  _bkBusy = true;
+  try {
+    if (!await bkEnsurePerm()) return;
+    const p = curProj() || ensureCurrentProj();
+    const dir = await _bkHandle.getDirectoryHandle(safeName(p.name), { create: true });
+    const fh = await dir.getFileHandle('最新.json', { create: true });
+    const wr = await fh.createWritable();
+    await wr.write(JSON.stringify(projectPayload(p)));
+    await wr.close();
+    _bkLast = nowStamp(); _bkErr = '';
+  } catch(e){ _bkErr = String((e && e.message) || e); }
+  _bkBusy = false;
+  renderBkCard();
+}
+function bkSchedule(){
+  if (!_bkHandle) return;
+  clearTimeout(_bkTimer);
+  _bkTimer = setTimeout(bkWriteLatest, 15000);
+}
+async function bkWriteEvidence(fp, title, zipHint){
+  if (!_bkHandle) return;
+  try {
+    const p = curProj() || ensureCurrentProj();
+    const dir = await _bkHandle.getDirectoryHandle(safeName(p.name), { create: true });
+    const his = await dir.getDirectoryHandle('历史', { create: true });
+    const fh = await his.getFileHandle('存证_' + Date.now() + '.json', { create: true });
+    const wr = await fh.createWritable();
+    await wr.write(JSON.stringify({ app: '画出原创乐曲', version: 2, type: 'evidence',
+      project: p.name, title: title || '', fingerprint: fp, at: nowStamp(), zip: zipHint || '' }));
+    await wr.close();
+    _bkLast = nowStamp();
+    renderBkCard();
+  } catch(e){}
+}
+/* 降级：不支持目录授权的浏览器，手动保存草稿后自动下载一份 .json 到「下载」文件夹 */
+function bkFallbackDownload(){
+  if (bkSupported()) return;   /* 支持自动备份文件夹的环境走写盘，不用下载 */
+  if (quotaFull()) return;
+  const ok = tryDownload('画出原创乐曲_自动备份_' + ymd() + '.json',
+    new Blob([JSON.stringify(payloadOf())], { type: 'application/json' }));
+  if (ok) flashTip('已自动下载一份备份 .json——请把它挪到一个固定文件夹留存');
+}
+function renderBkCard(){
+  const el = $('bkCard');
+  if (!el) return;
+  if (!bkSupported()){
+    el.innerHTML = '<span title="Safari/Firefox/手机不支持自动备份文件夹；Edge/Chrome 支持">💾 自动备份：此浏览器不支持——每次保存已自动下载备份 .json</span>';
+    return;
+  }
+  if (!_bkHandle){
+    el.innerHTML = '<button class="mini" id="btnBkFolder" title="选一个你电脑上的文件夹，之后每次保存自动写入 项目名/最新.json——浏览器被清空也能从硬盘找回">💾 开启自动备份</button><span style="color:var(--muted)">还没开——选一次文件夹，之后全自动</span>';
+    const b = $('btnBkFolder');
+    if (b) b.onclick = bkPickFolder;
+    return;
+  }
+  if (_bkPerm !== 'granted'){
+    el.innerHTML = '<button class="mini" id="btnBkFolder">💾 恢复自动备份连接</button><span style="color:var(--muted)">浏览器重启后点一下重新授权</span>';
+    const b = $('btnBkFolder');
+    if (b) b.onclick = async () => { if (!await bkEnsurePerm()) bkPickFolder(); };
+    return;
+  }
+  const day = _bkLast && _bkLast.slice(0, 10) === nowStamp().slice(0, 10) ? '今天 ' + _bkLast.slice(11, 16) : _bkLast;
+  el.innerHTML = '<span style="color:#15803d">💾 已自动备份到「' + esc(_bkHandle.name || '所选文件夹') + '」</span>'
+    + (day ? ' · ' + esc(day) : '')
+    + (_bkErr ? ' · <span style="color:#8b2f2f" title="' + esc(_bkErr) + '">上次写入失败</span>' : '');
+}
 
 function hardConfirmDelete(id, name, btn){
   armConfirm(btn, '确认删?', () => {
@@ -2325,7 +2927,16 @@ TKEYS.forEach(k => {
 /* ---------- 使用方法（原来堆在左侧的说明，全部收进这里） ---------- */
 function guideHTML(){
   return `<div class="guide">
-  <h3 class="gsec gold">🎁 先说你能得到什么</h3>
+  <h3 class="gsec gold">🗂 先立项——一个作品一个立项</h3>
+  <ul>
+    <li>顶栏「作品」下拉就是你的立项（作品档案）：<b>草稿、定稿、每一步改动记录都挂在立项名下</b>，不挂在某一稿上——所以 10 稿里选第 5 稿当定稿，第 6–10 稿的痕迹照样在，存证时全部如实写进《创作过程记录》。</li>
+    <li>「＋新建立项」＝开一个新作品：起好名字、清空画布、从零开始记录。同一立项里「✚ 新建」开新页<b>不会</b>另起记录——记录不断。</li>
+    <li>每份草稿有<b>「第 N 稿」编号</b>（按保存时间排）；点「★ 定稿」把某一稿标为定稿（可换、可取消）。存证包里会写明：定稿是哪份、定稿之后又试改了什么（单列一节，不影响定稿文本）。</li>
+    <li>配额：进行中作品最多 <b>5 个</b>；进行中作品的草稿总量最多 <b>50 份</b>（跨作品合计，单项不限）。顶栏常驻余量，45 份起转金提醒，50 份要「结项一个旧作品」或「删掉旧草稿」才能再存。「管理」里可改名 / 结项 / 搁置 / 重开 / 移入回收站（不删数据，可恢复）。</li>
+    <li>点草稿名字放回画布时，原画面会自动存一份「⟲ 自动备份」草稿，绝不静默丢稿。</li>
+  </ul>
+
+  <h3 class="gsec gold">🎁 再说你能得到什么</h3>
   <ul>
     <li><b>一份你亲手作出来的旋律谱</b>——格子上每个音都是你自己放的，照着就能唱、能听、能改。</li>
     <li><b>全套文件带走</b>：简谱图片（可直接打印 / 交登记材料）、乐谱 .musicxml、MIDI。</li>
@@ -2366,11 +2977,12 @@ function guideHTML(){
 
   <h3 class="gsec">💾 你的作品存在哪（重要，请看一眼）</h3>
   <ul>
-    <li>你画的每个音、贴的每句词，都存在<b>你这台电脑的这个浏览器</b>里，<b>不上传，我们看不到</b>。</li>
-    <li>所以：<b>关浏览器、重启电脑，东西都还在</b>；换一台电脑、换一个浏览器，就<b>看不到</b>——这不是丢了，是本来只在那一台里。</li>
-    <li><b>要长期留住，就一条</b>：离开前点「⇩ 备份全部」，会导出一个 .json 存到你电脑上；换地方点「⇧ 导入备份」选它，草稿全回来。</li>
+    <li>你画的每个音、贴的每句词、每一步改动记录，都存在<b>你这台电脑的这个浏览器</b>里（草稿在本地存储、<b>改动明细在 IndexedDB</b>——比老式存储更能装、更不容易被挤掉），<b>不上传，我们看不到</b>。</li>
+    <li>所以：<b>关浏览器、重启电脑，东西都还在</b>；换一台电脑、换一个浏览器，就<b>看不到</b>——这不是丢了，是本来只在那一台里。跟登录没关系：不登录在、登录也在、退出还在；登录只用来查存证台账。</li>
+    <li><b>最稳的一条：开「💾 自动备份」</b>——顶栏右边点一下，选一个你电脑上的文件夹，之后每次保存自动写入 <b>项目名/最新.json</b>，每次存证另存一份到 <b>历史/</b>。浏览器被清空也能从硬盘找回（支持电脑版 Edge/Chrome）。</li>
+    <li>没开自动备份时：离开前点「⇩ 备份全部」导出 .json 存到你电脑上；换地方点「⇧ 导入备份」选它，草稿、立项、改动记录全回来。</li>
     <li>每次存证，证据包会自动<b>下载到你「下载」文件夹</b>——那个 zip 才是要长期留的东西。</li>
-    <li>我们服务器上<b>只有一串指纹（64 个字符）和作品名</b>，<b>没有你的音符和歌词</b>。登录只用来查存证台账。</li>
+    <li>我们服务器上<b>只有一串指纹（64 个字符）和作品名</b>，<b>没有你的音符和歌词</b>。</li>
     <li>浏览器里是<b>工作台，不是保险箱</b>：清缓存、换浏览器会空。空了也不等于证据没了——包在你硬盘上，指纹在时间戳里，两边一对就能证明。</li>
   </ul>
 
@@ -2380,10 +2992,11 @@ function guideHTML(){
 
   <h3 class="gsec">🔄 换电脑了，或者草稿突然不见了，怎么办</h3>
   <ul>
-    <li><b>换新电脑接着写</b>：把之前「⇩ 备份全部」导出的 .json 拷到新电脑 → 打开本页 → 点「⇧ 导入备份」选它 → 草稿回来。</li>
-    <li><b>浏览器清空了 / 换了个浏览器</b>：同上，点「⇧ 导入备份」。如果一次都没备份过，那台机器上的草稿就找不回来了——这是浏览器存储的硬限制，我们不藏这个风险。</li>
+    <li><b>首选：备份文件夹的 最新.json</b>——开了「💾 自动备份」的，每个作品文件夹里都有 <b>项目名/最新.json</b>（永远是最新的）和 <b>历史/</b>（每次存证的记录）。把它拷到新电脑 → 打开本页 → 点「⇧ 导入备份」选它 → <b>草稿、立项、定稿标记、改动记录一起回来</b>（自动识别，重复的跳过）。</li>
+    <li><b>没开自动备份的</b>：把之前「⇩ 备份全部」导出的 .json 拷过去，同样「⇧ 导入备份」选它。</li>
+    <li><b>浏览器清空了 / 换了个浏览器</b>：同上，点「⇧ 导入备份」。如果一次都没备份过，那台机器上的草稿就找不回来了——这是浏览器存储的硬限制，我们不藏这个风险，所以请现在就点顶栏的「💾 开启自动备份」。</li>
     <li><b>手上只有当初的存证包</b>：解压 → 用「⇧ 导入备份」选里面的 <b>5_创作过程记录.json</b>，草稿和改动记录一起回来。</li>
-    <li><b>正在做的一件事</b>：接下来会加「自动备份到你自己选的文件夹」——选一次文件夹，之后每次保存自动往你硬盘写一份，那时这一节就不用你手动点了。在它上线之前，<b>离开前点一下「⇩ 备份全部」是最稳的习惯</b>。</li>
+    <li>不走云端：你的作品内容从不进我们的服务器（云端只有指纹台账），换电脑靠备份文件搬过去。</li>
   </ul>
   </div>`;
 }
@@ -2416,6 +3029,15 @@ $('btnHelp').onclick = () => openExport('使用方法', guideHTML());
     $('sig').value = S.sig.join('/'); $('lyrics').value = S.lyricsText;
   }
   rebuild();
+  /* v1.44：立项初始化（老数据自动归入「未命名作品」立项，记录保留）+ 明细 IndexedDB 预载 */
+  loadWorks();
+  ensureCurrentProj();
+  renderProjSel();
+  renderBkCard();
+  bkRestoreHandle();
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+  /* 关页前把没结算的改动记上、把自动备份落盘（尽力而为） */
+  window.addEventListener('pagehide', () => { try { flushWorkRevNow(); if (_bkHandle) bkWriteLatest(); } catch(e){} });
   renderDrafts();
 })();
 
@@ -2678,7 +3300,7 @@ async function humAnalyse(){
 
 /* ---- 存证：指纹 + 哈希链 + OpenTimestamps + 存证卡 ---- */
 const CHAIN_KEY = 'hycyg_evchain';
-const APP_VER = 'v1.43';
+const APP_VER = 'v1.44';
 
 function loadChain(){ try { return JSON.parse(localStorage.getItem(CHAIN_KEY) || '[]'); } catch(e){ return []; } }
 function saveChain(list){ try { localStorage.setItem(CHAIN_KEY, JSON.stringify(list)); return true; } catch(e){ return false; } }
@@ -2714,13 +3336,16 @@ function buildCertCard(entry, chain, anchored, otsName, proc){
   const shown = runs.slice(0, 12);
   const procHtml = runs.length
     ? '<h3>创作过程记录（登记表「创作过程 / 修改情况」栏可直接使用）</h3>'
-      + '<p>本作品自 <b>' + esc(proc.start) + '</b> 开始创作，至 <b>' + esc(proc.end) + '</b> 定稿，其间共记录 <b>' + proc.total + ' 次修改</b>'
-      + (runs.length !== proc.total ? '（同类合并后 ' + runs.length + ' 个阶段）' : '') + '。以下记录由软件在创作过程中自动追加，非事后补写：</p>'
+      + '<p>本作品自 <b>' + esc(proc.start) + '</b> 开始创作，至 <b>' + esc(proc.end) + '</b>，其间共记录 <b>' + proc.total + ' 次修改</b>'
+      + (proc.mainTotal != null ? '（其中定稿前 ' + proc.mainTotal + ' 次' + (proc.afterTotal ? '，定稿后试改 ' + proc.afterTotal + ' 次' : '') + '）' : '')
+      + (runs.length !== proc.total ? '（同类合并后 ' + runs.length + ' 个阶段）' : '') + '。记录挂在立项「' + esc(proc.projName || '') + '」名下，涵盖该项目全部草稿；以下由软件在创作过程中自动追加，非事后补写：</p>'
       + '<ol style="font-size:14px">' + shown.map(r =>
           '<li>' + esc(rangeT(r)) + '　' + esc(r.d)
           + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : '') + '</li>').join('')
-      + (runs.length > shown.length ? '<li>……其余 ' + (runs.length - shown.length) + ' 个阶段见随包《5_创作过程记录.txt》</li>' : '') + '</ol>'
-      + '<p style="color:#666;font-size:12px">本记录逐条说明该作品如何一步步形成，不判定作品是否原创、也不做查重；<b>完整过程另存为独立文件《5_创作过程记录.html》</b>（含可直接填表的一段话与逐条明细）。' + (proc.cut ? '本存证对应草稿保存时的那一稿，之后的修改未计入。' : '') + '</p>'
+      + (runs.length > shown.length ? '<li>……其余 ' + (runs.length - shown.length) + ' 个阶段见随包《5_创作过程记录.txt》</li>' : '')
+      + (proc.afterTotal ? '<li>定稿后试改 ' + proc.afterTotal + ' 次——单列一节（不影响定稿文本），明细见随包《5_创作过程记录.html》</li>' : '') + '</ol>'
+      + '<p style="color:#666;font-size:12px">本记录逐条说明该作品如何一步步形成，不判定作品是否原创、也不做查重；<b>完整过程另存为独立文件《5_创作过程记录.html》</b>（含可直接填表的一段话与逐条明细）。'
+      + (proc.finalName ? '本项目定稿：「' + esc(proc.finalName) + '」（' + esc(proc.finalStamp || '') + ' 标为定稿）。' : '') + '</p>'
     : '<h3>创作过程记录</h3><p style="color:#666;font-size:13px">本稿没有过程记录（此功能自 v1.42 起记录；或该稿来自更早的版本）。从下一次起，画布每次改动都会被自动记录，存证时一并生成。</p>';
   return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>存证卡 ' + esc(entry.fp.slice(0, 12)) + '</title>'
   + '<style>body{font-family:system-ui,Microsoft YaHei,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222;line-height:1.7}h1{font-size:20px}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #bbb;padding:4px 6px;text-align:left}code{background:#f2f0e8;padding:1px 4px;word-break:break-all}button{padding:6px 14px}#r{font-weight:bold;margin:8px 0}</style></head><body>'
@@ -2731,6 +3356,7 @@ function buildCertCard(entry, chain, anchored, otsName, proc){
   + '<li><b>生成时间（本地）：</b>' + esc(entry.t) + '</li>'
   + '<li><b>独立时间锚定：</b>' + (anchored ? '已提交 OpenTimestamps（证明文件 ' + esc(otsName) + '，数小时内可经比特币区块链独立验证）' : '未完成（离线或日历不可达）——指纹与哈希链仍然有效，可稍后重新存证补锚定') + '</li>'
   + '<li><b>作者账号：</b>' + (entry.author ? '已登录 ' + esc(entry.author) + '（云端存证库有对应登记记录，可申请核对）' : '未登录（本地生成）——本卡证明「作品在此时已存在」，作者身份请结合账号/实名/版权登记使用') + '</li>'
+  + '<li><b>所属立项：</b>' + (entry.proj ? esc(entry.proj) + '（第 ' + entry.draftNo + ' 稿' + (entry.isFinal ? '，已标为定稿' : '') + '）' : '（未记录，旧版存证）') + '</li>'
   + '<li><b>调性/速度：</b>' + esc(entry.meta) + '</li>'
   + '</ul>'
   + '<h3>验证方法（不需要经过本软件，任何人都可独立完成）</h3>'
@@ -2745,7 +3371,7 @@ function buildCertCard(entry, chain, anchored, otsName, proc){
   + (entry.title ? '《' + esc(entry.title) + '》' : '本作品')
   + '为本人独立创作的音乐作品，完成于 ' + esc(entry.t) + '（北京时间，与随附时间戳证明一致）。'
   + '旋律由本人在「画出原创乐曲」网页工具中亲手绘制（或哼唱/乐器弹奏后逐音修改）定稿，歌词为本人创作；'
-  + (proc && proc.total ? '创作期间共修改 ' + proc.total + ' 次（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + '），修改情况见本卡「创作过程记录」。' : '')
+  + (proc && proc.total ? '创作期间共修改 ' + (proc.mainTotal != null ? proc.mainTotal : proc.total) + ' 次（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + (proc.finalStamp ? '，' + esc(proc.finalStamp) + ' 定稿' : '') + '），修改情况见本卡「创作过程记录」。' : '')
   + '词曲一体对齐关系固化于随附规范作品文件中（SHA-256 指纹 ' + esc(entry.fp.slice(0, 16)) + '…）。'
   + '本人持有完整创作过程证据，作品未许可他人使用。</div>'
   + '<p style="color:#666;font-size:12px">以上为模板，请按实际情况核对修改后填入登记表；创作方式（绘制/哼唱/乐器弹奏）请如实选择表述。</p>'
@@ -2824,17 +3450,22 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
   }
   const draftRef = d;
   const dataSnap = d.data;
-  const proc = workRevsFor(d);
+  /* v1.44：记录挂在立项上——存证取「项目全程记录」，第 6~10 稿的痕迹不再丢 */
+  const proj = projById(d.projectId) || ensureCurrentProj();
+  const proc = workRevsForProject(proj);
+  const draftNo = draftRank(proj, d);
+  const isFinal = proj.finalDraftId === d.id;
   const procRuns = proc.revs.length ? mergeRuns(proc.revs) : [];
   const procBrief = procRuns.length
-    ? '已自动记录 <b>' + proc.total + ' 次修改</b>（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + '）——存证后会<b>单独生成一份《创作过程记录》文件</b>（双击打开，里面有一段可直接填进登记表「修改情况」栏的话），存证卡里同时留摘要：<br>'
+    ? '已自动记录 <b>' + proc.mainTotal + ' 次修改</b>（' + esc(proc.start) + ' 起至 ' + esc(proc.end) + (proc.finalStamp ? '，' + esc(proc.finalStamp) + ' 定稿' : '') + '）——记录挂在「' + esc(proj.name) + '」名下、<b>涵盖该项目全部草稿</b>（第 6~10 稿的痕迹不会丢）；存证后会<b>单独生成一份《创作过程记录》文件</b>（双击打开，里面有一段可直接填进登记表「修改情况」栏的话），存证卡里同时留摘要：<br>'
       + procRuns.slice(0, 3).map((r, i) => '<span style="color:#555">' + (i + 1) + '. ' + esc(rangeT(r)) + '　' + esc(r.d) + (r.count > 1 ? '（连续 ' + r.count + ' 次）' : '') + '</span>').join('<br>')
       + (procRuns.length > 3 ? '<br><span style="color:#888">…共 ' + procRuns.length + ' 个阶段，全部列在存证卡与随包记录里</span>' : '')
+      + (proc.afterTotal ? '<br><span style="color:#b45309">另有<b>定稿后试改 ' + proc.afterTotal + ' 次</b>，已完整计入明细（单列一节，不影响定稿文本）</span>' : '')
     : '这一稿<b>没有过程记录</b>（此功能自 v1.42 起记录，或本稿来自更早版本）。从现在起画布每次改动都会自动记一条，下次存证就会带上。';
   const canon = canonJSON(dataSnap);
   const nCells = new Set(dataSnap.cells).size;
   const lyCount = (dataSnap.lyricsText || '').replace(/\s/g, '').length;
-  const whatDesc = '草稿「' + draftRef.name + '」这一稿——' + nCells + ' 个音符格 · '
+  const whatDesc = '「' + proj.name + '」第 ' + draftNo + ' 稿' + (isFinal ? '（★ 定稿）' : '') + '——草稿「' + draftRef.name + '」：' + nCells + ' 个音符格 · '
     + NOTE_NAMES[dataSnap.root] + (dataSnap.mode === 'major' ? '大调' : '小调') + ' · ' + dataSnap.sig.join('/') + ' · ' + dataSnap.bpm + 'BPM · ' + dataSnap.measures + ' 小节'
     + (lyCount ? ' · 歌词 ' + lyCount + ' 字' : ' · （还没贴歌词）');
   openExport('🛡 作品存证——给这首曲子生成可独立验证的证据包', `
@@ -2864,6 +3495,7 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
         meta: (title ? title + ' · ' : '') + NOTE_NAMES[S.root] + (S.mode === 'major' ? '大调' : '小调') + ' · ' + S.sig.join('/') + ' · ' + S.bpm + 'BPM · ' + S.measures + '小节',
         ver: APP_VER };
       entry.title = title;
+      entry.proj = proj.name; entry.draftNo = draftNo; entry.isFinal = isFinal;
       entry.canonName = '2_规范作品文件.canon.json';   /* 存证卡验证步骤里引用包内文件名 */
       entry.author = maskId(_sessUser ? (_sessUser.phone || '') : '');
       chain.push(entry); saveChain(chain);
@@ -2875,9 +3507,10 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
       const enc = new TextEncoder();
       const zipFiles = [];
       zipFiles.push({ name: '0_请先读我.txt', u8: enc.encode(
-        '这份压缩包是这首作品的存证证据包，请整个留存好（建议网盘再备份一份）。\n'
+        '这是「' + proj.name + '」第 ' + draftNo + ' 稿' + (isFinal ? '（已标为定稿）' : '') + '的存证证据包，请整个留存好（建议网盘再备份一份）。\n'
         + '生成时间：' + tLocal + '\n'
         + (title ? '作品名称：' + title + '\n' : '')
+        + (proj.finalDraftId ? '本项目定稿：第 ' + draftNo + ' 稿「' + (isFinal ? draftRef.name : (loadDrafts().find(x => x.id === proj.finalDraftId) || {}).name || '') + '」\n' : '')
         + '作品指纹（SHA-256）：' + fp + '\n'
         + '\n包内文件（怎么打开）：\n'
         + '  1_简谱图片(作品样本).png —— 双击用看图软件打开。歌词逐字印在音符正下方。著作权登记时作为作品样本直接上传\n'
@@ -2907,9 +3540,10 @@ async function startStampFlow(d){   /* d＝草稿对象：对草稿箱里确定�
         zipFiles.push({ name: '5_创作过程记录.txt', u8: enc.encode(processTxt(title, proc)) });
         zipFiles.push({ name: '5_创作过程记录.json', u8: enc.encode(processJSON(title, proc)) });
       }
-      const zipName = '存证包_' + safeName(title || draftRef.name || '未命名') + '_'
+      const zipName = '存证包_' + safeName(proj.name) + '_第' + draftNo + '稿' + (isFinal ? '★定稿' : '') + '_'
         + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '.zip';
       tryDownload(zipName, buildZip(zipFiles));
+      bkWriteEvidence(fp, title || draftRef.name, zipName);   /* v1.44：开了自动备份就另存一份 存证记录到 历史/ */
       let cloudMsg = '';
       try{
         const c = cloudReady();
